@@ -1,4 +1,5 @@
 import { Eye, Wrench, SlidersHorizontal, Truck, Scale } from "lucide-react";
+import AnimatedSection, { AnimatedItem } from "./AnimatedSection";
 
 const advantages = [
   { icon: <Eye className="w-6 h-6" />, title: "Прозрачность", desc: "Фиксированные залоги, понятные договоры, никаких скрытых платежей" },
@@ -12,25 +13,24 @@ const WhyUsSection = () => {
   return (
     <section id="why-us" className="section-padding">
       <div className="container mx-auto">
-        <div className="text-center mb-16">
+        <AnimatedSection className="text-center mb-16">
           <p className="text-primary font-semibold text-sm tracking-widest uppercase mb-4">Преимущества</p>
           <h2 className="text-3xl md:text-5xl font-bold">
             Почему выбирают <span className="text-gradient-gold">3D Drive</span>
           </h2>
-        </div>
+        </AnimatedSection>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
-          {advantages.map((a) => (
-            <div
-              key={a.title}
-              className="bg-card-gradient gold-border rounded-xl p-6 text-center hover:gold-glow transition-shadow duration-500 group"
-            >
-              <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-primary/10 text-primary mb-4 group-hover:bg-primary/20 transition-colors">
-                {a.icon}
+          {advantages.map((a, i) => (
+            <AnimatedItem key={a.title} delay={i * 0.1}>
+              <div className="bg-card-gradient gold-border rounded-xl p-6 text-center hover:gold-glow transition-shadow duration-500 group h-full">
+                <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-primary/10 text-primary mb-4 group-hover:bg-primary/20 transition-colors">
+                  {a.icon}
+                </div>
+                <h3 className="font-bold text-sm mb-2">{a.title}</h3>
+                <p className="text-muted-foreground text-xs leading-relaxed">{a.desc}</p>
               </div>
-              <h3 className="font-bold text-sm mb-2">{a.title}</h3>
-              <p className="text-muted-foreground text-xs leading-relaxed">{a.desc}</p>
-            </div>
+            </AnimatedItem>
           ))}
         </div>
       </div>
