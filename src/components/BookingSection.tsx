@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { format } from "date-fns";
 import { ru } from "date-fns/locale";
-import { CalendarIcon, Car } from "lucide-react";
+import { CalendarIcon, Car, Shield, Gauge, UserCheck, Check } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
@@ -17,13 +17,21 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import AnimatedSection from "./AnimatedSection";
+import AnimatedSection, { AnimatedItem } from "./AnimatedSection";
 
 const cars = [
-  { value: "bmw-420i", label: "BMW 420i", price: "14 000" },
-  { value: "porsche-macan", label: "Porsche Macan", price: "12 000" },
-  { value: "mercedes-glb", label: "Mercedes GLB", price: "11 000" },
+  { value: "bmw-420i", label: "BMW 420i", price: 14000, deposit: 30000 },
+  { value: "porsche-macan", label: "Porsche Macan", price: 12000, deposit: 25000 },
+  { value: "mercedes-glb", label: "Mercedes GLB", price: 11000, deposit: 25000 },
 ];
+
+const extras = [
+  { id: "mileage", label: "Безлимитный пробег", price: 2000, icon: Gauge },
+  { id: "insurance", label: "Страховка КАСКО", price: 3000, icon: Shield },
+  { id: "driver", label: "Водитель", price: 5000, icon: UserCheck },
+];
+
+const PREPAY_PERCENT = 20;
 
 const BookingSection = () => {
   const [name, setName] = useState("");
@@ -31,6 +39,8 @@ const BookingSection = () => {
   const [car, setCar] = useState("");
   const [dateFrom, setDateFrom] = useState<Date>();
   const [dateTo, setDateTo] = useState<Date>();
+  const [selectedExtras, setSelectedExtras] = useState<string[]>([]);
+  const [agreed, setAgreed] = useState(false);
 
   const selectedCar = cars.find((c) => c.value === car);
   const days =
@@ -38,15 +48,37 @@ const BookingSection = () => {
       ? Math.max(1, Math.ceil((dateTo.getTime() - dateFrom.getTime()) / 86400000))
       : 0;
 
+  const extrasPerDay = selectedExtras.reduce((sum, id) => {
+    const extra = extras.find((e) => e.id === id);
+    return sum + (extra?.price ?? 0);
+  }, 0);
+
+  const baseCost = selectedCar ? selectedCar.price * days : 0;
+  const extrasCost = extrasPerDay * days;
+  const totalCost = baseCost + extrasCost;
+  const prepay = Math.round(totalCost * PREPAY_PERCENT / 100);
+  const remaining = totalCost - prepay;
+  const deposit = selectedCar?.deposit ?? 0;
+
+  const toggleExtra = (id: string) => {
+    setSelectedExtras((prev) =>
+      prev.includes(id) ? prev.filter((e) => e !== id) : [...prev, id]
+    );
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!name || !phone || !car || !dateFrom || !dateTo) return;
+    if (!name.trim() || !phone.trim() || !car || !dateFrom || !dateTo || !agreed) return;
 
     const carLabel = selectedCar?.label ?? car;
     const from = format(dateFrom, "dd.MM.yyyy");
     const to = format(dateTo, "dd.MM.yyyy");
+    const extrasText = selectedExtras.length
+      ? `\nОпции: ${selectedExtras.map((id) => extras.find((e) => e.id === id)?.label).join(", ")}`
+      : "";
+
     const text = encodeURIComponent(
-      `Бронирование с сайта 3D Drive\nИмя: ${name}\nТелефон: ${phone}\nАвтомобиль: ${carLabel}\nДаты: ${from} — ${to} (${days} сут.)`
+      `Бронирование с сайта 3D Drive\nИмя: ${name}\nТелефон: ${phone}\nАвтомобиль: ${carLabel}\nДаты: ${from} — ${to} (${days} сут.)${extrasText}\n\nИтого: ${totalCost.toLocaleString("ru-RU")} ₽\nПредоплата (${PREPAY_PERCENT}%): ${prepay.toLocaleString("ru-RU")} ₽\nОстаток при получении: ${remaining.toLocaleString("ru-RU")} ₽\nЗалог: ${deposit.toLocaleString("ru-RU")} ₽`
     );
     window.open(`https://wa.me/79868262332?text=${text}`, "_blank");
   };
@@ -56,6 +88,8 @@ const BookingSection = () => {
 
   const inputClass =
     "w-full bg-secondary border border-border rounded-lg px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary transition-colors";
+
+  const showSummary = selectedCar && days > 0;
 
   return (
     <section id="booking" className="section-padding">
@@ -72,8 +106,9 @@ const BookingSection = () => {
         <AnimatedSection delay={0.2}>
           <form
             onSubmit={handleSubmit}
-            className="max-w-2xl mx-auto bg-card-gradient gold-border rounded-2xl p-8 space-y-6"
+            className="max-w-2xl mx-auto bg-card-gradient gold-border rounded-2xl p-6 sm:p-8 space-y-6"
           >
+            {/* Car selection */}
             <div className="space-y-2">
               <label className="text-sm font-medium text-foreground">Автомобиль</label>
               <Select value={car} onValueChange={setCar}>
@@ -83,13 +118,14 @@ const BookingSection = () => {
                 <SelectContent>
                   {cars.map((c) => (
                     <SelectItem key={c.value} value={c.value}>
-                      {c.label} — от {c.price} ₽/сутки
+                      {c.label} — от {c.price.toLocaleString("ru-RU")} ₽/сутки
                     </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
             </div>
 
+            {/* Dates */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <label className="text-sm font-medium text-foreground">Дата начала</label>
@@ -153,18 +189,91 @@ const BookingSection = () => {
               </div>
             </div>
 
-            {selectedCar && days > 0 && (
-              <div className="flex items-center justify-between bg-secondary/50 rounded-lg px-4 py-3 text-sm">
-                <div className="flex items-center gap-2 text-muted-foreground">
-                  <Car className="h-4 w-4" />
-                  <span>{selectedCar.label} × {days} сут.</span>
+            {/* Extras */}
+            <div className="space-y-3">
+              <label className="text-sm font-medium text-foreground">Дополнительные опции</label>
+              {extras.map((extra) => {
+                const Icon = extra.icon;
+                const isSelected = selectedExtras.includes(extra.id);
+                return (
+                  <button
+                    key={extra.id}
+                    type="button"
+                    onClick={() => toggleExtra(extra.id)}
+                    className={cn(
+                      "w-full flex items-center gap-3 p-3 rounded-lg border text-left transition-all duration-200",
+                      isSelected
+                        ? "border-primary bg-primary/10"
+                        : "border-border bg-secondary/50 hover:border-muted-foreground/40"
+                    )}
+                  >
+                    <div
+                      className={cn(
+                        "w-5 h-5 rounded border flex items-center justify-center shrink-0 transition-colors",
+                        isSelected
+                          ? "bg-primary border-primary"
+                          : "border-muted-foreground/40"
+                      )}
+                    >
+                      {isSelected && <Check className="w-3 h-3 text-primary-foreground" />}
+                    </div>
+                    <Icon className={cn("w-4 h-4 shrink-0", isSelected ? "text-primary" : "text-muted-foreground")} />
+                    <span className={cn("text-sm flex-1", isSelected ? "text-foreground font-medium" : "text-muted-foreground")}>
+                      {extra.label}
+                    </span>
+                    <span className="text-xs text-muted-foreground whitespace-nowrap">
+                      +{extra.price.toLocaleString("ru-RU")} ₽/сут
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Price breakdown */}
+            {showSummary && (
+              <div className="bg-secondary/50 rounded-xl p-5 space-y-3">
+                <div className="flex items-center gap-2 mb-3">
+                  <Car className="h-4 w-4 text-primary" />
+                  <span className="text-sm font-semibold text-foreground">
+                    {selectedCar.label} × {days} сут.
+                  </span>
                 </div>
-                <span className="font-bold text-gradient-gold">
-                  от {(parseInt(selectedCar.price.replace(/\s/g, "")) * days).toLocaleString("ru-RU")} ₽
-                </span>
+
+                <div className="space-y-2 text-sm">
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Аренда</span>
+                    <span className="text-foreground">{baseCost.toLocaleString("ru-RU")} ₽</span>
+                  </div>
+                  {extrasCost > 0 && (
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">Доп. опции</span>
+                      <span className="text-foreground">{extrasCost.toLocaleString("ru-RU")} ₽</span>
+                    </div>
+                  )}
+                  <div className="border-t border-border pt-2 flex justify-between font-semibold">
+                    <span className="text-foreground">Итого</span>
+                    <span className="text-gradient-gold text-lg">{totalCost.toLocaleString("ru-RU")} ₽</span>
+                  </div>
+                </div>
+
+                <div className="border-t border-border pt-3 space-y-2 text-sm">
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Предоплата ({PREPAY_PERCENT}%)</span>
+                    <span className="text-primary font-semibold">{prepay.toLocaleString("ru-RU")} ₽</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Остаток при получении</span>
+                    <span className="text-foreground">{remaining.toLocaleString("ru-RU")} ₽</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Залог (возвратный)</span>
+                    <span className="text-foreground">{deposit.toLocaleString("ru-RU")} ₽</span>
+                  </div>
+                </div>
               </div>
             )}
 
+            {/* Contact */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <label className="text-sm font-medium text-foreground">Имя</label>
@@ -190,11 +299,31 @@ const BookingSection = () => {
               </div>
             </div>
 
+            {/* Agreement */}
+            <button
+              type="button"
+              onClick={() => setAgreed(!agreed)}
+              className="flex items-start gap-3 text-left w-full"
+            >
+              <div
+                className={cn(
+                  "w-5 h-5 rounded border flex items-center justify-center shrink-0 mt-0.5 transition-colors",
+                  agreed ? "bg-primary border-primary" : "border-muted-foreground/40"
+                )}
+              >
+                {agreed && <Check className="w-3 h-3 text-primary-foreground" />}
+              </div>
+              <span className="text-xs text-muted-foreground leading-relaxed">
+                Нажимая кнопку, вы соглашаетесь с условиями договора аренды и подтверждаете бронирование.
+              </span>
+            </button>
+
             <button
               type="submit"
-              className="w-full bg-gradient-gold text-primary-foreground py-3 rounded-lg font-semibold text-sm hover:opacity-90 transition-opacity"
+              disabled={!agreed || !car || !dateFrom || !dateTo || !name.trim() || !phone.trim()}
+              className="w-full bg-gradient-gold text-primary-foreground py-3.5 rounded-lg font-semibold text-sm hover:opacity-90 transition-opacity disabled:opacity-40 disabled:cursor-not-allowed"
             >
-              Забронировать через WhatsApp
+              Забронировать с предоплатой
             </button>
           </form>
         </AnimatedSection>
