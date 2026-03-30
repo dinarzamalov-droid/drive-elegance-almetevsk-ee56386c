@@ -50,7 +50,7 @@ const HeroSection = () => {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 animate-fade-up-delay-3">
             <a
-              href="#fleet"
+              href="#booking"
               className="bg-gradient-gold text-primary-foreground px-8 py-4 rounded-lg text-base font-bold hover:opacity-90 transition-opacity text-center"
             >
               Забронировать авто
