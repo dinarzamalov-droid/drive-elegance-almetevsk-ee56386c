@@ -42,9 +42,9 @@ const Footer = () => {
 
         <div className="border-t border-border mt-8 pt-8 flex flex-col md:flex-row items-center justify-between gap-4">
           <p className="text-xs text-muted-foreground">© 2026 3D Drive. Все права защищены.</p>
-          <a href="#" className="text-xs text-muted-foreground hover:text-primary transition-colors">
+          <Link to="/privacy-policy" className="text-xs text-muted-foreground hover:text-primary transition-colors">
             Политика конфиденциальности
-          </a>
+          </Link>
         </div>
       </div>
     </footer>
