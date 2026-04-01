@@ -362,19 +362,45 @@ const BookingSection = () => {
               </div>
             )}
 
-            {/* Contact */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {/* ФИО */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <div className="space-y-2">
-                <label className="text-sm font-medium text-foreground">Имя</label>
+                <label className="text-sm font-medium text-foreground">Фамилия *</label>
                 <input
                   type="text"
                   required
-                  placeholder="Ваше имя"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
+                  placeholder="Иванов"
+                  value={lastName}
+                  onChange={(e) => setLastName(e.target.value)}
                   className={inputClass}
                 />
               </div>
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-foreground">Имя *</label>
+                <input
+                  type="text"
+                  required
+                  placeholder="Иван"
+                  value={firstName}
+                  onChange={(e) => setFirstName(e.target.value)}
+                  className={inputClass}
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-foreground">Отчество *</label>
+                <input
+                  type="text"
+                  required
+                  placeholder="Иванович"
+                  value={middleName}
+                  onChange={(e) => setMiddleName(e.target.value)}
+                  className={inputClass}
+                />
+              </div>
+            </div>
+
+            {/* Телефон */}
+            <div className="grid grid-cols-1 gap-4">
               <div className="space-y-2">
                 <label className="text-sm font-medium text-foreground">Телефон</label>
                 <input
