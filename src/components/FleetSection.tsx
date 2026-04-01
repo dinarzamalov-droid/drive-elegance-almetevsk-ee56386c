@@ -9,6 +9,12 @@ import bmw5 from "@/assets/bmw-5.jpg";
 import porscheImg from "@/assets/porsche-macan.jpg";
 import mercedesImg from "@/assets/mercedes-glb.jpg";
 import lixiangImg from "@/assets/lixiang-l6.jpg";
+import lixiang1 from "@/assets/lixiang-1.jpg";
+import lixiang2 from "@/assets/lixiang-2.jpg";
+import lixiang3 from "@/assets/lixiang-3.jpg";
+import lixiang4 from "@/assets/lixiang-4.jpg";
+import lixiang5 from "@/assets/lixiang-5.jpg";
+import lixiang6 from "@/assets/lixiang-6.jpg";
 import AnimatedSection, { AnimatedItem } from "./AnimatedSection";
 
 const cars = [
