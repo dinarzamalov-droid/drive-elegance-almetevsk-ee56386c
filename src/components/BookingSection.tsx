@@ -271,9 +271,10 @@ const BookingSection = () => {
             {/* Extras */}
             <div className="space-y-3">
               <label className="text-sm font-medium text-foreground">Дополнительные опции</label>
-              {extras.map((extra) => {
+              {extrasConfig.map((extra) => {
                 const Icon = extra.icon;
                 const isSelected = selectedExtras.includes(extra.id);
+                const extraPrice = getExtraPrice(extra.id);
                 return (
                   <button
                     key={extra.id}
@@ -301,7 +302,7 @@ const BookingSection = () => {
                       {extra.label}
                     </span>
                     <span className="text-xs text-muted-foreground whitespace-nowrap">
-                      +{extra.price.toLocaleString("ru-RU")} ₽/сут
+                      +{extraPrice.toLocaleString("ru-RU")} ₽/сут
                     </span>
                   </button>
                 );
