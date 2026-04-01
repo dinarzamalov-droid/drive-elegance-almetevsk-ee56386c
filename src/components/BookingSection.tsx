@@ -47,7 +47,9 @@ const experienceOptions = [
 const PREPAY_PERCENT = 20;
 
 const BookingSection = () => {
-  const [name, setName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [middleName, setMiddleName] = useState("");
   const [phone, setPhone] = useState("");
   const [car, setCar] = useState(cars[0].value);
   const [age, setAge] = useState("21+");
