@@ -273,6 +273,43 @@ const BookingSection = () => {
               </div>
             </div>
 
+            {/* Discounts */}
+            <div className="space-y-3">
+              <label className="text-sm font-medium text-foreground">Скидки 🔥</label>
+              {[
+                { id: "birthday", label: "День рождения — скидка 10% на первые сутки", icon: Gift, checked: isBirthday, toggle: () => { setIsBirthday(!isBirthday); if (!isBirthday) setIsWedding(false); } },
+                { id: "wedding", label: "День свадьбы — скидка 10% на первые сутки", icon: Heart, checked: isWedding, toggle: () => { setIsWedding(!isWedding); if (!isWedding) setIsBirthday(false); } },
+              ].map((item) => {
+                const Icon = item.icon;
+                return (
+                  <button
+                    key={item.id}
+                    type="button"
+                    onClick={item.toggle}
+                    className={cn(
+                      "w-full flex items-center gap-3 p-3 rounded-lg border text-left transition-all duration-200",
+                      item.checked
+                        ? "border-primary bg-primary/10"
+                        : "border-border bg-secondary/50 hover:border-muted-foreground/40"
+                    )}
+                  >
+                    <div
+                      className={cn(
+                        "w-5 h-5 rounded border flex items-center justify-center shrink-0 transition-colors",
+                        item.checked ? "bg-primary border-primary" : "border-muted-foreground/40"
+                      )}
+                    >
+                      {item.checked && <Check className="w-3 h-3 text-primary-foreground" />}
+                    </div>
+                    <Icon className={cn("w-4 h-4 shrink-0", item.checked ? "text-primary" : "text-muted-foreground")} />
+                    <span className={cn("text-sm flex-1", item.checked ? "text-foreground font-medium" : "text-muted-foreground")}>
+                      {item.label}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+
             {/* Extras */}
             <div className="space-y-3">
               <label className="text-sm font-medium text-foreground">Дополнительные опции</label>
