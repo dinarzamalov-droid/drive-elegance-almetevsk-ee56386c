@@ -39,6 +39,7 @@ const Index = () => {
       <ContactSection />
       <PlansSection />
       <Footer />
+      <FloatingMessenger />
     </div>
   );
 };
