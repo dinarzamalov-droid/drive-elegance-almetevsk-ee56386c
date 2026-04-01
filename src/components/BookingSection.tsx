@@ -24,6 +24,7 @@ const cars = [
   { value: "bmw-420i", label: "BMW 420i", price: 14000, deposit: 30000 },
   { value: "porsche-macan", label: "Porsche Macan", price: 12000, deposit: 25000 },
   { value: "mercedes-glb", label: "Mercedes GLB", price: 11000, deposit: 25000 },
+  { value: "lixiang-l6", label: "LiXiang L6", price: 23000, deposit: 35000 },
 ];
 
 const extras = [
