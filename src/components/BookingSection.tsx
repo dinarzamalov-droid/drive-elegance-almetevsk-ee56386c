@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { format } from "date-fns";
 import { ru } from "date-fns/locale";
-import { CalendarIcon, Car, Shield, Gauge, UserCheck, Check, User, Clock, FileText } from "lucide-react";
+import { CalendarIcon, Car, Shield, Gauge, UserCheck, Check, User, Clock, FileText, Gift, Heart } from "lucide-react";
 import { generateContract } from "@/lib/generateContract";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -58,6 +58,8 @@ const BookingSection = () => {
   const [dateTo, setDateTo] = useState<Date>();
   const [selectedExtras, setSelectedExtras] = useState<string[]>([]);
   const [agreed, setAgreed] = useState(false);
+  const [isBirthday, setIsBirthday] = useState(false);
+  const [isWedding, setIsWedding] = useState(false);
 
   const selectedCar = cars.find((c) => c.value === car);
   const ageMultiplier = ageOptions.find((a) => a.value === age)?.multiplier ?? 1;
@@ -79,9 +81,12 @@ const BookingSection = () => {
 
   const extrasPerDay = selectedExtras.reduce((sum, id) => sum + getExtraPrice(id), 0);
 
+  const hasDiscount = isBirthday || isWedding;
+  const firstDayDiscount = hasDiscount ? Math.round((adjustedRate + extrasPerDay) * 0.1) : 0;
+
   const baseCost = adjustedRate * days;
   const extrasCost = extrasPerDay * days;
-  const totalCost = baseCost + extrasCost;
+  const totalCost = baseCost + extrasCost - firstDayDiscount;
   const prepay = Math.round((totalCost * PREPAY_PERCENT) / 100);
   const remaining = totalCost - prepay;
   const ageDepositExtra = ageOptions.find((a) => a.value === age)?.depositExtra ?? 0;
@@ -107,9 +112,12 @@ const BookingSection = () => {
     const extrasText = selectedExtras.length
       ? `\nОпции: ${selectedExtras.map((id) => extrasConfig.find((e) => e.id === id)?.label).join(", ")}`
       : "";
+    const discountText = firstDayDiscount > 0
+      ? `\n🔥 Скидка (${isBirthday ? "день рождения" : "день свадьбы"}): −${firstDayDiscount.toLocaleString("ru-RU")} ₽`
+      : "";
 
     const text = encodeURIComponent(
-      `Бронирование с сайта 3D Drive\nФИО: ${fullName}\nТелефон: ${phone}\nАвтомобиль: ${carLabel}\nВозраст: ${ageLabel}\nСтаж: ${expLabel}\nДаты: ${from} — ${to} (${days} сут.)${extrasText}\n\nСуточная ставка: ${adjustedRate.toLocaleString("ru-RU")} ₽\nИтого: ${totalCost.toLocaleString("ru-RU")} ₽\nПредоплата (${PREPAY_PERCENT}%): ${prepay.toLocaleString("ru-RU")} ₽\nОстаток при получении: ${remaining.toLocaleString("ru-RU")} ₽\nЗалог: ${deposit.toLocaleString("ru-RU")} ₽`
+      `Бронирование с сайта 3D Drive\nФИО: ${fullName}\nТелефон: ${phone}\nАвтомобиль: ${carLabel}\nВозраст: ${ageLabel}\nСтаж: ${expLabel}\nДаты: ${from} — ${to} (${days} сут.)${extrasText}${discountText}\n\nСуточная ставка: ${adjustedRate.toLocaleString("ru-RU")} ₽\nИтого: ${totalCost.toLocaleString("ru-RU")} ₽\nПредоплата (${PREPAY_PERCENT}%): ${prepay.toLocaleString("ru-RU")} ₽\nОстаток при получении: ${remaining.toLocaleString("ru-RU")} ₽\nЗалог: ${deposit.toLocaleString("ru-RU")} ₽`
     );
     window.open(`https://wa.me/79868262332?text=${text}`, "_blank");
   };
@@ -268,6 +276,43 @@ const BookingSection = () => {
               </div>
             </div>
 
+            {/* Discounts */}
+            <div className="space-y-3">
+              <label className="text-sm font-medium text-foreground">Скидки 🔥</label>
+              {[
+                { id: "birthday", label: "День рождения — скидка 10% на первые сутки", icon: Gift, checked: isBirthday, toggle: () => { setIsBirthday(!isBirthday); if (!isBirthday) setIsWedding(false); } },
+                { id: "wedding", label: "День свадьбы — скидка 10% на первые сутки", icon: Heart, checked: isWedding, toggle: () => { setIsWedding(!isWedding); if (!isWedding) setIsBirthday(false); } },
+              ].map((item) => {
+                const Icon = item.icon;
+                return (
+                  <button
+                    key={item.id}
+                    type="button"
+                    onClick={item.toggle}
+                    className={cn(
+                      "w-full flex items-center gap-3 p-3 rounded-lg border text-left transition-all duration-200",
+                      item.checked
+                        ? "border-primary bg-primary/10"
+                        : "border-border bg-secondary/50 hover:border-muted-foreground/40"
+                    )}
+                  >
+                    <div
+                      className={cn(
+                        "w-5 h-5 rounded border flex items-center justify-center shrink-0 transition-colors",
+                        item.checked ? "bg-primary border-primary" : "border-muted-foreground/40"
+                      )}
+                    >
+                      {item.checked && <Check className="w-3 h-3 text-primary-foreground" />}
+                    </div>
+                    <Icon className={cn("w-4 h-4 shrink-0", item.checked ? "text-primary" : "text-muted-foreground")} />
+                    <span className={cn("text-sm flex-1", item.checked ? "text-foreground font-medium" : "text-muted-foreground")}>
+                      {item.label}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+
             {/* Extras */}
             <div className="space-y-3">
               <label className="text-sm font-medium text-foreground">Дополнительные опции</label>
@@ -336,6 +381,14 @@ const BookingSection = () => {
                     <div className="flex justify-between">
                       <span className="text-muted-foreground">Доп. опции</span>
                       <span className="text-foreground">{extrasCost.toLocaleString("ru-RU")} ₽</span>
+                    </div>
+                  )}
+                  {firstDayDiscount > 0 && (
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">
+                        🔥 Скидка ({isBirthday ? "день рождения" : "день свадьбы"})
+                      </span>
+                      <span className="text-green-400 font-medium">−{firstDayDiscount.toLocaleString("ru-RU")} ₽</span>
                     </div>
                   )}
                   {(ageMultiplier > 1 || expMultiplier > 1) && (
