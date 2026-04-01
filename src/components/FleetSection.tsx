@@ -1,6 +1,7 @@
 import bmwImg from "@/assets/bmw-420i.jpg";
 import porscheImg from "@/assets/porsche-macan.jpg";
 import mercedesImg from "@/assets/mercedes-glb.jpg";
+import lixiangImg from "@/assets/lixiang-l6.jpg";
 import AnimatedSection, { AnimatedItem } from "./AnimatedSection";
 
 const cars = [
@@ -27,6 +28,14 @@ const cars = [
     deposit: "25 000",
     specs: "5 мест, 150 л.с., просторный салон",
     description: "Комфорт для семьи или деловой поездки",
+  },
+  {
+    name: "LiXiang L6",
+    image: lixiangImg,
+    price: "23 000",
+    deposit: "25 000",
+    specs: "449 л.с., гибрид, полный привод, премиум-кроссовер",
+    description: "Технологичный премиум-кроссовер. Гибрид, мощный, стильный серый цвет",
   },
 ];
 
