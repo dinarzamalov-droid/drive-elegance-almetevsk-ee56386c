@@ -9,6 +9,12 @@ import bmw5 from "@/assets/bmw-5.jpg";
 import porscheImg from "@/assets/porsche-macan.jpg";
 import mercedesImg from "@/assets/mercedes-glb.jpg";
 import lixiangImg from "@/assets/lixiang-l6.jpg";
+import lixiang1 from "@/assets/lixiang-1.jpg";
+import lixiang2 from "@/assets/lixiang-2.jpg";
+import lixiang3 from "@/assets/lixiang-3.jpg";
+import lixiang4 from "@/assets/lixiang-4.jpg";
+import lixiang5 from "@/assets/lixiang-5.jpg";
+import lixiang6 from "@/assets/lixiang-6.jpg";
 import AnimatedSection, { AnimatedItem } from "./AnimatedSection";
 
 const cars = [
@@ -38,7 +44,7 @@ const cars = [
   },
   {
     name: "LiXiang L6",
-    images: [lixiangImg],
+    images: [lixiangImg, lixiang1, lixiang2, lixiang3, lixiang4, lixiang5, lixiang6],
     price: "23 000",
     deposit: "35 000",
     specs: "449 л.с., гибрид, полный привод, премиум-кроссовер",
