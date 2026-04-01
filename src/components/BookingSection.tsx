@@ -39,9 +39,9 @@ const ageOptions = [
 ];
 
 const experienceOptions = [
-  { value: "3+", label: "3 года и более", multiplier: 1.0 },
-  { value: "1-3", label: "от 1 до 3 лет", multiplier: 1.1 },
-  { value: "0-1", label: "менее 1 года", multiplier: 1.25 },
+  { value: "3+", label: "3 года и более", multiplier: 1.0, depositExtra: 0 },
+  { value: "1-3", label: "от 1 до 3 лет", multiplier: 1.1, depositExtra: 0 },
+  { value: "0-1", label: "менее 1 года", multiplier: 1.25, depositExtra: 10000 },
 ];
 
 const PREPAY_PERCENT = 20;
