@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { format } from "date-fns";
 import { ru } from "date-fns/locale";
-import { CalendarIcon, Car, Shield, Gauge, UserCheck, Check, User, Clock, FileText, Gift, Heart } from "lucide-react";
+import { CalendarIcon, Car, Shield, Gauge, UserCheck, Check, User, Clock, FileText, Gift, Heart, Tag, Percent } from "lucide-react";
 import { generateContract } from "@/lib/generateContract";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -20,11 +20,44 @@ import {
 } from "@/components/ui/select";
 import AnimatedSection from "./AnimatedSection";
 
+type CarCategory = "premium" | "tech";
+
+const durationDiscounts: Record<CarCategory, { minDays: number; discount: number }[]> = {
+  premium: [
+    { minDays: 30, discount: 0.40 },
+    { minDays: 14, discount: 0.30 },
+    { minDays: 7, discount: 0.20 },
+    { minDays: 5, discount: 0.15 },
+    { minDays: 3, discount: 0.10 },
+  ],
+  tech: [
+    { minDays: 30, discount: 0.30 },
+    { minDays: 14, discount: 0.25 },
+    { minDays: 7, discount: 0.20 },
+    { minDays: 5, discount: 0.15 },
+    { minDays: 3, discount: 0.10 },
+  ],
+};
+
+function getDurationDiscount(category: CarCategory, days: number): number {
+  const tiers = durationDiscounts[category];
+  for (const tier of tiers) {
+    if (days >= tier.minDays) return tier.discount;
+  }
+  return 0;
+}
+
+const promoCodes: Record<string, { label: string; percent: number }> = {
+  DRIVE10: { label: "DRIVE10 — 10% на всю аренду", percent: 10 },
+  WELCOME5: { label: "WELCOME5 — 5% на всю аренду", percent: 5 },
+  FRIEND15: { label: "FRIEND15 — 15% на всю аренду", percent: 15 },
+};
+
 const cars = [
-  { value: "bmw-420i", label: "BMW 420i", price: 14000, deposit: 30000, extras: { mileage: 2000, insurance: 3000, driver: 5000 } },
-  { value: "porsche-macan", label: "Porsche Macan", price: 12000, deposit: 25000, extras: { mileage: 2500, insurance: 3500, driver: 5000 } },
-  { value: "mercedes-glb", label: "Mercedes GLB", price: 11000, deposit: 25000, extras: { mileage: 1500, insurance: 2500, driver: 4000 } },
-  { value: "lixiang-l6", label: "LiXiang L6", price: 23000, deposit: 35000, extras: { mileage: 3000, insurance: 5000, driver: 7000 } },
+  { value: "bmw-420i", label: "BMW 420i", price: 14000, deposit: 30000, category: "premium" as CarCategory, extras: { mileage: 2000, insurance: 3000, driver: 5000 } },
+  { value: "porsche-macan", label: "Porsche Macan", price: 12000, deposit: 25000, category: "premium" as CarCategory, extras: { mileage: 2500, insurance: 3500, driver: 5000 } },
+  { value: "mercedes-glb", label: "Mercedes GLB", price: 11000, deposit: 25000, category: "premium" as CarCategory, extras: { mileage: 1500, insurance: 2500, driver: 4000 } },
+  { value: "lixiang-l6", label: "LiXiang L6", price: 23000, deposit: 35000, category: "tech" as CarCategory, extras: { mileage: 3000, insurance: 5000, driver: 7000 } },
 ];
 
 const extrasConfig = [
