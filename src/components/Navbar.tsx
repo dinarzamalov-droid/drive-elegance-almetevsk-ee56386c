@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { Menu, X, Phone } from "lucide-react";
+import logo from "@/assets/logo.png";
 
 const navItems = [
   { label: "О нас", href: "#about" },
@@ -7,6 +8,8 @@ const navItems = [
   { label: "Условия", href: "#terms" },
   { label: "Преимущества", href: "#why-us" },
   { label: "Отзывы", href: "#reviews" },
+  { label: "Сертификаты", href: "#certificates" },
+  { label: "Клуб", href: "#club" },
   { label: "Контакты", href: "#contact" },
 ];
 
