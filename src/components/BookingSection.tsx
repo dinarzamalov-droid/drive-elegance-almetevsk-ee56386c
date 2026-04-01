@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { format } from "date-fns";
 import { ru } from "date-fns/locale";
-import { CalendarIcon, Car, Shield, Gauge, UserCheck, Check, User, Clock, FileText, Gift, Heart } from "lucide-react";
+import { CalendarIcon, Car, Shield, Gauge, UserCheck, Check, User, Clock, FileText, Gift, Heart, Tag, Percent } from "lucide-react";
 import { generateContract } from "@/lib/generateContract";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -20,11 +20,44 @@ import {
 } from "@/components/ui/select";
 import AnimatedSection from "./AnimatedSection";
 
+type CarCategory = "premium" | "tech";
+
+const durationDiscounts: Record<CarCategory, { minDays: number; discount: number }[]> = {
+  premium: [
+    { minDays: 30, discount: 0.40 },
+    { minDays: 14, discount: 0.30 },
+    { minDays: 7, discount: 0.20 },
+    { minDays: 5, discount: 0.15 },
+    { minDays: 3, discount: 0.10 },
+  ],
+  tech: [
+    { minDays: 30, discount: 0.30 },
+    { minDays: 14, discount: 0.25 },
+    { minDays: 7, discount: 0.20 },
+    { minDays: 5, discount: 0.15 },
+    { minDays: 3, discount: 0.10 },
+  ],
+};
+
+function getDurationDiscount(category: CarCategory, days: number): number {
+  const tiers = durationDiscounts[category];
+  for (const tier of tiers) {
+    if (days >= tier.minDays) return tier.discount;
+  }
+  return 0;
+}
+
+const promoCodes: Record<string, { label: string; percent: number }> = {
+  DRIVE10: { label: "DRIVE10 — 10% на всю аренду", percent: 10 },
+  WELCOME5: { label: "WELCOME5 — 5% на всю аренду", percent: 5 },
+  FRIEND15: { label: "FRIEND15 — 15% на всю аренду", percent: 15 },
+};
+
 const cars = [
-  { value: "bmw-420i", label: "BMW 420i", price: 14000, deposit: 30000, extras: { mileage: 2000, insurance: 3000, driver: 5000 } },
-  { value: "porsche-macan", label: "Porsche Macan", price: 12000, deposit: 25000, extras: { mileage: 2500, insurance: 3500, driver: 5000 } },
-  { value: "mercedes-glb", label: "Mercedes GLB", price: 11000, deposit: 25000, extras: { mileage: 1500, insurance: 2500, driver: 4000 } },
-  { value: "lixiang-l6", label: "LiXiang L6", price: 23000, deposit: 35000, extras: { mileage: 3000, insurance: 5000, driver: 7000 } },
+  { value: "bmw-420i", label: "BMW 420i", price: 14000, deposit: 30000, category: "premium" as CarCategory, extras: { mileage: 2000, insurance: 3000, driver: 5000 } },
+  { value: "porsche-macan", label: "Porsche Macan", price: 12000, deposit: 25000, category: "premium" as CarCategory, extras: { mileage: 2500, insurance: 3500, driver: 5000 } },
+  { value: "mercedes-glb", label: "Mercedes GLB", price: 11000, deposit: 25000, category: "premium" as CarCategory, extras: { mileage: 1500, insurance: 2500, driver: 4000 } },
+  { value: "lixiang-l6", label: "LiXiang L6", price: 23000, deposit: 35000, category: "tech" as CarCategory, extras: { mileage: 3000, insurance: 5000, driver: 7000 } },
 ];
 
 const extrasConfig = [
@@ -58,6 +91,9 @@ const BookingSection = () => {
   const [dateTo, setDateTo] = useState<Date>();
   const [selectedExtras, setSelectedExtras] = useState<string[]>([]);
   const [agreed, setAgreed] = useState(false);
+  const [promoCode, setPromoCode] = useState("");
+  const [appliedPromo, setAppliedPromo] = useState<string | null>(null);
+  const [promoError, setPromoError] = useState("");
   const [isBirthday, setIsBirthday] = useState(false);
   const [isWedding, setIsWedding] = useState(false);
 
@@ -70,9 +106,10 @@ const BookingSection = () => {
       ? Math.max(1, Math.ceil((dateTo.getTime() - dateFrom.getTime()) / 86400000))
       : 0;
 
-  const adjustedRate = selectedCar
-    ? Math.round(selectedCar.price * ageMultiplier * expMultiplier)
-    : 0;
+  const baseRate = selectedCar?.price ?? 0;
+  const durationDiscountPercent = selectedCar ? getDurationDiscount(selectedCar.category, days) : 0;
+  const discountedRate = Math.round(baseRate * (1 - durationDiscountPercent));
+  const adjustedRate = Math.round(discountedRate * ageMultiplier * expMultiplier);
 
   const getExtraPrice = (id: string) => {
     if (!selectedCar) return 0;
@@ -84,14 +121,37 @@ const BookingSection = () => {
   const hasDiscount = isBirthday || isWedding;
   const firstDayDiscount = hasDiscount ? Math.round((adjustedRate + extrasPerDay) * 0.1) : 0;
 
+  const promoDiscount = appliedPromo && promoCodes[appliedPromo]
+    ? promoCodes[appliedPromo].percent
+    : 0;
+
   const baseCost = adjustedRate * days;
   const extrasCost = extrasPerDay * days;
-  const totalCost = baseCost + extrasCost - firstDayDiscount;
+  const subtotal = baseCost + extrasCost - firstDayDiscount;
+  const promoDiscountAmount = Math.round(subtotal * promoDiscount / 100);
+  const totalCost = subtotal - promoDiscountAmount;
   const prepay = Math.round((totalCost * PREPAY_PERCENT) / 100);
   const remaining = totalCost - prepay;
   const ageDepositExtra = ageOptions.find((a) => a.value === age)?.depositExtra ?? 0;
   const expDepositExtra = experienceOptions.find((e) => e.value === experience)?.depositExtra ?? 0;
   const deposit = (selectedCar?.deposit ?? 0) + ageDepositExtra + expDepositExtra;
+
+  const applyPromo = () => {
+    const code = promoCode.trim().toUpperCase();
+    if (promoCodes[code]) {
+      setAppliedPromo(code);
+      setPromoError("");
+    } else {
+      setAppliedPromo(null);
+      setPromoError("Промокод не найден");
+    }
+  };
+
+  const removePromo = () => {
+    setAppliedPromo(null);
+    setPromoCode("");
+    setPromoError("");
+  };
 
   const toggleExtra = (id: string) => {
     setSelectedExtras((prev) =>
@@ -115,9 +175,15 @@ const BookingSection = () => {
     const discountText = firstDayDiscount > 0
       ? `\n🔥 Скидка (${isBirthday ? "день рождения" : "день свадьбы"}): −${firstDayDiscount.toLocaleString("ru-RU")} ₽`
       : "";
+    const durationText = durationDiscountPercent > 0
+      ? `\n📅 Скидка за срок (${Math.round(durationDiscountPercent * 100)}%): ставка ${discountedRate.toLocaleString("ru-RU")} ₽/сут`
+      : "";
+    const promoText = promoDiscountAmount > 0
+      ? `\n🏷 Промокод ${appliedPromo}: −${promoDiscountAmount.toLocaleString("ru-RU")} ₽`
+      : "";
 
     const text = encodeURIComponent(
-      `Бронирование с сайта 3D Drive\nФИО: ${fullName}\nТелефон: ${phone}\nАвтомобиль: ${carLabel}\nВозраст: ${ageLabel}\nСтаж: ${expLabel}\nДаты: ${from} — ${to} (${days} сут.)${extrasText}${discountText}\n\nСуточная ставка: ${adjustedRate.toLocaleString("ru-RU")} ₽\nИтого: ${totalCost.toLocaleString("ru-RU")} ₽\nПредоплата (${PREPAY_PERCENT}%): ${prepay.toLocaleString("ru-RU")} ₽\nОстаток при получении: ${remaining.toLocaleString("ru-RU")} ₽\nЗалог: ${deposit.toLocaleString("ru-RU")} ₽`
+      `Бронирование с сайта 3D Drive\nФИО: ${fullName}\nТелефон: ${phone}\nАвтомобиль: ${carLabel}\nВозраст: ${ageLabel}\nСтаж: ${expLabel}\nДаты: ${from} — ${to} (${days} сут.)${extrasText}${durationText}${discountText}${promoText}\n\nСуточная ставка: ${adjustedRate.toLocaleString("ru-RU")} ₽\nИтого: ${totalCost.toLocaleString("ru-RU")} ₽\nПредоплата (${PREPAY_PERCENT}%): ${prepay.toLocaleString("ru-RU")} ₽\nОстаток при получении: ${remaining.toLocaleString("ru-RU")} ₽\nЗалог: ${deposit.toLocaleString("ru-RU")} ₽`
     );
     window.open(`https://wa.me/79868262332?text=${text}`, "_blank");
   };
@@ -276,6 +342,15 @@ const BookingSection = () => {
               </div>
             </div>
 
+            {/* Duration discount info */}
+            {days >= 3 && selectedCar && (
+              <div className="bg-primary/10 border border-primary/20 rounded-lg p-3 text-sm">
+                <span className="text-primary font-medium">
+                  📅 Скидка за срок аренды {Math.round(durationDiscountPercent * 100)}% — ставка {discountedRate.toLocaleString("ru-RU")} ₽/сут вместо {baseRate.toLocaleString("ru-RU")} ₽
+                </span>
+              </div>
+            )}
+
             {/* Discounts */}
             <div className="space-y-3">
               <label className="text-sm font-medium text-foreground">Скидки 🔥</label>
@@ -354,6 +429,49 @@ const BookingSection = () => {
               })}
             </div>
 
+            {/* Promo code */}
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-foreground flex items-center gap-2">
+                <Tag className="w-4 h-4 text-primary" />
+                Промокод
+              </label>
+              {appliedPromo ? (
+                <div className="flex items-center gap-2 p-3 rounded-lg border border-primary bg-primary/10">
+                  <Percent className="w-4 h-4 text-primary" />
+                  <span className="text-sm text-foreground font-medium flex-1">
+                    {promoCodes[appliedPromo].label}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={removePromo}
+                    className="text-xs text-muted-foreground hover:text-foreground transition-colors"
+                  >
+                    Удалить
+                  </button>
+                </div>
+              ) : (
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    placeholder="Введите промокод"
+                    value={promoCode}
+                    onChange={(e) => { setPromoCode(e.target.value); setPromoError(""); }}
+                    className={inputClass}
+                  />
+                  <button
+                    type="button"
+                    onClick={applyPromo}
+                    className="px-4 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 transition-colors shrink-0"
+                  >
+                    Применить
+                  </button>
+                </div>
+              )}
+              {promoError && (
+                <p className="text-xs text-destructive">{promoError}</p>
+              )}
+            </div>
+
             {/* Price breakdown */}
             {showSummary && (
               <div className="bg-secondary/50 rounded-xl p-5 space-y-3">
@@ -368,9 +486,23 @@ const BookingSection = () => {
                     <span className="text-foreground font-medium">{selectedCar.label}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-muted-foreground">Суточная ставка</span>
-                    <span className="text-foreground">{adjustedRate.toLocaleString("ru-RU")} ₽</span>
+                    <span className="text-muted-foreground">Базовая ставка</span>
+                    <span className="text-foreground">{baseRate.toLocaleString("ru-RU")} ₽/сут</span>
                   </div>
+                  {durationDiscountPercent > 0 && (
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">
+                        📅 Скидка за срок ({Math.round(durationDiscountPercent * 100)}%)
+                      </span>
+                      <span className="text-primary font-medium">{discountedRate.toLocaleString("ru-RU")} ₽/сут</span>
+                    </div>
+                  )}
+                  {(ageMultiplier > 1 || expMultiplier > 1) && (
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground text-xs">Коэффициент (возраст/стаж)</span>
+                      <span className="text-foreground text-xs">×{(ageMultiplier * expMultiplier).toFixed(2)}</span>
+                    </div>
+                  )}
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">
                       Аренда ({days} сут.)
@@ -388,13 +520,15 @@ const BookingSection = () => {
                       <span className="text-muted-foreground">
                         🔥 Скидка ({isBirthday ? "день рождения" : "день свадьбы"})
                       </span>
-                      <span className="text-green-400 font-medium">−{firstDayDiscount.toLocaleString("ru-RU")} ₽</span>
+                      <span className="text-primary font-medium">−{firstDayDiscount.toLocaleString("ru-RU")} ₽</span>
                     </div>
                   )}
-                  {(ageMultiplier > 1 || expMultiplier > 1) && (
+                  {promoDiscountAmount > 0 && (
                     <div className="flex justify-between">
-                      <span className="text-muted-foreground text-xs">Коэффициент (возраст/стаж)</span>
-                      <span className="text-foreground text-xs">×{(ageMultiplier * expMultiplier).toFixed(2)}</span>
+                      <span className="text-muted-foreground">
+                        🏷 Промокод {appliedPromo} ({promoDiscount}%)
+                      </span>
+                      <span className="text-primary font-medium">−{promoDiscountAmount.toLocaleString("ru-RU")} ₽</span>
                     </div>
                   )}
                   <div className="border-t border-border pt-2 flex justify-between font-semibold">
