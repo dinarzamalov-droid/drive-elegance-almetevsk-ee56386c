@@ -380,6 +380,14 @@ const BookingSection = () => {
                       <span className="text-foreground">{extrasCost.toLocaleString("ru-RU")} ₽</span>
                     </div>
                   )}
+                  {firstDayDiscount > 0 && (
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">
+                        🔥 Скидка ({isBirthday ? "день рождения" : "день свадьбы"})
+                      </span>
+                      <span className="text-green-400 font-medium">−{firstDayDiscount.toLocaleString("ru-RU")} ₽</span>
+                    </div>
+                  )}
                   {(ageMultiplier > 1 || expMultiplier > 1) && (
                     <div className="flex justify-between">
                       <span className="text-muted-foreground text-xs">Коэффициент (возраст/стаж)</span>
