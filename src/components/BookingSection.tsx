@@ -447,7 +447,7 @@ const BookingSection = () => {
                 onClick={() => {
                   if (!selectedCar || !dateFrom || !dateTo) return;
                   generateContract({
-                    name,
+                    name: `${lastName.trim()} ${firstName.trim()} ${middleName.trim()}`,
                     phone,
                     carLabel: selectedCar.label,
                     dateFrom: format(dateFrom, "dd.MM.yyyy"),
