@@ -18,9 +18,8 @@ const Footer = () => {
       <div className="container mx-auto">
         <div className="flex flex-col md:flex-row items-center justify-between gap-8">
           <div>
-            <a href="#" className="text-2xl font-bold tracking-tight">
-              <span className="text-gradient-gold">3D</span>
-              <span className="text-foreground"> Drive</span>
+            <a href="#">
+              <img src={logo} alt="3D Drive" className="h-8" />
             </a>
             <p className="text-xs text-muted-foreground mt-2">Премиальная аренда автомобилей в Альметьевске</p>
           </div>
