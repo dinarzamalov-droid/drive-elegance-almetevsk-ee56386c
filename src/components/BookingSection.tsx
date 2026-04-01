@@ -459,7 +459,7 @@ const BookingSection = () => {
                     dateTo: format(dateTo, "dd.MM.yyyy"),
                     days,
                     dailyRate: adjustedRate,
-                    extrasList: selectedExtras.map((id) => extras.find((e) => e.id === id)?.label ?? id),
+                    extrasList: selectedExtras.map((id) => extrasConfig.find((e) => e.id === id)?.label ?? id),
                     extrasCost,
                     totalCost,
                     prepay,
