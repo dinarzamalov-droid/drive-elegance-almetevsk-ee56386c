@@ -106,9 +106,10 @@ const BookingSection = () => {
       ? Math.max(1, Math.ceil((dateTo.getTime() - dateFrom.getTime()) / 86400000))
       : 0;
 
-  const adjustedRate = selectedCar
-    ? Math.round(selectedCar.price * ageMultiplier * expMultiplier)
-    : 0;
+  const baseRate = selectedCar?.price ?? 0;
+  const durationDiscountPercent = selectedCar ? getDurationDiscount(selectedCar.category, days) : 0;
+  const discountedRate = Math.round(baseRate * (1 - durationDiscountPercent));
+  const adjustedRate = Math.round(discountedRate * ageMultiplier * expMultiplier);
 
   const getExtraPrice = (id: string) => {
     if (!selectedCar) return 0;
@@ -120,14 +121,37 @@ const BookingSection = () => {
   const hasDiscount = isBirthday || isWedding;
   const firstDayDiscount = hasDiscount ? Math.round((adjustedRate + extrasPerDay) * 0.1) : 0;
 
+  const promoDiscount = appliedPromo && promoCodes[appliedPromo]
+    ? promoCodes[appliedPromo].percent
+    : 0;
+
   const baseCost = adjustedRate * days;
   const extrasCost = extrasPerDay * days;
-  const totalCost = baseCost + extrasCost - firstDayDiscount;
+  const subtotal = baseCost + extrasCost - firstDayDiscount;
+  const promoDiscountAmount = Math.round(subtotal * promoDiscount / 100);
+  const totalCost = subtotal - promoDiscountAmount;
   const prepay = Math.round((totalCost * PREPAY_PERCENT) / 100);
   const remaining = totalCost - prepay;
   const ageDepositExtra = ageOptions.find((a) => a.value === age)?.depositExtra ?? 0;
   const expDepositExtra = experienceOptions.find((e) => e.value === experience)?.depositExtra ?? 0;
   const deposit = (selectedCar?.deposit ?? 0) + ageDepositExtra + expDepositExtra;
+
+  const applyPromo = () => {
+    const code = promoCode.trim().toUpperCase();
+    if (promoCodes[code]) {
+      setAppliedPromo(code);
+      setPromoError("");
+    } else {
+      setAppliedPromo(null);
+      setPromoError("Промокод не найден");
+    }
+  };
+
+  const removePromo = () => {
+    setAppliedPromo(null);
+    setPromoCode("");
+    setPromoError("");
+  };
 
   const toggleExtra = (id: string) => {
     setSelectedExtras((prev) =>
