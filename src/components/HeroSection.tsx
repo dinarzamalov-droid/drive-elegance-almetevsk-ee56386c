@@ -34,7 +34,7 @@ const HeroSection = () => {
         </div>
       ))}
 
-      <div className="absolute inset-0 bg-gradient-to-t from-background via-background/60 to-background/30" />
+      <div className="absolute inset-0 bg-gradient-to-t from-background via-background/70 to-background/20" />
 
       <div className="relative z-10 h-full flex flex-col justify-end pb-20 md:pb-32 container mx-auto px-4">
         <div className="max-w-3xl">
