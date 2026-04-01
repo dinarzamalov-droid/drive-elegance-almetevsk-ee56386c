@@ -81,9 +81,12 @@ const BookingSection = () => {
 
   const extrasPerDay = selectedExtras.reduce((sum, id) => sum + getExtraPrice(id), 0);
 
+  const hasDiscount = isBirthday || isWedding;
+  const firstDayDiscount = hasDiscount ? Math.round((adjustedRate + extrasPerDay) * 0.1) : 0;
+
   const baseCost = adjustedRate * days;
   const extrasCost = extrasPerDay * days;
-  const totalCost = baseCost + extrasCost;
+  const totalCost = baseCost + extrasCost - firstDayDiscount;
   const prepay = Math.round((totalCost * PREPAY_PERCENT) / 100);
   const remaining = totalCost - prepay;
   const ageDepositExtra = ageOptions.find((a) => a.value === age)?.depositExtra ?? 0;
