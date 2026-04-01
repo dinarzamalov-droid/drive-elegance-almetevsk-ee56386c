@@ -58,6 +58,8 @@ const BookingSection = () => {
   const [dateTo, setDateTo] = useState<Date>();
   const [selectedExtras, setSelectedExtras] = useState<string[]>([]);
   const [agreed, setAgreed] = useState(false);
+  const [isBirthday, setIsBirthday] = useState(false);
+  const [isWedding, setIsWedding] = useState(false);
 
   const selectedCar = cars.find((c) => c.value === car);
   const ageMultiplier = ageOptions.find((a) => a.value === age)?.multiplier ?? 1;
