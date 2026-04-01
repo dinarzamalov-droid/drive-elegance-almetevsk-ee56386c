@@ -443,7 +443,7 @@ const BookingSection = () => {
               </button>
               <button
                 type="button"
-                disabled={!car || !dateFrom || !dateTo || !name.trim() || !phone.trim()}
+                disabled={!car || !dateFrom || !dateTo || !lastName.trim() || !firstName.trim() || !middleName.trim() || !phone.trim()}
                 onClick={() => {
                   if (!selectedCar || !dateFrom || !dateTo) return;
                   generateContract({
