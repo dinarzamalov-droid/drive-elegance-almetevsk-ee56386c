@@ -112,6 +112,9 @@ const BookingSection = () => {
     const extrasText = selectedExtras.length
       ? `\nОпции: ${selectedExtras.map((id) => extrasConfig.find((e) => e.id === id)?.label).join(", ")}`
       : "";
+    const discountText = firstDayDiscount > 0
+      ? `\n🔥 Скидка (${isBirthday ? "день рождения" : "день свадьбы"}): −${firstDayDiscount.toLocaleString("ru-RU")} ₽`
+      : "";
 
     const text = encodeURIComponent(
       `Бронирование с сайта 3D Drive\nФИО: ${fullName}\nТелефон: ${phone}\nАвтомобиль: ${carLabel}\nВозраст: ${ageLabel}\nСтаж: ${expLabel}\nДаты: ${from} — ${to} (${days} сут.)${extrasText}\n\nСуточная ставка: ${adjustedRate.toLocaleString("ru-RU")} ₽\nИтого: ${totalCost.toLocaleString("ru-RU")} ₽\nПредоплата (${PREPAY_PERCENT}%): ${prepay.toLocaleString("ru-RU")} ₽\nОстаток при получении: ${remaining.toLocaleString("ru-RU")} ₽\nЗалог: ${deposit.toLocaleString("ru-RU")} ₽`
