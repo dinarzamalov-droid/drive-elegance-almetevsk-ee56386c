@@ -72,10 +72,12 @@ const BookingSection = () => {
     ? Math.round(selectedCar.price * ageMultiplier * expMultiplier)
     : 0;
 
-  const extrasPerDay = selectedExtras.reduce((sum, id) => {
-    const extra = extras.find((e) => e.id === id);
-    return sum + (extra?.price ?? 0);
-  }, 0);
+  const getExtraPrice = (id: string) => {
+    if (!selectedCar) return 0;
+    return (selectedCar.extras as Record<string, number>)[id] ?? 0;
+  };
+
+  const extrasPerDay = selectedExtras.reduce((sum, id) => sum + getExtraPrice(id), 0);
 
   const baseCost = adjustedRate * days;
   const extrasCost = extrasPerDay * days;
