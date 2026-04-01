@@ -34,8 +34,8 @@ const extras = [
 ];
 
 const ageOptions = [
-  { value: "21+", label: "21 год и старше", multiplier: 1.0 },
-  { value: "19-20", label: "19–20 лет", multiplier: 1.15 },
+  { value: "21+", label: "21 год и старше", multiplier: 1.0, depositExtra: 0 },
+  { value: "19-20", label: "19–20 лет", multiplier: 1.15, depositExtra: 5000 },
 ];
 
 const experienceOptions = [
