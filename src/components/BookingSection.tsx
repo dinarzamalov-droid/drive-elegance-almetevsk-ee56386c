@@ -420,6 +420,49 @@ const BookingSection = () => {
               })}
             </div>
 
+            {/* Promo code */}
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-foreground flex items-center gap-2">
+                <Tag className="w-4 h-4 text-primary" />
+                Промокод
+              </label>
+              {appliedPromo ? (
+                <div className="flex items-center gap-2 p-3 rounded-lg border border-primary bg-primary/10">
+                  <Percent className="w-4 h-4 text-primary" />
+                  <span className="text-sm text-foreground font-medium flex-1">
+                    {promoCodes[appliedPromo].label}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={removePromo}
+                    className="text-xs text-muted-foreground hover:text-foreground transition-colors"
+                  >
+                    Удалить
+                  </button>
+                </div>
+              ) : (
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    placeholder="Введите промокод"
+                    value={promoCode}
+                    onChange={(e) => { setPromoCode(e.target.value); setPromoError(""); }}
+                    className={inputClass}
+                  />
+                  <button
+                    type="button"
+                    onClick={applyPromo}
+                    className="px-4 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 transition-colors shrink-0"
+                  >
+                    Применить
+                  </button>
+                </div>
+              )}
+              {promoError && (
+                <p className="text-xs text-destructive">{promoError}</p>
+              )}
+            </div>
+
             {/* Price breakdown */}
             {showSummary && (
               <div className="bg-secondary/50 rounded-xl p-5 space-y-3">
@@ -434,9 +477,23 @@ const BookingSection = () => {
                     <span className="text-foreground font-medium">{selectedCar.label}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-muted-foreground">Суточная ставка</span>
-                    <span className="text-foreground">{adjustedRate.toLocaleString("ru-RU")} ₽</span>
+                    <span className="text-muted-foreground">Базовая ставка</span>
+                    <span className="text-foreground">{baseRate.toLocaleString("ru-RU")} ₽/сут</span>
                   </div>
+                  {durationDiscountPercent > 0 && (
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">
+                        📅 Скидка за срок ({Math.round(durationDiscountPercent * 100)}%)
+                      </span>
+                      <span className="text-primary font-medium">{discountedRate.toLocaleString("ru-RU")} ₽/сут</span>
+                    </div>
+                  )}
+                  {(ageMultiplier > 1 || expMultiplier > 1) && (
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground text-xs">Коэффициент (возраст/стаж)</span>
+                      <span className="text-foreground text-xs">×{(ageMultiplier * expMultiplier).toFixed(2)}</span>
+                    </div>
+                  )}
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">
                       Аренда ({days} сут.)
@@ -454,13 +511,15 @@ const BookingSection = () => {
                       <span className="text-muted-foreground">
                         🔥 Скидка ({isBirthday ? "день рождения" : "день свадьбы"})
                       </span>
-                      <span className="text-green-400 font-medium">−{firstDayDiscount.toLocaleString("ru-RU")} ₽</span>
+                      <span className="text-primary font-medium">−{firstDayDiscount.toLocaleString("ru-RU")} ₽</span>
                     </div>
                   )}
-                  {(ageMultiplier > 1 || expMultiplier > 1) && (
+                  {promoDiscountAmount > 0 && (
                     <div className="flex justify-between">
-                      <span className="text-muted-foreground text-xs">Коэффициент (возраст/стаж)</span>
-                      <span className="text-foreground text-xs">×{(ageMultiplier * expMultiplier).toFixed(2)}</span>
+                      <span className="text-muted-foreground">
+                        🏷 Промокод {appliedPromo} ({promoDiscount}%)
+                      </span>
+                      <span className="text-primary font-medium">−{promoDiscountAmount.toLocaleString("ru-RU")} ₽</span>
                     </div>
                   )}
                   <div className="border-t border-border pt-2 flex justify-between font-semibold">
