@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { MessageCircle, X, Send, Phone } from "lucide-react";
+import { MessageCircle, X, Send, Phone, ExternalLink } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const FloatingMessenger = () => {
@@ -41,6 +41,16 @@ const FloatingMessenger = () => {
           >
             <Send className="w-5 h-5" />
             Telegram
+          </a>
+          {/* Авито */}
+          <a
+            href="https://www.avito.ru/user/your_profile"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-3 bg-[#00AAFF] text-white px-5 py-3 rounded-full font-semibold text-sm shadow-lg hover:brightness-110 transition-all"
+          >
+            <ExternalLink className="w-5 h-5" />
+            Авито
           </a>
         </div>
       )}
