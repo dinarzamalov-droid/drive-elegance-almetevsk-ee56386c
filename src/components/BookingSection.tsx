@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { format } from "date-fns";
 import { ru } from "date-fns/locale";
-import { CalendarIcon, Car, Shield, Gauge, UserCheck, Check } from "lucide-react";
+import { CalendarIcon, Car, Shield, Gauge, UserCheck, Check, User, Clock } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
@@ -17,7 +17,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import AnimatedSection, { AnimatedItem } from "./AnimatedSection";
+import AnimatedSection from "./AnimatedSection";
 
 const cars = [
   { value: "bmw-420i", label: "BMW 420i", price: 14000, deposit: 30000 },
@@ -28,7 +28,18 @@ const cars = [
 const extras = [
   { id: "mileage", label: "Безлимитный пробег", price: 2000, icon: Gauge },
   { id: "insurance", label: "Страховка КАСКО", price: 3000, icon: Shield },
-  { id: "driver", label: "Водитель", price: 5000, icon: UserCheck },
+  { id: "driver", label: "Аренда с водителем", price: 5000, icon: UserCheck },
+];
+
+const ageOptions = [
+  { value: "21+", label: "21 год и старше", multiplier: 1.0 },
+  { value: "19-20", label: "19–20 лет", multiplier: 1.15 },
+];
+
+const experienceOptions = [
+  { value: "3+", label: "3 года и более", multiplier: 1.0 },
+  { value: "1-3", label: "от 1 до 3 лет", multiplier: 1.1 },
+  { value: "0-1", label: "менее 1 года", multiplier: 1.25 },
 ];
 
 const PREPAY_PERCENT = 20;
@@ -36,27 +47,36 @@ const PREPAY_PERCENT = 20;
 const BookingSection = () => {
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
-  const [car, setCar] = useState("");
+  const [car, setCar] = useState(cars[0].value);
+  const [age, setAge] = useState("21+");
+  const [experience, setExperience] = useState("3+");
   const [dateFrom, setDateFrom] = useState<Date>();
   const [dateTo, setDateTo] = useState<Date>();
   const [selectedExtras, setSelectedExtras] = useState<string[]>([]);
   const [agreed, setAgreed] = useState(false);
 
   const selectedCar = cars.find((c) => c.value === car);
+  const ageMultiplier = ageOptions.find((a) => a.value === age)?.multiplier ?? 1;
+  const expMultiplier = experienceOptions.find((e) => e.value === experience)?.multiplier ?? 1;
+
   const days =
     dateFrom && dateTo
       ? Math.max(1, Math.ceil((dateTo.getTime() - dateFrom.getTime()) / 86400000))
       : 0;
+
+  const adjustedRate = selectedCar
+    ? Math.round(selectedCar.price * ageMultiplier * expMultiplier)
+    : 0;
 
   const extrasPerDay = selectedExtras.reduce((sum, id) => {
     const extra = extras.find((e) => e.id === id);
     return sum + (extra?.price ?? 0);
   }, 0);
 
-  const baseCost = selectedCar ? selectedCar.price * days : 0;
+  const baseCost = adjustedRate * days;
   const extrasCost = extrasPerDay * days;
   const totalCost = baseCost + extrasCost;
-  const prepay = Math.round(totalCost * PREPAY_PERCENT / 100);
+  const prepay = Math.round((totalCost * PREPAY_PERCENT) / 100);
   const remaining = totalCost - prepay;
   const deposit = selectedCar?.deposit ?? 0;
 
@@ -73,12 +93,14 @@ const BookingSection = () => {
     const carLabel = selectedCar?.label ?? car;
     const from = format(dateFrom, "dd.MM.yyyy");
     const to = format(dateTo, "dd.MM.yyyy");
+    const ageLabel = ageOptions.find((a) => a.value === age)?.label ?? age;
+    const expLabel = experienceOptions.find((e) => e.value === experience)?.label ?? experience;
     const extrasText = selectedExtras.length
       ? `\nОпции: ${selectedExtras.map((id) => extras.find((e) => e.id === id)?.label).join(", ")}`
       : "";
 
     const text = encodeURIComponent(
-      `Бронирование с сайта 3D Drive\nИмя: ${name}\nТелефон: ${phone}\nАвтомобиль: ${carLabel}\nДаты: ${from} — ${to} (${days} сут.)${extrasText}\n\nИтого: ${totalCost.toLocaleString("ru-RU")} ₽\nПредоплата (${PREPAY_PERCENT}%): ${prepay.toLocaleString("ru-RU")} ₽\nОстаток при получении: ${remaining.toLocaleString("ru-RU")} ₽\nЗалог: ${deposit.toLocaleString("ru-RU")} ₽`
+      `Бронирование с сайта 3D Drive\nИмя: ${name}\nТелефон: ${phone}\nАвтомобиль: ${carLabel}\nВозраст: ${ageLabel}\nСтаж: ${expLabel}\nДаты: ${from} — ${to} (${days} сут.)${extrasText}\n\nСуточная ставка: ${adjustedRate.toLocaleString("ru-RU")} ₽\nИтого: ${totalCost.toLocaleString("ru-RU")} ₽\nПредоплата (${PREPAY_PERCENT}%): ${prepay.toLocaleString("ru-RU")} ₽\nОстаток при получении: ${remaining.toLocaleString("ru-RU")} ₽\nЗалог: ${deposit.toLocaleString("ru-RU")} ₽`
     );
     window.open(`https://wa.me/79868262332?text=${text}`, "_blank");
   };
@@ -94,13 +116,16 @@ const BookingSection = () => {
   return (
     <section id="booking" className="section-padding">
       <div className="container mx-auto">
-        <AnimatedSection className="text-center mb-16">
+        <AnimatedSection className="text-center mb-12">
           <p className="text-primary font-semibold text-sm tracking-widest uppercase mb-4">
-            Бронирование
+            Калькулятор аренды
           </p>
-          <h2 className="text-3xl md:text-5xl font-bold">
-            Забронируйте <span className="text-gradient-gold">ваш автомобиль</span>
+          <h2 className="text-3xl md:text-5xl font-bold mb-3">
+            Рассчитайте <span className="text-gradient-gold">стоимость аренды</span>
           </h2>
+          <p className="text-muted-foreground max-w-lg mx-auto">
+            Выберите автомобиль, укажите свои параметры — получите персональное предложение
+          </p>
         </AnimatedSection>
 
         <AnimatedSection delay={0.2}>
@@ -108,27 +133,72 @@ const BookingSection = () => {
             onSubmit={handleSubmit}
             className="max-w-2xl mx-auto bg-card-gradient gold-border rounded-2xl p-6 sm:p-8 space-y-6"
           >
-            {/* Car selection */}
+            {/* Car toggle buttons */}
             <div className="space-y-2">
               <label className="text-sm font-medium text-foreground">Автомобиль</label>
-              <Select value={car} onValueChange={setCar}>
-                <SelectTrigger className="w-full bg-secondary border-border text-foreground">
-                  <SelectValue placeholder="Выберите автомобиль" />
-                </SelectTrigger>
-                <SelectContent>
-                  {cars.map((c) => (
-                    <SelectItem key={c.value} value={c.value}>
-                      {c.label} — от {c.price.toLocaleString("ru-RU")} ₽/сутки
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <div className="flex flex-wrap gap-2">
+                {cars.map((c) => (
+                  <button
+                    key={c.value}
+                    type="button"
+                    onClick={() => setCar(c.value)}
+                    className={cn(
+                      "flex-1 min-w-[120px] px-4 py-3 rounded-lg text-sm font-medium transition-all duration-200 border",
+                      car === c.value
+                        ? "bg-primary text-primary-foreground border-primary shadow-lg shadow-primary/20"
+                        : "bg-secondary border-border text-muted-foreground hover:border-muted-foreground/40 hover:text-foreground"
+                    )}
+                  >
+                    {c.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Age & Experience */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-foreground flex items-center gap-2">
+                  <User className="w-4 h-4 text-primary" />
+                  Ваш возраст
+                </label>
+                <Select value={age} onValueChange={setAge}>
+                  <SelectTrigger className="w-full bg-secondary border-border text-foreground">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {ageOptions.map((opt) => (
+                      <SelectItem key={opt.value} value={opt.value}>
+                        {opt.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-foreground flex items-center gap-2">
+                  <Clock className="w-4 h-4 text-primary" />
+                  Стаж вождения
+                </label>
+                <Select value={experience} onValueChange={setExperience}>
+                  <SelectTrigger className="w-full bg-secondary border-border text-foreground">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {experienceOptions.map((opt) => (
+                      <SelectItem key={opt.value} value={opt.value}>
+                        {opt.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
 
             {/* Dates */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <label className="text-sm font-medium text-foreground">Дата начала</label>
+                <label className="text-sm font-medium text-foreground">Дата заезда</label>
                 <Popover>
                   <PopoverTrigger asChild>
                     <Button
@@ -160,7 +230,7 @@ const BookingSection = () => {
               </div>
 
               <div className="space-y-2">
-                <label className="text-sm font-medium text-foreground">Дата окончания</label>
+                <label className="text-sm font-medium text-foreground">Дата выезда</label>
                 <Popover>
                   <PopoverTrigger asChild>
                     <Button
@@ -232,22 +302,36 @@ const BookingSection = () => {
             {/* Price breakdown */}
             {showSummary && (
               <div className="bg-secondary/50 rounded-xl p-5 space-y-3">
-                <div className="flex items-center gap-2 mb-3">
+                <h3 className="text-sm font-semibold text-foreground flex items-center gap-2 mb-3">
                   <Car className="h-4 w-4 text-primary" />
-                  <span className="text-sm font-semibold text-foreground">
-                    {selectedCar.label} × {days} сут.
-                  </span>
-                </div>
+                  Ваше предложение
+                </h3>
 
                 <div className="space-y-2 text-sm">
                   <div className="flex justify-between">
-                    <span className="text-muted-foreground">Аренда</span>
+                    <span className="text-muted-foreground">Автомобиль</span>
+                    <span className="text-foreground font-medium">{selectedCar.label}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Суточная ставка</span>
+                    <span className="text-foreground">{adjustedRate.toLocaleString("ru-RU")} ₽</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">
+                      Аренда ({days} сут.)
+                    </span>
                     <span className="text-foreground">{baseCost.toLocaleString("ru-RU")} ₽</span>
                   </div>
                   {extrasCost > 0 && (
                     <div className="flex justify-between">
                       <span className="text-muted-foreground">Доп. опции</span>
                       <span className="text-foreground">{extrasCost.toLocaleString("ru-RU")} ₽</span>
+                    </div>
+                  )}
+                  {(ageMultiplier > 1 || expMultiplier > 1) && (
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground text-xs">Коэффициент (возраст/стаж)</span>
+                      <span className="text-foreground text-xs">×{(ageMultiplier * expMultiplier).toFixed(2)}</span>
                     </div>
                   )}
                   <div className="border-t border-border pt-2 flex justify-between font-semibold">
