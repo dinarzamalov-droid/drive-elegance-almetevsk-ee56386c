@@ -92,7 +92,8 @@ const BookingSection = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!name.trim() || !phone.trim() || !car || !dateFrom || !dateTo || !agreed) return;
+    if (!lastName.trim() || !firstName.trim() || !middleName.trim() || !phone.trim() || !car || !dateFrom || !dateTo || !agreed) return;
+    const fullName = `${lastName.trim()} ${firstName.trim()} ${middleName.trim()}`;
 
     const carLabel = selectedCar?.label ?? car;
     const from = format(dateFrom, "dd.MM.yyyy");
