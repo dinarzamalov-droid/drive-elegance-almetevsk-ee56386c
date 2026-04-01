@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { format } from "date-fns";
 import { ru } from "date-fns/locale";
-import { CalendarIcon, Car, Shield, Gauge, UserCheck, Check, User, Clock } from "lucide-react";
+import { CalendarIcon, Car, Shield, Gauge, UserCheck, Check, User, Clock, FileText } from "lucide-react";
+import { generateContract } from "@/lib/generateContract";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
@@ -402,13 +403,43 @@ const BookingSection = () => {
               </span>
             </button>
 
-            <button
-              type="submit"
-              disabled={!agreed || !car || !dateFrom || !dateTo || !name.trim() || !phone.trim()}
-              className="w-full bg-gradient-gold text-primary-foreground py-3.5 rounded-lg font-semibold text-sm hover:opacity-90 transition-opacity disabled:opacity-40 disabled:cursor-not-allowed"
-            >
-              Забронировать с предоплатой
-            </button>
+            <div className="flex flex-col sm:flex-row gap-3">
+              <button
+                type="submit"
+                disabled={!agreed || !car || !dateFrom || !dateTo || !name.trim() || !phone.trim()}
+                className="flex-1 bg-gradient-gold text-primary-foreground py-3.5 rounded-lg font-semibold text-sm hover:opacity-90 transition-opacity disabled:opacity-40 disabled:cursor-not-allowed"
+              >
+                Забронировать с предоплатой
+              </button>
+              <button
+                type="button"
+                disabled={!car || !dateFrom || !dateTo || !name.trim() || !phone.trim()}
+                onClick={() => {
+                  if (!selectedCar || !dateFrom || !dateTo) return;
+                  generateContract({
+                    name,
+                    phone,
+                    carLabel: selectedCar.label,
+                    dateFrom: format(dateFrom, "dd.MM.yyyy"),
+                    dateTo: format(dateTo, "dd.MM.yyyy"),
+                    days,
+                    dailyRate: adjustedRate,
+                    extrasList: selectedExtras.map((id) => extras.find((e) => e.id === id)?.label ?? id),
+                    extrasCost,
+                    totalCost,
+                    prepay,
+                    remaining,
+                    deposit,
+                    ageLabel: ageOptions.find((a) => a.value === age)?.label ?? age,
+                    experienceLabel: experienceOptions.find((e) => e.value === experience)?.label ?? experience,
+                  });
+                }}
+                className="flex items-center justify-center gap-2 px-6 py-3.5 rounded-lg font-semibold text-sm border border-primary text-primary hover:bg-primary/10 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+              >
+                <FileText className="w-4 h-4" />
+                Скачать договор
+              </button>
+            </div>
           </form>
         </AnimatedSection>
       </div>
