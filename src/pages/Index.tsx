@@ -12,6 +12,7 @@ import FaqSection from "@/components/FaqSection";
 import ContactSection from "@/components/ContactSection";
 import CorporateSection from "@/components/CorporateSection";
 import GiftCertificatesSection from "@/components/GiftCertificatesSection";
+import ClubCardsSection from "@/components/ClubCardsSection";
 import PlansSection from "@/components/PlansSection";
 import Footer from "@/components/Footer";
 
