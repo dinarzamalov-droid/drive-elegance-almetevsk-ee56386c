@@ -34,14 +34,14 @@ const extras = [
 ];
 
 const ageOptions = [
-  { value: "21+", label: "21 год и старше", multiplier: 1.0 },
-  { value: "19-20", label: "19–20 лет", multiplier: 1.15 },
+  { value: "21+", label: "21 год и старше", multiplier: 1.0, depositExtra: 0 },
+  { value: "19-20", label: "19–20 лет", multiplier: 1.15, depositExtra: 5000 },
 ];
 
 const experienceOptions = [
-  { value: "3+", label: "3 года и более", multiplier: 1.0 },
-  { value: "1-3", label: "от 1 до 3 лет", multiplier: 1.1 },
-  { value: "0-1", label: "менее 1 года", multiplier: 1.25 },
+  { value: "3+", label: "3 года и более", multiplier: 1.0, depositExtra: 0 },
+  { value: "1-3", label: "от 1 до 3 лет", multiplier: 1.1, depositExtra: 0 },
+  { value: "0-1", label: "менее 1 года", multiplier: 1.25, depositExtra: 10000 },
 ];
 
 const PREPAY_PERCENT = 20;
@@ -82,7 +82,9 @@ const BookingSection = () => {
   const totalCost = baseCost + extrasCost;
   const prepay = Math.round((totalCost * PREPAY_PERCENT) / 100);
   const remaining = totalCost - prepay;
-  const deposit = selectedCar?.deposit ?? 0;
+  const ageDepositExtra = ageOptions.find((a) => a.value === age)?.depositExtra ?? 0;
+  const expDepositExtra = experienceOptions.find((e) => e.value === experience)?.depositExtra ?? 0;
+  const deposit = (selectedCar?.deposit ?? 0) + ageDepositExtra + expDepositExtra;
 
   const toggleExtra = (id: string) => {
     setSelectedExtras((prev) =>
