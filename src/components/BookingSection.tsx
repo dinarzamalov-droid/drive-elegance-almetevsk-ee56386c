@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { format } from "date-fns";
 import { ru } from "date-fns/locale";
-import { CalendarIcon, Car, Shield, Gauge, UserCheck, Check, User, Clock, FileText, Gift, Heart, Tag, Percent } from "lucide-react";
+import { CalendarIcon, Car, Shield, Gauge, UserCheck, Check, User, Clock, FileText, Gift, Heart, Tag, Percent, MessageCircle, Send } from "lucide-react";
 import { generateContract } from "@/lib/generateContract";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
