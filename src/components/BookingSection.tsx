@@ -436,7 +436,7 @@ const BookingSection = () => {
             <div className="flex flex-col sm:flex-row gap-3">
               <button
                 type="submit"
-                disabled={!agreed || !car || !dateFrom || !dateTo || !name.trim() || !phone.trim()}
+                disabled={!agreed || !car || !dateFrom || !dateTo || !lastName.trim() || !firstName.trim() || !middleName.trim() || !phone.trim()}
                 className="flex-1 bg-gradient-gold text-primary-foreground py-3.5 rounded-lg font-semibold text-sm hover:opacity-90 transition-opacity disabled:opacity-40 disabled:cursor-not-allowed"
               >
                 Забронировать с предоплатой
