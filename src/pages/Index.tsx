@@ -1,5 +1,6 @@
 import Navbar from "@/components/Navbar";
 import HeroSection from "@/components/HeroSection";
+import FloatingMessenger from "@/components/FloatingMessenger";
 import AboutSection from "@/components/AboutSection";
 import FleetSection from "@/components/FleetSection";
 import BookingSection from "@/components/BookingSection";
