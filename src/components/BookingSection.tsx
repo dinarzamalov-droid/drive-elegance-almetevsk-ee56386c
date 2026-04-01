@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { format } from "date-fns";
 import { ru } from "date-fns/locale";
-import { CalendarIcon, Car, Shield, Gauge, UserCheck, Check, User, Clock, FileText, Gift, Heart, Tag, Percent } from "lucide-react";
+import { CalendarIcon, Car, Shield, Gauge, UserCheck, Check, User, Clock, FileText, Gift, Heart, Tag, Percent, MessageCircle, Send } from "lucide-react";
 import { generateContract } from "@/lib/generateContract";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -159,33 +159,46 @@ const BookingSection = () => {
     );
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!lastName.trim() || !firstName.trim() || !middleName.trim() || !phone.trim() || !car || !dateFrom || !dateTo || !agreed) return;
+  const buildMessageText = () => {
     const fullName = `${lastName.trim()} ${firstName.trim()} ${middleName.trim()}`;
-
     const carLabel = selectedCar?.label ?? car;
-    const from = format(dateFrom, "dd.MM.yyyy");
-    const to = format(dateTo, "dd.MM.yyyy");
+    const from = dateFrom ? format(dateFrom, "dd.MM.yyyy") : "";
+    const to = dateTo ? format(dateTo, "dd.MM.yyyy") : "";
     const ageLabel = ageOptions.find((a) => a.value === age)?.label ?? age;
     const expLabel = experienceOptions.find((e) => e.value === experience)?.label ?? experience;
     const extrasText = selectedExtras.length
       ? `\nОпции: ${selectedExtras.map((id) => extrasConfig.find((e) => e.id === id)?.label).join(", ")}`
       : "";
-    const discountText = firstDayDiscount > 0
-      ? `\n🔥 Скидка (${isBirthday ? "день рождения" : "день свадьбы"}): −${firstDayDiscount.toLocaleString("ru-RU")} ₽`
-      : "";
     const durationText = durationDiscountPercent > 0
       ? `\n📅 Скидка за срок (${Math.round(durationDiscountPercent * 100)}%): ставка ${discountedRate.toLocaleString("ru-RU")} ₽/сут`
+      : "";
+    const discountText = firstDayDiscount > 0
+      ? `\n🔥 Скидка (${isBirthday ? "день рождения" : "день свадьбы"}): −${firstDayDiscount.toLocaleString("ru-RU")} ₽`
       : "";
     const promoText = promoDiscountAmount > 0
       ? `\n🏷 Промокод ${appliedPromo}: −${promoDiscountAmount.toLocaleString("ru-RU")} ₽`
       : "";
 
-    const text = encodeURIComponent(
-      `Бронирование с сайта 3D Drive\nФИО: ${fullName}\nТелефон: ${phone}\nАвтомобиль: ${carLabel}\nВозраст: ${ageLabel}\nСтаж: ${expLabel}\nДаты: ${from} — ${to} (${days} сут.)${extrasText}${durationText}${discountText}${promoText}\n\nСуточная ставка: ${adjustedRate.toLocaleString("ru-RU")} ₽\nИтого: ${totalCost.toLocaleString("ru-RU")} ₽\nПредоплата (${PREPAY_PERCENT}%): ${prepay.toLocaleString("ru-RU")} ₽\nОстаток при получении: ${remaining.toLocaleString("ru-RU")} ₽\nЗалог: ${deposit.toLocaleString("ru-RU")} ₽`
-    );
+    return `Бронирование с сайта 3D Drive\nФИО: ${fullName}\nТелефон: ${phone}\nАвтомобиль: ${carLabel}\nВозраст: ${ageLabel}\nСтаж: ${expLabel}\nДаты: ${from} — ${to} (${days} сут.)${extrasText}${durationText}${discountText}${promoText}\n\nСуточная ставка: ${adjustedRate.toLocaleString("ru-RU")} ₽\nИтого: ${totalCost.toLocaleString("ru-RU")} ₽\nПредоплата (${PREPAY_PERCENT}%): ${prepay.toLocaleString("ru-RU")} ₽\nОстаток при получении: ${remaining.toLocaleString("ru-RU")} ₽\nЗалог: ${deposit.toLocaleString("ru-RU")} ₽`;
+  };
+
+  const isFormValid = lastName.trim() && firstName.trim() && middleName.trim() && phone.trim() && car && dateFrom && dateTo && agreed;
+
+  const sendViaWhatsApp = () => {
+    if (!isFormValid) return;
+    const text = encodeURIComponent(buildMessageText());
     window.open(`https://wa.me/79868262332?text=${text}`, "_blank");
+  };
+
+  const sendViaTelegram = () => {
+    if (!isFormValid) return;
+    const text = encodeURIComponent(buildMessageText());
+    window.open(`https://t.me/share/url?url=${encodeURIComponent("3D Drive")}&text=${text}`, "_blank");
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    sendViaWhatsApp();
   };
 
   const today = new Date();
@@ -625,14 +638,28 @@ const BookingSection = () => {
               </span>
             </button>
 
-            <div className="flex flex-col sm:flex-row gap-3">
-              <button
-                type="submit"
-                disabled={!agreed || !car || !dateFrom || !dateTo || !lastName.trim() || !firstName.trim() || !middleName.trim() || !phone.trim()}
-                className="flex-1 bg-gradient-gold text-primary-foreground py-3.5 rounded-lg font-semibold text-sm hover:opacity-90 transition-opacity disabled:opacity-40 disabled:cursor-not-allowed"
-              >
-                Забронировать с предоплатой
-              </button>
+            <div className="space-y-3">
+              <label className="text-sm font-medium text-foreground">Отправить бронирование через:</label>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <button
+                  type="button"
+                  disabled={!isFormValid}
+                  onClick={sendViaWhatsApp}
+                  className="flex items-center justify-center gap-2 py-3.5 rounded-lg font-semibold text-sm bg-gradient-gold text-primary-foreground hover:opacity-90 transition-opacity disabled:opacity-40 disabled:cursor-not-allowed"
+                >
+                  <MessageCircle className="w-4 h-4" />
+                  WhatsApp
+                </button>
+                <button
+                  type="button"
+                  disabled={!isFormValid}
+                  onClick={sendViaTelegram}
+                  className="flex items-center justify-center gap-2 py-3.5 rounded-lg font-semibold text-sm bg-[hsl(200,80%,50%)] text-primary-foreground hover:opacity-90 transition-opacity disabled:opacity-40 disabled:cursor-not-allowed"
+                >
+                  <Send className="w-4 h-4" />
+                  Telegram
+                </button>
+              </div>
               <button
                 type="button"
                 disabled={!car || !dateFrom || !dateTo || !lastName.trim() || !firstName.trim() || !middleName.trim() || !phone.trim()}
@@ -656,7 +683,7 @@ const BookingSection = () => {
                     experienceLabel: experienceOptions.find((e) => e.value === experience)?.label ?? experience,
                   });
                 }}
-                className="flex items-center justify-center gap-2 px-6 py-3.5 rounded-lg font-semibold text-sm border border-primary text-primary hover:bg-primary/10 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                className="w-full flex items-center justify-center gap-2 px-6 py-3.5 rounded-lg font-semibold text-sm border border-primary text-primary hover:bg-primary/10 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
               >
                 <FileText className="w-4 h-4" />
                 Скачать договор
