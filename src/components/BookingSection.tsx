@@ -21,17 +21,17 @@ import {
 import AnimatedSection from "./AnimatedSection";
 
 const cars = [
-  { value: "bmw-420i", label: "BMW 420i", price: 14000, deposit: 30000 },
-  { value: "porsche-macan", label: "Porsche Macan", price: 12000, deposit: 25000 },
-  { value: "mercedes-glb", label: "Mercedes GLB", price: 11000, deposit: 25000 },
-  { value: "lixiang-l6", label: "LiXiang L6", price: 23000, deposit: 35000 },
+  { value: "bmw-420i", label: "BMW 420i", price: 14000, deposit: 30000, extras: { mileage: 2000, insurance: 3000, driver: 5000 } },
+  { value: "porsche-macan", label: "Porsche Macan", price: 12000, deposit: 25000, extras: { mileage: 2500, insurance: 3500, driver: 5000 } },
+  { value: "mercedes-glb", label: "Mercedes GLB", price: 11000, deposit: 25000, extras: { mileage: 1500, insurance: 2500, driver: 4000 } },
+  { value: "lixiang-l6", label: "LiXiang L6", price: 23000, deposit: 35000, extras: { mileage: 3000, insurance: 5000, driver: 7000 } },
 ];
 
-const extras = [
-  { id: "mileage", label: "Безлимитный пробег", price: 2000, icon: Gauge },
-  { id: "insurance", label: "Страховка КАСКО", price: 3000, icon: Shield },
-  { id: "driver", label: "Аренда с водителем", price: 5000, icon: UserCheck },
-];
+const extrasConfig = [
+  { id: "mileage", label: "Безлимитный пробег", icon: Gauge },
+  { id: "insurance", label: "Страховка КАСКО", icon: Shield },
+  { id: "driver", label: "Аренда с водителем", icon: UserCheck },
+] as const;
 
 const ageOptions = [
   { value: "21+", label: "21 год и старше", multiplier: 1.0, depositExtra: 0 },
