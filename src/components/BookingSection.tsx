@@ -638,14 +638,28 @@ const BookingSection = () => {
               </span>
             </button>
 
-            <div className="flex flex-col sm:flex-row gap-3">
-              <button
-                type="submit"
-                disabled={!agreed || !car || !dateFrom || !dateTo || !lastName.trim() || !firstName.trim() || !middleName.trim() || !phone.trim()}
-                className="flex-1 bg-gradient-gold text-primary-foreground py-3.5 rounded-lg font-semibold text-sm hover:opacity-90 transition-opacity disabled:opacity-40 disabled:cursor-not-allowed"
-              >
-                Забронировать с предоплатой
-              </button>
+            <div className="space-y-3">
+              <label className="text-sm font-medium text-foreground">Отправить бронирование через:</label>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <button
+                  type="button"
+                  disabled={!isFormValid}
+                  onClick={sendViaWhatsApp}
+                  className="flex items-center justify-center gap-2 py-3.5 rounded-lg font-semibold text-sm bg-gradient-gold text-primary-foreground hover:opacity-90 transition-opacity disabled:opacity-40 disabled:cursor-not-allowed"
+                >
+                  <MessageCircle className="w-4 h-4" />
+                  WhatsApp
+                </button>
+                <button
+                  type="button"
+                  disabled={!isFormValid}
+                  onClick={sendViaTelegram}
+                  className="flex items-center justify-center gap-2 py-3.5 rounded-lg font-semibold text-sm bg-[hsl(200,80%,50%)] text-primary-foreground hover:opacity-90 transition-opacity disabled:opacity-40 disabled:cursor-not-allowed"
+                >
+                  <Send className="w-4 h-4" />
+                  Telegram
+                </button>
+              </div>
               <button
                 type="button"
                 disabled={!car || !dateFrom || !dateTo || !lastName.trim() || !firstName.trim() || !middleName.trim() || !phone.trim()}
@@ -669,7 +683,7 @@ const BookingSection = () => {
                     experienceLabel: experienceOptions.find((e) => e.value === experience)?.label ?? experience,
                   });
                 }}
-                className="flex items-center justify-center gap-2 px-6 py-3.5 rounded-lg font-semibold text-sm border border-primary text-primary hover:bg-primary/10 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                className="w-full flex items-center justify-center gap-2 px-6 py-3.5 rounded-lg font-semibold text-sm border border-primary text-primary hover:bg-primary/10 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
               >
                 <FileText className="w-4 h-4" />
                 Скачать договор
