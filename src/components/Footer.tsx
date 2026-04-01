@@ -1,4 +1,5 @@
 import { MessageCircle, Send } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const footerLinks = [
   { label: "О нас", href: "#about" },
