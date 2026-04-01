@@ -41,6 +41,7 @@ const Index = () => {
       <PlansSection />
       <Footer />
       <FloatingMessenger />
+      <ThemeSwitcher />
     </div>
   );
 };
