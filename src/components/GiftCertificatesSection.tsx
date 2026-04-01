@@ -1,6 +1,7 @@
 import { useState, useRef } from "react";
 import { Gift, ChevronLeft, ChevronRight, Star, Car, Users, UserCheck, Crown } from "lucide-react";
 import AnimatedSection from "./AnimatedSection";
+import CustomCertificateForm from "./CustomCertificateForm";
 import { cn } from "@/lib/utils";
 
 const certificates = [
