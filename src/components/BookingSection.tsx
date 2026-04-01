@@ -159,33 +159,46 @@ const BookingSection = () => {
     );
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!lastName.trim() || !firstName.trim() || !middleName.trim() || !phone.trim() || !car || !dateFrom || !dateTo || !agreed) return;
+  const buildMessageText = () => {
     const fullName = `${lastName.trim()} ${firstName.trim()} ${middleName.trim()}`;
-
     const carLabel = selectedCar?.label ?? car;
-    const from = format(dateFrom, "dd.MM.yyyy");
-    const to = format(dateTo, "dd.MM.yyyy");
+    const from = dateFrom ? format(dateFrom, "dd.MM.yyyy") : "";
+    const to = dateTo ? format(dateTo, "dd.MM.yyyy") : "";
     const ageLabel = ageOptions.find((a) => a.value === age)?.label ?? age;
     const expLabel = experienceOptions.find((e) => e.value === experience)?.label ?? experience;
     const extrasText = selectedExtras.length
       ? `\nОпции: ${selectedExtras.map((id) => extrasConfig.find((e) => e.id === id)?.label).join(", ")}`
       : "";
-    const discountText = firstDayDiscount > 0
-      ? `\n🔥 Скидка (${isBirthday ? "день рождения" : "день свадьбы"}): −${firstDayDiscount.toLocaleString("ru-RU")} ₽`
-      : "";
     const durationText = durationDiscountPercent > 0
       ? `\n📅 Скидка за срок (${Math.round(durationDiscountPercent * 100)}%): ставка ${discountedRate.toLocaleString("ru-RU")} ₽/сут`
+      : "";
+    const discountText = firstDayDiscount > 0
+      ? `\n🔥 Скидка (${isBirthday ? "день рождения" : "день свадьбы"}): −${firstDayDiscount.toLocaleString("ru-RU")} ₽`
       : "";
     const promoText = promoDiscountAmount > 0
       ? `\n🏷 Промокод ${appliedPromo}: −${promoDiscountAmount.toLocaleString("ru-RU")} ₽`
       : "";
 
-    const text = encodeURIComponent(
-      `Бронирование с сайта 3D Drive\nФИО: ${fullName}\nТелефон: ${phone}\nАвтомобиль: ${carLabel}\nВозраст: ${ageLabel}\nСтаж: ${expLabel}\nДаты: ${from} — ${to} (${days} сут.)${extrasText}${durationText}${discountText}${promoText}\n\nСуточная ставка: ${adjustedRate.toLocaleString("ru-RU")} ₽\nИтого: ${totalCost.toLocaleString("ru-RU")} ₽\nПредоплата (${PREPAY_PERCENT}%): ${prepay.toLocaleString("ru-RU")} ₽\nОстаток при получении: ${remaining.toLocaleString("ru-RU")} ₽\nЗалог: ${deposit.toLocaleString("ru-RU")} ₽`
-    );
+    return `Бронирование с сайта 3D Drive\nФИО: ${fullName}\nТелефон: ${phone}\nАвтомобиль: ${carLabel}\nВозраст: ${ageLabel}\nСтаж: ${expLabel}\nДаты: ${from} — ${to} (${days} сут.)${extrasText}${durationText}${discountText}${promoText}\n\nСуточная ставка: ${adjustedRate.toLocaleString("ru-RU")} ₽\nИтого: ${totalCost.toLocaleString("ru-RU")} ₽\nПредоплата (${PREPAY_PERCENT}%): ${prepay.toLocaleString("ru-RU")} ₽\nОстаток при получении: ${remaining.toLocaleString("ru-RU")} ₽\nЗалог: ${deposit.toLocaleString("ru-RU")} ₽`;
+  };
+
+  const isFormValid = lastName.trim() && firstName.trim() && middleName.trim() && phone.trim() && car && dateFrom && dateTo && agreed;
+
+  const sendViaWhatsApp = () => {
+    if (!isFormValid) return;
+    const text = encodeURIComponent(buildMessageText());
     window.open(`https://wa.me/79868262332?text=${text}`, "_blank");
+  };
+
+  const sendViaTelegram = () => {
+    if (!isFormValid) return;
+    const text = encodeURIComponent(buildMessageText());
+    window.open(`https://t.me/share/url?url=${encodeURIComponent("3D Drive")}&text=${text}`, "_blank");
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    sendViaWhatsApp();
   };
 
   const today = new Date();
