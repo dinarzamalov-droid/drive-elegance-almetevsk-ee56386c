@@ -47,7 +47,9 @@ const experienceOptions = [
 const PREPAY_PERCENT = 20;
 
 const BookingSection = () => {
-  const [name, setName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [middleName, setMiddleName] = useState("");
   const [phone, setPhone] = useState("");
   const [car, setCar] = useState(cars[0].value);
   const [age, setAge] = useState("21+");
@@ -90,7 +92,8 @@ const BookingSection = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!name.trim() || !phone.trim() || !car || !dateFrom || !dateTo || !agreed) return;
+    if (!lastName.trim() || !firstName.trim() || !middleName.trim() || !phone.trim() || !car || !dateFrom || !dateTo || !agreed) return;
+    const fullName = `${lastName.trim()} ${firstName.trim()} ${middleName.trim()}`;
 
     const carLabel = selectedCar?.label ?? car;
     const from = format(dateFrom, "dd.MM.yyyy");
@@ -102,7 +105,7 @@ const BookingSection = () => {
       : "";
 
     const text = encodeURIComponent(
-      `Бронирование с сайта 3D Drive\nИмя: ${name}\nТелефон: ${phone}\nАвтомобиль: ${carLabel}\nВозраст: ${ageLabel}\nСтаж: ${expLabel}\nДаты: ${from} — ${to} (${days} сут.)${extrasText}\n\nСуточная ставка: ${adjustedRate.toLocaleString("ru-RU")} ₽\nИтого: ${totalCost.toLocaleString("ru-RU")} ₽\nПредоплата (${PREPAY_PERCENT}%): ${prepay.toLocaleString("ru-RU")} ₽\nОстаток при получении: ${remaining.toLocaleString("ru-RU")} ₽\nЗалог: ${deposit.toLocaleString("ru-RU")} ₽`
+      `Бронирование с сайта 3D Drive\nФИО: ${fullName}\nТелефон: ${phone}\nАвтомобиль: ${carLabel}\nВозраст: ${ageLabel}\nСтаж: ${expLabel}\nДаты: ${from} — ${to} (${days} сут.)${extrasText}\n\nСуточная ставка: ${adjustedRate.toLocaleString("ru-RU")} ₽\nИтого: ${totalCost.toLocaleString("ru-RU")} ₽\nПредоплата (${PREPAY_PERCENT}%): ${prepay.toLocaleString("ru-RU")} ₽\nОстаток при получении: ${remaining.toLocaleString("ru-RU")} ₽\nЗалог: ${deposit.toLocaleString("ru-RU")} ₽`
     );
     window.open(`https://wa.me/79868262332?text=${text}`, "_blank");
   };
@@ -359,19 +362,45 @@ const BookingSection = () => {
               </div>
             )}
 
-            {/* Contact */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {/* ФИО */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <div className="space-y-2">
-                <label className="text-sm font-medium text-foreground">Имя</label>
+                <label className="text-sm font-medium text-foreground">Фамилия *</label>
                 <input
                   type="text"
                   required
-                  placeholder="Ваше имя"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
+                  placeholder="Иванов"
+                  value={lastName}
+                  onChange={(e) => setLastName(e.target.value)}
                   className={inputClass}
                 />
               </div>
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-foreground">Имя *</label>
+                <input
+                  type="text"
+                  required
+                  placeholder="Иван"
+                  value={firstName}
+                  onChange={(e) => setFirstName(e.target.value)}
+                  className={inputClass}
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-foreground">Отчество *</label>
+                <input
+                  type="text"
+                  required
+                  placeholder="Иванович"
+                  value={middleName}
+                  onChange={(e) => setMiddleName(e.target.value)}
+                  className={inputClass}
+                />
+              </div>
+            </div>
+
+            {/* Телефон */}
+            <div className="grid grid-cols-1 gap-4">
               <div className="space-y-2">
                 <label className="text-sm font-medium text-foreground">Телефон</label>
                 <input
@@ -407,18 +436,18 @@ const BookingSection = () => {
             <div className="flex flex-col sm:flex-row gap-3">
               <button
                 type="submit"
-                disabled={!agreed || !car || !dateFrom || !dateTo || !name.trim() || !phone.trim()}
+                disabled={!agreed || !car || !dateFrom || !dateTo || !lastName.trim() || !firstName.trim() || !middleName.trim() || !phone.trim()}
                 className="flex-1 bg-gradient-gold text-primary-foreground py-3.5 rounded-lg font-semibold text-sm hover:opacity-90 transition-opacity disabled:opacity-40 disabled:cursor-not-allowed"
               >
                 Забронировать с предоплатой
               </button>
               <button
                 type="button"
-                disabled={!car || !dateFrom || !dateTo || !name.trim() || !phone.trim()}
+                disabled={!car || !dateFrom || !dateTo || !lastName.trim() || !firstName.trim() || !middleName.trim() || !phone.trim()}
                 onClick={() => {
                   if (!selectedCar || !dateFrom || !dateTo) return;
                   generateContract({
-                    name,
+                    name: `${lastName.trim()} ${firstName.trim()} ${middleName.trim()}`,
                     phone,
                     carLabel: selectedCar.label,
                     dateFrom: format(dateFrom, "dd.MM.yyyy"),
