@@ -34,7 +34,7 @@ const cars = [
   },
   {
     name: "Porsche Macan",
-    images: [porscheImg],
+    images: [porscheImg, porsche1, porsche2, porsche3, porsche4, porsche5, porsche6],
     price: "12 000",
     deposit: "25 000",
     specs: "252 л.с., полный привод, компактный SUV + stage 1",
