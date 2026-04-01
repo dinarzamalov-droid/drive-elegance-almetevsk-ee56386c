@@ -105,7 +105,7 @@ const BookingSection = () => {
     const ageLabel = ageOptions.find((a) => a.value === age)?.label ?? age;
     const expLabel = experienceOptions.find((e) => e.value === experience)?.label ?? experience;
     const extrasText = selectedExtras.length
-      ? `\nОпции: ${selectedExtras.map((id) => extras.find((e) => e.id === id)?.label).join(", ")}`
+      ? `\nОпции: ${selectedExtras.map((id) => extrasConfig.find((e) => e.id === id)?.label).join(", ")}`
       : "";
 
     const text = encodeURIComponent(
