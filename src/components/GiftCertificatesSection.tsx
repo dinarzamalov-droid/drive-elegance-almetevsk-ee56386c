@@ -171,6 +171,9 @@ const GiftCertificatesSection = () => {
             })}
           </div>
         </AnimatedSection>
+
+        {/* Custom amount form */}
+        <CustomCertificateForm />
       </div>
     </section>
   );
