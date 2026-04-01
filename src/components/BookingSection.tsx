@@ -342,6 +342,15 @@ const BookingSection = () => {
               </div>
             </div>
 
+            {/* Duration discount info */}
+            {days >= 3 && selectedCar && (
+              <div className="bg-primary/10 border border-primary/20 rounded-lg p-3 text-sm">
+                <span className="text-primary font-medium">
+                  📅 Скидка за срок аренды {Math.round(durationDiscountPercent * 100)}% — ставка {discountedRate.toLocaleString("ru-RU")} ₽/сут вместо {baseRate.toLocaleString("ru-RU")} ₽
+                </span>
+              </div>
+            )}
+
             {/* Discounts */}
             <div className="space-y-3">
               <label className="text-sm font-medium text-foreground">Скидки 🔥</label>
