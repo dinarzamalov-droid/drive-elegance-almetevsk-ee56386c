@@ -82,7 +82,9 @@ const BookingSection = () => {
   const totalCost = baseCost + extrasCost;
   const prepay = Math.round((totalCost * PREPAY_PERCENT) / 100);
   const remaining = totalCost - prepay;
-  const deposit = selectedCar?.deposit ?? 0;
+  const ageDepositExtra = ageOptions.find((a) => a.value === age)?.depositExtra ?? 0;
+  const expDepositExtra = experienceOptions.find((e) => e.value === experience)?.depositExtra ?? 0;
+  const deposit = (selectedCar?.deposit ?? 0) + ageDepositExtra + expDepositExtra;
 
   const toggleExtra = (id: string) => {
     setSelectedExtras((prev) =>
