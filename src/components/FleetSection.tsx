@@ -7,6 +7,12 @@ import bmw3 from "@/assets/bmw-3.jpg";
 import bmw4 from "@/assets/bmw-4.jpg";
 import bmw5 from "@/assets/bmw-5.jpg";
 import porscheImg from "@/assets/porsche-macan.jpg";
+import porsche1 from "@/assets/porsche-1.jpg";
+import porsche2 from "@/assets/porsche-2.jpg";
+import porsche3 from "@/assets/porsche-3.jpg";
+import porsche4 from "@/assets/porsche-4.jpg";
+import porsche5 from "@/assets/porsche-5.jpg";
+import porsche6 from "@/assets/porsche-6.jpg";
 import mercedesImg from "@/assets/mercedes-glb.jpg";
 import lixiangImg from "@/assets/lixiang-l6.jpg";
 import lixiang1 from "@/assets/lixiang-1.jpg";
@@ -28,7 +34,7 @@ const cars = [
   },
   {
     name: "Porsche Macan",
-    images: [porscheImg],
+    images: [porscheImg, porsche1, porsche2, porsche3, porsche4, porsche5, porsche6],
     price: "12 000",
     deposit: "25 000",
     specs: "252 л.с., полный привод, компактный SUV + stage 1",
