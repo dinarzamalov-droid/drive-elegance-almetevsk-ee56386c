@@ -1,11 +1,14 @@
 import { MessageCircle, Send } from "lucide-react";
 import { Link } from "react-router-dom";
+import logo from "@/assets/logo.png";
 
 const footerLinks = [
   { label: "О нас", href: "#about" },
   { label: "Автопарк", href: "#fleet" },
   { label: "Условия", href: "#terms" },
   { label: "Отзывы", href: "#reviews" },
+  { label: "Сертификаты", href: "#certificates" },
+  { label: "Клуб", href: "#club" },
   { label: "Контакты", href: "#contact" },
 ];
 
