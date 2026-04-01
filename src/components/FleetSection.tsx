@@ -44,7 +44,7 @@ const cars = [
   },
   {
     name: "LiXiang L6",
-    images: [lixiangImg],
+    images: [lixiangImg, lixiang1, lixiang2, lixiang3, lixiang4, lixiang5, lixiang6],
     price: "23 000",
     deposit: "35 000",
     specs: "449 л.с., гибрид, полный привод, премиум-кроссовер",
