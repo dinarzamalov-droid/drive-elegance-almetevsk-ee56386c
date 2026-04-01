@@ -91,6 +91,9 @@ const BookingSection = () => {
   const [dateTo, setDateTo] = useState<Date>();
   const [selectedExtras, setSelectedExtras] = useState<string[]>([]);
   const [agreed, setAgreed] = useState(false);
+  const [promoCode, setPromoCode] = useState("");
+  const [appliedPromo, setAppliedPromo] = useState<string | null>(null);
+  const [promoError, setPromoError] = useState("");
   const [isBirthday, setIsBirthday] = useState(false);
   const [isWedding, setIsWedding] = useState(false);
 
