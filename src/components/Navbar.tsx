@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { Menu, X, Phone } from "lucide-react";
+import logo from "@/assets/logo.png";
 
 const navItems = [
   { label: "О нас", href: "#about" },
@@ -7,6 +8,8 @@ const navItems = [
   { label: "Условия", href: "#terms" },
   { label: "Преимущества", href: "#why-us" },
   { label: "Отзывы", href: "#reviews" },
+  { label: "Сертификаты", href: "#certificates" },
+  { label: "Клуб", href: "#club" },
   { label: "Контакты", href: "#contact" },
 ];
 
@@ -27,9 +30,8 @@ const Navbar = () => {
       }`}
     >
       <div className="container mx-auto px-4 flex items-center justify-between h-20">
-        <a href="#" className="text-2xl font-bold tracking-tight">
-          <span className="text-gradient-gold">3D</span>
-          <span className="text-foreground"> Drive</span>
+        <a href="#">
+          <img src={logo} alt="3D Drive" className="h-9" />
         </a>
 
         <div className="hidden lg:flex items-center gap-8">
