@@ -37,7 +37,7 @@ const Step1CarSelect = ({ selectedCar, onSelect }: Step1Props) => {
                 : "border-border hover:border-muted-foreground/40"
             )}
           >
-            <div className="h-40 overflow-hidden">
+            <div className="h-40 overflow-hidden car-plate-overlay">
               <img
                 src={carImages[car.value]}
                 alt={car.label}
