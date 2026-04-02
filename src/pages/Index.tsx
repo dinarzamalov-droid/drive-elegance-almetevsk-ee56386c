@@ -12,6 +12,7 @@ import ReviewsSection from "@/components/ReviewsSection";
 import HowItWorksSection from "@/components/HowItWorksSection";
 import HandoverSection from "@/components/HandoverSection";
 import FaqSection from "@/components/FaqSection";
+import CompareSection from "@/components/CompareSection";
 import ContactSection from "@/components/ContactSection";
 import CorporateSection from "@/components/CorporateSection";
 import GiftCertificatesSection from "@/components/GiftCertificatesSection";
@@ -26,6 +27,7 @@ const Index = () => {
       <HeroSection />
       <AboutSection />
       <FleetSection />
+      <CompareSection />
       <BookingSection />
       <TermsSection />
       <WhyUsSection />
