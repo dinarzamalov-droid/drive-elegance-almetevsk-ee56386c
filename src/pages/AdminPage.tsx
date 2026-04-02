@@ -40,6 +40,7 @@ interface Booking {
   experience_category: string;
   selected_extras: string[] | null;
   promo_code: string | null;
+  preferred_messenger: string | null;
 }
 
 const statusLabels: Record<string, string> = {
