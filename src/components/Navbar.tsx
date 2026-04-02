@@ -87,6 +87,14 @@ const Navbar = () => {
             </a>
           ))}
           <a
+            href={isLoggedIn ? "/profile" : "/auth"}
+            onClick={(e) => handleNavClick(e, isLoggedIn ? "/profile" : "/auth")}
+            className="flex items-center gap-2 bg-secondary text-foreground px-4 py-2.5 rounded-lg text-sm font-medium hover:bg-secondary/80 transition-colors"
+          >
+            <User className="w-4 h-4" />
+            {isLoggedIn ? "Кабинет" : "Войти"}
+          </a>
+          <a
             href="tel:+79868262332"
             className="flex items-center gap-2 bg-gradient-gold text-primary-foreground px-5 py-2.5 rounded-lg text-sm font-semibold hover:opacity-90 transition-opacity"
           >
