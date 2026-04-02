@@ -12,6 +12,7 @@ const navItems = [
   { label: "Отзывы", href: "#reviews" },
   { label: "Удобства", href: "#features" },
   { label: "Туристам", href: "#tourism" },
+  { label: "Моё бронирование", href: "/my-booking" },
   { label: "Контакты", href: "#contact" },
 ];
 
