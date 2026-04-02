@@ -8,6 +8,7 @@ import NotFound from "./pages/NotFound.tsx";
 import PrivacyPolicy from "./pages/PrivacyPolicy.tsx";
 import BookingPage from "./pages/BookingPage.tsx";
 import AdminPage from "./pages/AdminPage.tsx";
+import TourismPage from "./pages/TourismPage.tsx";
 
 const queryClient = new QueryClient();
 
