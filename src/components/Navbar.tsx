@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { Menu, X, Phone } from "lucide-react";
+import { Menu, X, Phone, User } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 import logo from "@/assets/logo.png";
 
 const navItems = [
@@ -19,8 +20,15 @@ const navItems = [
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => setIsLoggedIn(!!session));
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => setIsLoggedIn(!!session));
+    return () => subscription.unsubscribe();
+  }, []);
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 50);
@@ -79,6 +87,14 @@ const Navbar = () => {
             </a>
           ))}
           <a
+            href={isLoggedIn ? "/profile" : "/auth"}
+            onClick={(e) => handleNavClick(e, isLoggedIn ? "/profile" : "/auth")}
+            className="flex items-center gap-2 bg-secondary text-foreground px-4 py-2.5 rounded-lg text-sm font-medium hover:bg-secondary/80 transition-colors"
+          >
+            <User className="w-4 h-4" />
+            {isLoggedIn ? "Кабинет" : "Войти"}
+          </a>
+          <a
             href="tel:+79868262332"
             className="flex items-center gap-2 bg-gradient-gold text-primary-foreground px-5 py-2.5 rounded-lg text-sm font-semibold hover:opacity-90 transition-opacity"
           >
@@ -109,8 +125,16 @@ const Navbar = () => {
               </a>
             ))}
             <a
+              href={isLoggedIn ? "/profile" : "/auth"}
+              onClick={(e) => handleNavClick(e, isLoggedIn ? "/profile" : "/auth")}
+              className="flex items-center justify-center gap-2 bg-secondary text-foreground px-5 py-3 rounded-lg text-sm font-medium"
+            >
+              <User className="w-4 h-4" />
+              {isLoggedIn ? "Личный кабинет" : "Войти / Регистрация"}
+            </a>
+            <a
               href="tel:+79868262332"
-              className="flex items-center justify-center gap-2 bg-gradient-gold text-primary-foreground px-5 py-3 rounded-lg text-sm font-semibold mt-2"
+              className="flex items-center justify-center gap-2 bg-gradient-gold text-primary-foreground px-5 py-3 rounded-lg text-sm font-semibold"
             >
               <Phone className="w-4 h-4" />
               +7 (986) 826 23 32
