@@ -125,8 +125,16 @@ const Navbar = () => {
               </a>
             ))}
             <a
+              href={isLoggedIn ? "/profile" : "/auth"}
+              onClick={(e) => handleNavClick(e, isLoggedIn ? "/profile" : "/auth")}
+              className="flex items-center justify-center gap-2 bg-secondary text-foreground px-5 py-3 rounded-lg text-sm font-medium"
+            >
+              <User className="w-4 h-4" />
+              {isLoggedIn ? "Личный кабинет" : "Войти / Регистрация"}
+            </a>
+            <a
               href="tel:+79868262332"
-              className="flex items-center justify-center gap-2 bg-gradient-gold text-primary-foreground px-5 py-3 rounded-lg text-sm font-semibold mt-2"
+              className="flex items-center justify-center gap-2 bg-gradient-gold text-primary-foreground px-5 py-3 rounded-lg text-sm font-semibold"
             >
               <Phone className="w-4 h-4" />
               +7 (986) 826 23 32
