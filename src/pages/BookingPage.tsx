@@ -26,6 +26,7 @@ const BookingPage = () => {
   const preselectedCar = searchParams.get("car") ?? "";
 
   const [step, setStep] = useState(preselectedCar ? 2 : 1);
+  const [saving, setSaving] = useState(false);
   const [state, setState] = useState<BookingState>({
     ...initialBookingState,
     car: preselectedCar || initialBookingState.car,
@@ -51,8 +52,58 @@ const BookingPage = () => {
     }
   };
 
-  const next = () => {
-    if (step < TOTAL_STEPS && canNext()) setStep(step + 1);
+  const saveBooking = async () => {
+    if (!calc.selectedCar || !state.dateFrom || !state.dateTo) return;
+    setSaving(true);
+    try {
+      const { error } = await supabase.from("bookings" as any).insert({
+        car_value: state.car,
+        car_label: calc.selectedCar.label,
+        date_from: state.dateFrom.toISOString().split("T")[0],
+        date_to: state.dateTo.toISOString().split("T")[0],
+        days: calc.days,
+        city: state.city,
+        delivery_time: state.deliveryTime,
+        age_category: state.age,
+        experience_category: state.experience,
+        selected_extras: state.selectedExtras,
+        daily_rate: calc.adjustedRate,
+        extras_cost: calc.extrasCost,
+        total_cost: calc.totalCost,
+        prepay: calc.prepay,
+        remaining: calc.remaining,
+        deposit: calc.deposit,
+        promo_code: state.appliedPromo,
+        last_name: state.lastName.trim(),
+        first_name: state.firstName.trim(),
+        middle_name: state.middleName.trim(),
+        phone: state.phone.trim(),
+        email: state.email.trim(),
+        passport_series: state.passportSeries,
+        passport_number: state.passportNumber,
+        passport_date: state.passportDate || null,
+        passport_code: state.passportCode || null,
+        license_number: state.licenseNumber,
+        license_date: state.licenseDate || null,
+        payment_method: state.paymentMethod,
+      } as any);
+      if (error) throw error;
+      toast.success("Бронирование сохранено!");
+    } catch (err) {
+      console.error("Booking save error:", err);
+      toast.error("Ошибка сохранения бронирования");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const next = async () => {
+    if (step < TOTAL_STEPS && canNext()) {
+      if (step === 5) {
+        await saveBooking();
+      }
+      setStep(step + 1);
+    }
   };
   const prev = () => {
     if (step > 1) setStep(step - 1);
