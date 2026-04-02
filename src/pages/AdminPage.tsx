@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Lock, LogOut, RefreshCw, Search, Download } from "lucide-react";
+import { Lock, LogOut, RefreshCw, Search, Download, X, ChevronRight } from "lucide-react";
 import { format } from "date-fns";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -9,22 +9,36 @@ import Footer from "@/components/Footer";
 interface Booking {
   id: string;
   car_label: string;
+  car_value: string;
   date_from: string;
   date_to: string;
   days: number;
+  daily_rate: number;
+  extras_cost: number;
   total_cost: number;
   prepay: number;
+  remaining: number;
   deposit: number;
   last_name: string;
   first_name: string;
   middle_name: string | null;
   phone: string;
   email: string;
+  passport_series: string | null;
+  passport_number: string | null;
+  passport_date: string | null;
+  passport_code: string | null;
+  license_number: string | null;
+  license_date: string | null;
   payment_method: string;
   payment_status: string;
   status: string;
   created_at: string;
   city: string;
+  delivery_time: string | null;
+  age_category: string;
+  experience_category: string;
+  selected_extras: string[] | null;
   promo_code: string | null;
 }
 
@@ -46,6 +60,20 @@ const methodLabels: Record<string, string> = {
   online: "Онлайн",
 };
 
+const Section = ({ title, children }: { title: string; children: React.ReactNode }) => (
+  <div>
+    <h3 className="font-semibold text-xs text-muted-foreground uppercase tracking-wider mb-2 mt-2">{title}</h3>
+    <div className="bg-secondary/50 rounded-lg p-3 space-y-1.5">{children}</div>
+  </div>
+);
+
+const Row = ({ label, value, bold }: { label: string; value: string; bold?: boolean }) => (
+  <div className="flex justify-between gap-4">
+    <span className="text-muted-foreground shrink-0">{label}</span>
+    <span className={`text-right ${bold ? "font-bold" : ""}`}>{value}</span>
+  </div>
+);
+
 const AdminPage = () => {
   const [authenticated, setAuthenticated] = useState(false);
   const [password, setPassword] = useState("");
@@ -53,6 +81,7 @@ const AdminPage = () => {
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(false);
   const [search, setSearch] = useState("");
+  const [selected, setSelected] = useState<Booking | null>(null);
 
   const fetchBookings = async (pwd: string) => {
     setLoading(true);
@@ -238,7 +267,11 @@ const AdminPage = () => {
                   </tr>
                 ) : (
                   filtered.map((b) => (
-                    <tr key={b.id} className="border-t border-border hover:bg-secondary/50 transition-colors">
+                    <tr
+                      key={b.id}
+                      onClick={() => setSelected(b)}
+                      className="border-t border-border hover:bg-secondary/50 transition-colors cursor-pointer"
+                    >
                       <td className="px-4 py-3 whitespace-nowrap text-muted-foreground">
                         {format(new Date(b.created_at), "dd.MM.yy HH:mm")}
                       </td>
@@ -259,7 +292,7 @@ const AdminPage = () => {
                       <td className="px-4 py-3 text-center">
                         <span className="text-xs">{methodLabels[b.payment_method] || b.payment_method}</span>
                       </td>
-                      <td className="px-4 py-3 text-center">
+                      <td className="px-4 py-3 text-center" onClick={(e) => e.stopPropagation()}>
                         <select
                           value={b.status}
                           onChange={(e) => updateStatus(b.id, e.target.value)}
@@ -284,6 +317,68 @@ const AdminPage = () => {
             </table>
           </div>
         </div>
+
+        {/* Detail modal */}
+        {selected && (
+          <div
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
+            onClick={() => setSelected(null)}
+          >
+            <div
+              className="bg-card border border-border rounded-2xl w-full max-w-lg max-h-[85vh] overflow-y-auto p-6 space-y-4"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="flex items-center justify-between">
+                <h2 className="text-lg font-bold">Бронирование #{selected.id.slice(0, 8)}</h2>
+                <button onClick={() => setSelected(null)} className="p-1 rounded-lg hover:bg-secondary transition-colors">
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+
+              <div className="space-y-3 text-sm">
+                <Section title="Клиент">
+                  <Row label="ФИО" value={`${selected.last_name} ${selected.first_name} ${selected.middle_name || ""}`} />
+                  <Row label="Телефон" value={selected.phone} />
+                  <Row label="Email" value={selected.email} />
+                  <Row label="Паспорт" value={selected.passport_series && selected.passport_number ? `${selected.passport_series} ${selected.passport_number}` : "—"} />
+                  {selected.passport_date && <Row label="Дата выдачи" value={selected.passport_date} />}
+                  {selected.passport_code && <Row label="Код подразделения" value={selected.passport_code} />}
+                  <Row label="ВУ" value={selected.license_number || "—"} />
+                  {selected.license_date && <Row label="Дата выдачи ВУ" value={selected.license_date} />}
+                </Section>
+
+                <Section title="Автомобиль и даты">
+                  <Row label="Автомобиль" value={selected.car_label} />
+                  <Row label="Период" value={`${selected.date_from} — ${selected.date_to} (${selected.days} д.)`} />
+                  <Row label="Город" value={selected.city} />
+                  {selected.delivery_time && <Row label="Время подачи" value={selected.delivery_time} />}
+                  <Row label="Возраст" value={selected.age_category} />
+                  <Row label="Стаж" value={selected.experience_category} />
+                  {selected.selected_extras && selected.selected_extras.length > 0 && (
+                    <Row label="Опции" value={selected.selected_extras.join(", ")} />
+                  )}
+                </Section>
+
+                <Section title="Финансы">
+                  <Row label="Суточная ставка" value={`${selected.daily_rate.toLocaleString("ru-RU")} ₽`} />
+                  {selected.extras_cost > 0 && <Row label="Доп. опции" value={`${selected.extras_cost.toLocaleString("ru-RU")} ₽`} />}
+                  <Row label="Итого" value={`${selected.total_cost.toLocaleString("ru-RU")} ₽`} bold />
+                  <Row label="Предоплата" value={`${selected.prepay.toLocaleString("ru-RU")} ₽`} />
+                  <Row label="Остаток" value={`${selected.remaining.toLocaleString("ru-RU")} ₽`} />
+                  <Row label="Залог" value={`${selected.deposit.toLocaleString("ru-RU")} ₽`} />
+                  {selected.promo_code && <Row label="Промокод" value={selected.promo_code} />}
+                  <Row label="Способ оплаты" value={methodLabels[selected.payment_method] || selected.payment_method} />
+                  <Row label="Статус оплаты" value={paymentLabels[selected.payment_status] || selected.payment_status} />
+                </Section>
+
+                <Section title="Статус">
+                  <Row label="Создано" value={format(new Date(selected.created_at), "dd.MM.yyyy HH:mm")} />
+                  <Row label="Статус" value={statusLabels[selected.status] || selected.status} />
+                </Section>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
       <Footer />
     </div>
