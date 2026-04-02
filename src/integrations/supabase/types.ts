@@ -212,6 +212,75 @@ export type Database = {
         }
         Relationships: []
       }
+      profiles: {
+        Row: {
+          bonus_balance: number
+          created_at: string
+          email: string
+          favorite_cars: string[] | null
+          first_name: string
+          id: string
+          last_name: string
+          license_date: string | null
+          license_number: string | null
+          loyalty_level: string
+          middle_name: string | null
+          passport_code: string | null
+          passport_date: string | null
+          passport_number: string | null
+          passport_series: string | null
+          phone: string
+          total_rentals: number
+          total_spent: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          bonus_balance?: number
+          created_at?: string
+          email?: string
+          favorite_cars?: string[] | null
+          first_name?: string
+          id?: string
+          last_name?: string
+          license_date?: string | null
+          license_number?: string | null
+          loyalty_level?: string
+          middle_name?: string | null
+          passport_code?: string | null
+          passport_date?: string | null
+          passport_number?: string | null
+          passport_series?: string | null
+          phone?: string
+          total_rentals?: number
+          total_spent?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          bonus_balance?: number
+          created_at?: string
+          email?: string
+          favorite_cars?: string[] | null
+          first_name?: string
+          id?: string
+          last_name?: string
+          license_date?: string | null
+          license_number?: string | null
+          loyalty_level?: string
+          middle_name?: string | null
+          passport_code?: string | null
+          passport_date?: string | null
+          passport_number?: string | null
+          passport_series?: string | null
+          phone?: string
+          total_rentals?: number
+          total_spent?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
