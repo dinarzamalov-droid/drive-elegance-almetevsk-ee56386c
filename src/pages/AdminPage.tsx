@@ -231,14 +231,22 @@ const AdminPage = () => {
                         <span className="text-xs">{methodLabels[b.payment_method] || b.payment_method}</span>
                       </td>
                       <td className="px-4 py-3 text-center">
-                        <span className={`inline-block px-2 py-1 rounded-full text-xs font-medium ${
-                          b.status === "new" ? "bg-primary/20 text-primary" :
-                          b.status === "confirmed" ? "bg-green-500/20 text-green-400" :
-                          b.status === "cancelled" ? "bg-destructive/20 text-destructive" :
-                          "bg-secondary text-muted-foreground"
-                        }`}>
-                          {statusLabels[b.status] || b.status}
-                        </span>
+                        <select
+                          value={b.status}
+                          onChange={(e) => updateStatus(b.id, e.target.value)}
+                          className={`px-2 py-1 rounded-full text-xs font-medium border-none cursor-pointer focus:outline-none focus:ring-2 focus:ring-primary ${
+                            b.status === "new" ? "bg-primary/20 text-primary" :
+                            b.status === "confirmed" ? "bg-green-500/20 text-green-400" :
+                            b.status === "cancelled" ? "bg-destructive/20 text-destructive" :
+                            b.status === "completed" ? "bg-blue-500/20 text-blue-400" :
+                            "bg-secondary text-muted-foreground"
+                          }`}
+                        >
+                          <option value="new">Новая</option>
+                          <option value="confirmed">Подтверждена</option>
+                          <option value="completed">Завершена</option>
+                          <option value="cancelled">Отменена</option>
+                        </select>
                       </td>
                     </tr>
                   ))
