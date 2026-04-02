@@ -303,6 +303,68 @@ const AdminPage = () => {
             </table>
           </div>
         </div>
+
+        {/* Detail modal */}
+        {selected && (
+          <div
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
+            onClick={() => setSelected(null)}
+          >
+            <div
+              className="bg-card border border-border rounded-2xl w-full max-w-lg max-h-[85vh] overflow-y-auto p-6 space-y-4"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="flex items-center justify-between">
+                <h2 className="text-lg font-bold">Бронирование #{selected.id.slice(0, 8)}</h2>
+                <button onClick={() => setSelected(null)} className="p-1 rounded-lg hover:bg-secondary transition-colors">
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+
+              <div className="space-y-3 text-sm">
+                <Section title="Клиент">
+                  <Row label="ФИО" value={`${selected.last_name} ${selected.first_name} ${selected.middle_name || ""}`} />
+                  <Row label="Телефон" value={selected.phone} />
+                  <Row label="Email" value={selected.email} />
+                  <Row label="Паспорт" value={selected.passport_series && selected.passport_number ? `${selected.passport_series} ${selected.passport_number}` : "—"} />
+                  {selected.passport_date && <Row label="Дата выдачи" value={selected.passport_date} />}
+                  {selected.passport_code && <Row label="Код подразделения" value={selected.passport_code} />}
+                  <Row label="ВУ" value={selected.license_number || "—"} />
+                  {selected.license_date && <Row label="Дата выдачи ВУ" value={selected.license_date} />}
+                </Section>
+
+                <Section title="Автомобиль и даты">
+                  <Row label="Автомобиль" value={selected.car_label} />
+                  <Row label="Период" value={`${selected.date_from} — ${selected.date_to} (${selected.days} д.)`} />
+                  <Row label="Город" value={selected.city} />
+                  {selected.delivery_time && <Row label="Время подачи" value={selected.delivery_time} />}
+                  <Row label="Возраст" value={selected.age_category} />
+                  <Row label="Стаж" value={selected.experience_category} />
+                  {selected.selected_extras && selected.selected_extras.length > 0 && (
+                    <Row label="Опции" value={selected.selected_extras.join(", ")} />
+                  )}
+                </Section>
+
+                <Section title="Финансы">
+                  <Row label="Суточная ставка" value={`${selected.daily_rate.toLocaleString("ru-RU")} ₽`} />
+                  {selected.extras_cost > 0 && <Row label="Доп. опции" value={`${selected.extras_cost.toLocaleString("ru-RU")} ₽`} />}
+                  <Row label="Итого" value={`${selected.total_cost.toLocaleString("ru-RU")} ₽`} bold />
+                  <Row label="Предоплата" value={`${selected.prepay.toLocaleString("ru-RU")} ₽`} />
+                  <Row label="Остаток" value={`${selected.remaining.toLocaleString("ru-RU")} ₽`} />
+                  <Row label="Залог" value={`${selected.deposit.toLocaleString("ru-RU")} ₽`} />
+                  {selected.promo_code && <Row label="Промокод" value={selected.promo_code} />}
+                  <Row label="Способ оплаты" value={methodLabels[selected.payment_method] || selected.payment_method} />
+                  <Row label="Статус оплаты" value={paymentLabels[selected.payment_status] || selected.payment_status} />
+                </Section>
+
+                <Section title="Статус">
+                  <Row label="Создано" value={format(new Date(selected.created_at), "dd.MM.yyyy HH:mm")} />
+                  <Row label="Статус" value={statusLabels[selected.status] || selected.status} />
+                </Section>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
       <Footer />
     </div>
