@@ -113,6 +113,7 @@ const BookingPage = () => {
         license_number: state.licenseNumber,
         license_date: state.licenseDate || null,
         payment_method: state.paymentMethod,
+        preferred_messenger: state.preferredMessenger,
       } as any);
       if (error) throw error;
       toast.success("Бронирование сохранено!");

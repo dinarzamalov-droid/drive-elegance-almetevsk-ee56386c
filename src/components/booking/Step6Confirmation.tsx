@@ -1,8 +1,9 @@
-import { CheckCircle, FileText, MessageCircle, Send, CalendarPlus } from "lucide-react";
+import { CheckCircle, FileText, MessageCircle, Send, CalendarPlus, Download } from "lucide-react";
 import { format } from "date-fns";
 import { cars, ageOptions, experienceOptions, extrasConfig, PREPAY_PERCENT } from "@/lib/bookingData";
 import { getBookingCalculations } from "@/lib/bookingCalculations";
 import { generateContract } from "@/lib/generateContract";
+import { downloadIcsFile } from "@/lib/generateIcs";
 import type { BookingState } from "@/lib/bookingData";
 
 interface Step6Props {
@@ -90,18 +91,34 @@ const Step6Confirmation = ({ state }: Step6Props) => {
           <FileText className="w-4 h-4" /> Скачать договор PDF
         </button>
         {state.dateFrom && state.dateTo && (
-          <button
-            onClick={() => {
-              const from = format(state.dateFrom!, "yyyyMMdd");
-              const to = format(state.dateTo!, "yyyyMMdd");
-              const title = encodeURIComponent(`Аренда ${selectedCar?.label} — 3D Drive`);
-              const details = encodeURIComponent(`Автомобиль: ${selectedCar?.label}\nТелефон: ${state.phone}\nПредоплата: ${calc.prepay.toLocaleString("ru-RU")} ₽`);
-              window.open(`https://calendar.google.com/calendar/render?action=TEMPLATE&text=${title}&dates=${from}/${to}&details=${details}`, "_blank");
-            }}
-            className="w-full flex items-center justify-center gap-2 px-6 py-3 rounded-lg font-semibold text-sm border border-border text-muted-foreground hover:text-foreground hover:border-muted-foreground/60 transition-colors"
-          >
-            <CalendarPlus className="w-4 h-4" /> Добавить в календарь
-          </button>
+          <>
+            <button
+              onClick={() => {
+                const from = format(state.dateFrom!, "yyyyMMdd");
+                const to = format(state.dateTo!, "yyyyMMdd");
+                const title = encodeURIComponent(`Аренда ${selectedCar?.label} — 3D Drive`);
+                const details = encodeURIComponent(`Автомобиль: ${selectedCar?.label}\nТелефон: ${state.phone}\nПредоплата: ${calc.prepay.toLocaleString("ru-RU")} ₽`);
+                window.open(`https://calendar.google.com/calendar/render?action=TEMPLATE&text=${title}&dates=${from}/${to}&details=${details}`, "_blank");
+              }}
+              className="w-full flex items-center justify-center gap-2 px-6 py-3 rounded-lg font-semibold text-sm border border-border text-muted-foreground hover:text-foreground hover:border-muted-foreground/60 transition-colors"
+            >
+              <CalendarPlus className="w-4 h-4" /> Google Календарь
+            </button>
+            <button
+              onClick={() => {
+                downloadIcsFile({
+                  title: `Аренда ${selectedCar?.label} — 3D Drive`,
+                  description: `Автомобиль: ${selectedCar?.label}\nТелефон: ${state.phone}\nПредоплата: ${calc.prepay.toLocaleString("ru-RU")} ₽`,
+                  dateFrom: state.dateFrom!,
+                  dateTo: state.dateTo!,
+                  location: state.city,
+                });
+              }}
+              className="w-full flex items-center justify-center gap-2 px-6 py-3 rounded-lg font-semibold text-sm border border-border text-muted-foreground hover:text-foreground hover:border-muted-foreground/60 transition-colors"
+            >
+              <Download className="w-4 h-4" /> Скачать .ics (Apple/Outlook)
+            </button>
+          </>
         )}
       </div>
     </div>

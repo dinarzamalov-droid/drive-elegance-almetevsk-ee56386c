@@ -40,6 +40,7 @@ interface Booking {
   experience_category: string;
   selected_extras: string[] | null;
   promo_code: string | null;
+  preferred_messenger: string | null;
 }
 
 const statusLabels: Record<string, string> = {
@@ -139,13 +140,13 @@ const AdminPage = () => {
 
   const exportCsv = () => {
     if (filtered.length === 0) return;
-    const headers = ["Дата создания","Фамилия","Имя","Телефон","Email","Авто","Дата начала","Дата окончания","Дней","Сумма","Предоплата","Залог","Оплата","Статус","Промокод","Город"];
+    const headers = ["Дата создания","Фамилия","Имя","Телефон","Email","Авто","Дата начала","Дата окончания","Дней","Сумма","Предоплата","Залог","Оплата","Статус","Промокод","Город","Мессенджер"];
     const rows = filtered.map((b) => [
       b.created_at, b.last_name, b.first_name, b.phone, b.email, b.car_label,
       b.date_from, b.date_to, b.days, b.total_cost, b.prepay, b.deposit,
       methodLabels[b.payment_method] || b.payment_method,
       statusLabels[b.status] || b.status,
-      b.promo_code || "", b.city,
+      b.promo_code || "", b.city, b.preferred_messenger || "",
     ]);
     const csv = "\uFEFF" + [headers, ...rows].map((r) => r.map((v) => `"${v}"`).join(";")).join("\n");
     const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
