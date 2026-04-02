@@ -1,4 +1,4 @@
-import { CheckCircle, FileText, MessageCircle, Send } from "lucide-react";
+import { CheckCircle, FileText, MessageCircle, Send, CalendarPlus } from "lucide-react";
 import { format } from "date-fns";
 import { cars, ageOptions, experienceOptions, extrasConfig, PREPAY_PERCENT } from "@/lib/bookingData";
 import { getBookingCalculations } from "@/lib/bookingCalculations";
