@@ -70,6 +70,20 @@ const AdminPage = () => {
     }
   };
 
+  const updateStatus = async (bookingId: string, status: string) => {
+    try {
+      const { data, error } = await supabase.functions.invoke("admin-bookings", {
+        body: { password: storedPassword, action: "update_status", bookingId, status },
+      });
+      if (error) throw error;
+      if (data.error) throw new Error(data.error);
+      setBookings(data.bookings || []);
+      toast.success(`Статус изменён на «${statusLabels[status] || status}»`);
+    } catch (err: any) {
+      toast.error(err.message || "Ошибка обновления");
+    }
+  };
+
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
