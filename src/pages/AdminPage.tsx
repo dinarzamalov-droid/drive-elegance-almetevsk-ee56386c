@@ -1,0 +1,242 @@
+import { useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
+import { Lock, LogOut, RefreshCw, Search } from "lucide-react";
+import { format } from "date-fns";
+import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
+
+interface Booking {
+  id: string;
+  car_label: string;
+  date_from: string;
+  date_to: string;
+  days: number;
+  total_cost: number;
+  prepay: number;
+  deposit: number;
+  last_name: string;
+  first_name: string;
+  middle_name: string | null;
+  phone: string;
+  email: string;
+  payment_method: string;
+  payment_status: string;
+  status: string;
+  created_at: string;
+  city: string;
+  promo_code: string | null;
+}
+
+const statusLabels: Record<string, string> = {
+  new: "Новая",
+  confirmed: "Подтверждена",
+  completed: "Завершена",
+  cancelled: "Отменена",
+};
+
+const paymentLabels: Record<string, string> = {
+  pending: "Ожидание",
+  paid: "Оплачено",
+};
+
+const methodLabels: Record<string, string> = {
+  cash: "Наличные",
+  transfer: "Перевод",
+  online: "Онлайн",
+};
+
+const AdminPage = () => {
+  const [authenticated, setAuthenticated] = useState(false);
+  const [password, setPassword] = useState("");
+  const [storedPassword, setStoredPassword] = useState("");
+  const [bookings, setBookings] = useState<Booking[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [search, setSearch] = useState("");
+
+  const fetchBookings = async (pwd: string) => {
+    setLoading(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("admin-bookings", {
+        body: { password: pwd },
+      });
+      if (error) throw error;
+      if (data.error) throw new Error(data.error);
+      setBookings(data.bookings || []);
+    } catch (err: any) {
+      toast.error(err.message || "Ошибка загрузки");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("admin-bookings", {
+        body: { password },
+      });
+      if (error) throw error;
+      if (data.error) {
+        toast.error(data.error);
+        return;
+      }
+      setStoredPassword(password);
+      setBookings(data.bookings || []);
+      setAuthenticated(true);
+      toast.success("Добро пожаловать!");
+    } catch (err: any) {
+      toast.error(err.message || "Ошибка");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const filtered = bookings.filter((b) => {
+    const q = search.toLowerCase();
+    return (
+      !q ||
+      b.last_name.toLowerCase().includes(q) ||
+      b.first_name.toLowerCase().includes(q) ||
+      b.car_label.toLowerCase().includes(q) ||
+      b.phone.includes(q) ||
+      b.email.toLowerCase().includes(q)
+    );
+  });
+
+  if (!authenticated) {
+    return (
+      <div className="min-h-screen bg-background">
+        <Navbar />
+        <div className="pt-24 pb-12 px-4 flex items-center justify-center min-h-[80vh]">
+          <form onSubmit={handleLogin} className="bg-card-gradient gold-border rounded-2xl p-8 w-full max-w-sm space-y-6">
+            <div className="text-center">
+              <Lock className="w-10 h-10 mx-auto mb-3 text-primary" />
+              <h1 className="text-2xl font-bold">Админ-панель</h1>
+              <p className="text-muted-foreground text-sm mt-1">Введите пароль для доступа</p>
+            </div>
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="Пароль"
+              className="w-full px-4 py-3 rounded-lg bg-secondary border border-border text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+              autoFocus
+            />
+            <button
+              type="submit"
+              disabled={!password || loading}
+              className="w-full py-3 rounded-lg font-semibold text-sm bg-gradient-gold text-primary-foreground hover:opacity-90 disabled:opacity-50 transition-all"
+            >
+              {loading ? "Проверка..." : "Войти"}
+            </button>
+          </form>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-background">
+      <Navbar />
+      <div className="pt-24 pb-12 px-4">
+        <div className="container mx-auto max-w-6xl">
+          <div className="flex items-center justify-between mb-6 flex-wrap gap-3">
+            <h1 className="text-2xl font-bold">Бронирования ({bookings.length})</h1>
+            <div className="flex gap-2">
+              <button
+                onClick={() => fetchBookings(storedPassword)}
+                className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium bg-secondary text-foreground hover:bg-secondary/80 transition-colors"
+              >
+                <RefreshCw className={`w-4 h-4 ${loading ? "animate-spin" : ""}`} /> Обновить
+              </button>
+              <button
+                onClick={() => { setAuthenticated(false); setPassword(""); setStoredPassword(""); setBookings([]); }}
+                className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium bg-destructive/10 text-destructive hover:bg-destructive/20 transition-colors"
+              >
+                <LogOut className="w-4 h-4" /> Выйти
+              </button>
+            </div>
+          </div>
+
+          <div className="relative mb-4">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+            <input
+              type="text"
+              placeholder="Поиск по имени, авто, телефону, email..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="w-full pl-10 pr-4 py-3 rounded-lg bg-secondary border border-border text-foreground focus:outline-none focus:ring-2 focus:ring-primary text-sm"
+            />
+          </div>
+
+          <div className="overflow-x-auto rounded-xl border border-border">
+            <table className="w-full text-sm">
+              <thead className="bg-secondary">
+                <tr>
+                  <th className="text-left px-4 py-3 font-semibold">Дата</th>
+                  <th className="text-left px-4 py-3 font-semibold">Клиент</th>
+                  <th className="text-left px-4 py-3 font-semibold">Авто</th>
+                  <th className="text-left px-4 py-3 font-semibold">Период</th>
+                  <th className="text-right px-4 py-3 font-semibold">Сумма</th>
+                  <th className="text-right px-4 py-3 font-semibold">Предоплата</th>
+                  <th className="text-center px-4 py-3 font-semibold">Оплата</th>
+                  <th className="text-center px-4 py-3 font-semibold">Статус</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filtered.length === 0 ? (
+                  <tr>
+                    <td colSpan={8} className="text-center py-8 text-muted-foreground">
+                      {loading ? "Загрузка..." : "Нет бронирований"}
+                    </td>
+                  </tr>
+                ) : (
+                  filtered.map((b) => (
+                    <tr key={b.id} className="border-t border-border hover:bg-secondary/50 transition-colors">
+                      <td className="px-4 py-3 whitespace-nowrap text-muted-foreground">
+                        {format(new Date(b.created_at), "dd.MM.yy HH:mm")}
+                      </td>
+                      <td className="px-4 py-3">
+                        <div className="font-medium">{b.last_name} {b.first_name}</div>
+                        <div className="text-xs text-muted-foreground">{b.phone}</div>
+                      </td>
+                      <td className="px-4 py-3 font-medium">{b.car_label}</td>
+                      <td className="px-4 py-3 whitespace-nowrap text-muted-foreground">
+                        {b.date_from} — {b.date_to} ({b.days} д.)
+                      </td>
+                      <td className="px-4 py-3 text-right font-medium">
+                        {b.total_cost.toLocaleString("ru-RU")} ₽
+                      </td>
+                      <td className="px-4 py-3 text-right text-muted-foreground">
+                        {b.prepay.toLocaleString("ru-RU")} ₽
+                      </td>
+                      <td className="px-4 py-3 text-center">
+                        <span className="text-xs">{methodLabels[b.payment_method] || b.payment_method}</span>
+                      </td>
+                      <td className="px-4 py-3 text-center">
+                        <span className={`inline-block px-2 py-1 rounded-full text-xs font-medium ${
+                          b.status === "new" ? "bg-primary/20 text-primary" :
+                          b.status === "confirmed" ? "bg-green-500/20 text-green-400" :
+                          b.status === "cancelled" ? "bg-destructive/20 text-destructive" :
+                          "bg-secondary text-muted-foreground"
+                        }`}>
+                          {statusLabels[b.status] || b.status}
+                        </span>
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      <Footer />
+    </div>
+  );
+};
+
+export default AdminPage;
