@@ -1,38 +1,33 @@
+## План реализации системы бронирования
 
+### Этап 1: Подключение инфраструктуры
+- **Lovable Cloud** — база данных для хранения бронирований
+- **Stripe** — приём онлайн-оплаты предоплаты
+- **Email домен** — отправка уведомлений на почту менеджера и клиента
 
-## Plan: Complete Site Design — Logo, Handover Section, Navigation
+### Этап 2: База данных
+- Таблица `bookings` (бронирования: авто, даты, клиент, статус, сумма)
+- Таблица `clients` (паспорт, ВУ, контакты)
+- RLS-политики для безопасности
 
-Based on the uploaded branding images (orange 3D Drive logo on dark/white backgrounds) and the previous approved plan, here are the remaining implementation tasks.
+### Этап 3: Пошаговый визард бронирования (6 шагов)
+1. **Выбор автомобиля** — карточки из автопарка с фото, ценами, характеристиками
+2. **Калькулятор** — даты, возраст, стаж, опции, итоговый расчёт (сохраняем текущую логику)
+3. **Данные клиента** — ФИО, паспорт, ВУ, телефон, email, согласие на обработку ПД
+4. **Проект договора** — предпросмотр заполненного договора (текст + PDF)
+5. **Оплата** — выбор способа: наличные / перевод / Stripe (онлайн)
+6. **Подтверждение** — сообщение об успехе, скачивание PDF договора
 
-### Task 1: Add Logo to Navbar and Footer
+### Этап 4: Уведомления
+- WhatsApp/Telegram — формирование сообщения менеджеру (как сейчас)
+- Email — подтверждение клиенту + уведомление менеджеру
 
-Copy `IMG_7120-2.png` (orange 3D Drive logo on white/transparent background) to `src/assets/logo.png`. In both `Navbar.tsx` and `Footer.tsx`, replace the text-based logo (`<span>3D</span><span> Drive</span>`) with an `<img>` tag importing the asset. Navbar logo height ~36px, Footer logo height ~32px.
+### Этап 5: Генерация документов
+- Обновлённый PDF договора с паспортными данными
+- Акт приёма-передачи (PDF)
 
-### Task 2: Create HandoverSection (Порядок выдачи и осмотра)
-
-Create `src/components/HandoverSection.tsx` with:
-- 5 numbered steps (Подготовка, Встреча, Фотофиксация, Акт приема-передачи, Возврат)
-- "Ограничения при аренде" block (5 rules: no third-party drivers, no commercial use, no racing, no illegal activity, no smoking/pets)
-- Uses `AnimatedSection`/`AnimatedItem`, same card styling as other sections
-
-Add to `Index.tsx` after `HowItWorksSection`.
-
-### Task 3: Update Navigation Links
-
-Add to `navItems` in `Navbar.tsx` and `footerLinks` in `Footer.tsx`:
-- `{ label: "Сертификаты", href: "#certificates" }`
-- `{ label: "Клуб", href: "#club" }`
-
-Verify `ClubCardsSection` has `id="club"` on its section element.
-
-### Files Changed
-
-| File | Action |
-|------|--------|
-| `src/assets/logo.png` | Copy from upload |
-| `src/components/Navbar.tsx` | Logo image + nav links |
-| `src/components/Footer.tsx` | Logo image + footer links |
-| `src/components/HandoverSection.tsx` | Create new |
-| `src/pages/Index.tsx` | Add HandoverSection |
-| `src/components/ClubCardsSection.tsx` | Add `id="club"` if missing |
-
+### Технические детали
+- Отдельная страница `/booking` для визарда (или модальное окно)
+- Прогресс-бар с номерами шагов
+- Валидация на каждом шаге перед переходом к следующему
+- Адаптивный дизайн (мобильный viewport 430px)
