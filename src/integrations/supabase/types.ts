@@ -14,7 +14,117 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      bookings: {
+        Row: {
+          age_category: string
+          car_label: string
+          car_value: string
+          city: string
+          created_at: string
+          daily_rate: number
+          date_from: string
+          date_to: string
+          days: number
+          delivery_time: string | null
+          deposit: number
+          email: string
+          experience_category: string
+          extras_cost: number
+          first_name: string
+          id: string
+          last_name: string
+          license_date: string | null
+          license_number: string | null
+          middle_name: string | null
+          passport_code: string | null
+          passport_date: string | null
+          passport_number: string | null
+          passport_series: string | null
+          payment_method: string
+          payment_status: string
+          phone: string
+          prepay: number
+          promo_code: string | null
+          remaining: number
+          selected_extras: string[] | null
+          status: string
+          total_cost: number
+          updated_at: string
+        }
+        Insert: {
+          age_category: string
+          car_label: string
+          car_value: string
+          city?: string
+          created_at?: string
+          daily_rate: number
+          date_from: string
+          date_to: string
+          days: number
+          delivery_time?: string | null
+          deposit: number
+          email: string
+          experience_category: string
+          extras_cost?: number
+          first_name: string
+          id?: string
+          last_name: string
+          license_date?: string | null
+          license_number?: string | null
+          middle_name?: string | null
+          passport_code?: string | null
+          passport_date?: string | null
+          passport_number?: string | null
+          passport_series?: string | null
+          payment_method: string
+          payment_status?: string
+          phone: string
+          prepay: number
+          promo_code?: string | null
+          remaining: number
+          selected_extras?: string[] | null
+          status?: string
+          total_cost: number
+          updated_at?: string
+        }
+        Update: {
+          age_category?: string
+          car_label?: string
+          car_value?: string
+          city?: string
+          created_at?: string
+          daily_rate?: number
+          date_from?: string
+          date_to?: string
+          days?: number
+          delivery_time?: string | null
+          deposit?: number
+          email?: string
+          experience_category?: string
+          extras_cost?: number
+          first_name?: string
+          id?: string
+          last_name?: string
+          license_date?: string | null
+          license_number?: string | null
+          middle_name?: string | null
+          passport_code?: string | null
+          passport_date?: string | null
+          passport_number?: string | null
+          passport_series?: string | null
+          payment_method?: string
+          payment_status?: string
+          phone?: string
+          prepay?: number
+          promo_code?: string | null
+          remaining?: number
+          selected_extras?: string[] | null
+          status?: string
+          total_cost?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
