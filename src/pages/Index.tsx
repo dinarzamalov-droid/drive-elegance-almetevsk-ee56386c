@@ -9,6 +9,7 @@ import BookingSection from "@/components/BookingSection";
 import TermsSection from "@/components/TermsSection";
 import WhyUsSection from "@/components/WhyUsSection";
 import ForWhomSection from "@/components/ForWhomSection";
+import ChauffeurSection from "@/components/ChauffeurSection";
 import ReviewsSection from "@/components/ReviewsSection";
 import HowItWorksSection from "@/components/HowItWorksSection";
 import HandoverSection from "@/components/HandoverSection";
