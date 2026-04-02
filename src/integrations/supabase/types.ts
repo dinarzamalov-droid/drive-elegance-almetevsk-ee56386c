@@ -128,6 +128,90 @@ export type Database = {
         }
         Relationships: []
       }
+      clients: {
+        Row: {
+          bonus_balance: number
+          created_at: string
+          email: string
+          first_name: string
+          id: string
+          last_name: string
+          list_status: string
+          loyalty_level: string
+          middle_name: string | null
+          notes: string | null
+          phone: string
+          total_rentals: number
+          total_spent: number
+          updated_at: string
+        }
+        Insert: {
+          bonus_balance?: number
+          created_at?: string
+          email: string
+          first_name: string
+          id?: string
+          last_name: string
+          list_status?: string
+          loyalty_level?: string
+          middle_name?: string | null
+          notes?: string | null
+          phone: string
+          total_rentals?: number
+          total_spent?: number
+          updated_at?: string
+        }
+        Update: {
+          bonus_balance?: number
+          created_at?: string
+          email?: string
+          first_name?: string
+          id?: string
+          last_name?: string
+          list_status?: string
+          loyalty_level?: string
+          middle_name?: string | null
+          notes?: string | null
+          phone?: string
+          total_rentals?: number
+          total_spent?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      fleet: {
+        Row: {
+          car_label: string
+          car_value: string
+          created_at: string
+          id: string
+          mileage: number
+          notes: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          car_label: string
+          car_value: string
+          created_at?: string
+          id?: string
+          mileage?: number
+          notes?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          car_label?: string
+          car_value?: string
+          created_at?: string
+          id?: string
+          mileage?: number
+          notes?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
