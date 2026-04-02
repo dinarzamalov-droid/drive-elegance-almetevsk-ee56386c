@@ -107,6 +107,28 @@ const AdminPage = () => {
     }
   };
 
+
+  const exportCsv = () => {
+    if (filtered.length === 0) return;
+    const headers = ["Дата создания","Фамилия","Имя","Телефон","Email","Авто","Дата начала","Дата окончания","Дней","Сумма","Предоплата","Залог","Оплата","Статус","Промокод","Город"];
+    const rows = filtered.map((b) => [
+      b.created_at, b.last_name, b.first_name, b.phone, b.email, b.car_label,
+      b.date_from, b.date_to, b.days, b.total_cost, b.prepay, b.deposit,
+      methodLabels[b.payment_method] || b.payment_method,
+      statusLabels[b.status] || b.status,
+      b.promo_code || "", b.city,
+    ]);
+    const csv = "\uFEFF" + [headers, ...rows].map((r) => r.map((v) => `"${v}"`).join(";")).join("\n");
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `bookings_${format(new Date(), "yyyy-MM-dd")}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+    toast.success("CSV экспортирован");
+  };
+
   const filtered = bookings.filter((b) => {
     const q = search.toLowerCase();
     return (
