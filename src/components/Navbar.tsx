@@ -11,6 +11,7 @@ const navItems = [
   { label: "Сертификаты", href: "#certificates" },
   { label: "Клуб", href: "#club" },
   { label: "Контакты", href: "#contact" },
+  { label: "Туристам", href: "/tourism" },
 ];
 
 const Navbar = () => {
