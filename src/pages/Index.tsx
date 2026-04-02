@@ -17,7 +17,7 @@ import ContactSection from "@/components/ContactSection";
 import CorporateSection from "@/components/CorporateSection";
 import GiftCertificatesSection from "@/components/GiftCertificatesSection";
 import ClubCardsSection from "@/components/ClubCardsSection";
-import PlansSection from "@/components/PlansSection";
+
 import TourismSection from "@/components/TourismSection";
 import FeaturesSection from "@/components/FeaturesSection";
 import Footer from "@/components/Footer";
@@ -44,7 +44,7 @@ const Index = () => {
       <GiftCertificatesSection />
       <ClubCardsSection />
       <ContactSection />
-      <PlansSection />
+      
       <Footer />
       <FloatingMessenger />
       <ThemeSwitcher />
