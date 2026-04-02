@@ -9,6 +9,7 @@ const footerLinks = [
   { label: "Отзывы", href: "#reviews" },
   { label: "Сертификаты", href: "#certificates" },
   { label: "Клуб", href: "#club" },
+  { label: "Моё бронирование", href: "/my-booking" },
   { label: "Контакты", href: "#contact" },
 ];
 
