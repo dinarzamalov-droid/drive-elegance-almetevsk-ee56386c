@@ -1,4 +1,4 @@
-import { Check } from "lucide-react";
+import { Check, Send, Phone, MessageCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { BookingState } from "@/lib/bookingData";
 
@@ -6,6 +6,12 @@ interface Step3Props {
   state: BookingState;
   onChange: (partial: Partial<BookingState>) => void;
 }
+
+const messengerOptions = [
+  { value: "telegram" as const, label: "Telegram", icon: Send, color: "bg-[#26A5E4]", borderColor: "border-[#26A5E4]" },
+  { value: "whatsapp" as const, label: "WhatsApp", icon: Phone, color: "bg-[#25D366]", borderColor: "border-[#25D366]" },
+  { value: "max" as const, label: "МАХ", icon: MessageCircle, color: "bg-gradient-to-r from-[#1a1a1a] to-[#333]", borderColor: "border-primary", badge: "Быстрый ответ" },
+];
 
 const Step3ClientData = ({ state, onChange }: Step3Props) => {
   const inputClass =
@@ -78,6 +84,41 @@ const Step3ClientData = ({ state, onChange }: Step3Props) => {
         <div className="space-y-2">
           <label className="text-sm font-medium">Email *</label>
           <input type="email" placeholder="email@example.com" value={state.email} onChange={(e) => onChange({ email: e.target.value })} className={inputClass} />
+        </div>
+      </div>
+
+      {/* Messenger selection */}
+      <div className="space-y-3">
+        <label className="text-sm font-medium">Мессенджер для уведомлений</label>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          {messengerOptions.map((m) => {
+            const Icon = m.icon;
+            const selected = state.preferredMessenger === m.value;
+            return (
+              <button
+                key={m.value}
+                type="button"
+                onClick={() => onChange({ preferredMessenger: m.value })}
+                className={cn(
+                  "relative flex items-center gap-3 px-4 py-3 rounded-xl border-2 transition-all text-left",
+                  selected
+                    ? `${m.borderColor} ${m.color} text-white shadow-lg scale-[1.02]`
+                    : "border-border bg-secondary text-foreground hover:border-muted-foreground/60"
+                )}
+              >
+                <Icon className="w-5 h-5 shrink-0" />
+                <span className="font-semibold text-sm">{m.label}</span>
+                {m.badge && (
+                  <span className={cn(
+                    "absolute -top-2 -right-2 text-[10px] font-semibold px-2 py-0.5 rounded-full",
+                    selected ? "bg-[#25D366] text-white" : "bg-primary text-primary-foreground"
+                  )}>
+                    {m.badge}
+                  </span>
+                )}
+              </button>
+            );
+          })}
         </div>
       </div>
 

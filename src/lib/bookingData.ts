@@ -87,6 +87,8 @@ export interface BookingState {
   licenseNumber: string;
   licenseDate: string;
   agreed: boolean;
+  // Messenger for notifications
+  preferredMessenger: "telegram" | "whatsapp" | "max" | "";
   // Step 5: Payment
   paymentMethod: "cash" | "transfer" | "online" | "";
 }
@@ -116,5 +118,6 @@ export const initialBookingState: BookingState = {
   licenseNumber: "",
   licenseDate: "",
   agreed: false,
+  preferredMessenger: "",
   paymentMethod: "",
 };
