@@ -67,6 +67,7 @@ const AdminPage = () => {
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(false);
   const [search, setSearch] = useState("");
+  const [selected, setSelected] = useState<Booking | null>(null);
 
   const fetchBookings = async (pwd: string) => {
     setLoading(true);
