@@ -3,10 +3,10 @@ import { Gauge } from "lucide-react";
 export type CarCategory = "premium" | "tech";
 
 export const cars = [
-  { value: "bmw-420i", label: "BMW 420i", price: 14000, deposit: 30000, category: "premium" as CarCategory, specs: "245 л.с., купе, 0-100 за 5,8 сек", extras: { mileage: 2000, insurance: 3000, driver: 5000 } },
-  { value: "porsche-macan", label: "Porsche Macan", price: 12000, deposit: 25000, category: "premium" as CarCategory, specs: "252 л.с., полный привод, SUV + stage 1", extras: { mileage: 2500, insurance: 3500, driver: 5000 } },
-  { value: "mercedes-glb", label: "Mercedes GLB", price: 11000, deposit: 25000, category: "premium" as CarCategory, specs: "5 мест, 150 л.с., просторный салон", extras: { mileage: 1500, insurance: 2500, driver: 4000 } },
-  { value: "lixiang-l6", label: "LiXiang L6", price: 23000, deposit: 35000, category: "tech" as CarCategory, specs: "449 л.с., гибрид, полный привод", extras: { mileage: 3000, insurance: 5000, driver: 7000 } },
+  { value: "bmw-420i", label: "BMW 420i", price: 14000, deposit: 30000, category: "premium" as CarCategory, specs: "245 л.с., купе, 0-100 за 5,8 сек", extras: { mileage: 2000, delivery: 2500 } },
+  { value: "porsche-macan", label: "Porsche Macan", price: 12000, deposit: 25000, category: "premium" as CarCategory, specs: "252 л.с., полный привод, SUV + stage 1", extras: { mileage: 2500, delivery: 2500 } },
+  { value: "mercedes-glb", label: "Mercedes GLB", price: 11000, deposit: 25000, category: "premium" as CarCategory, specs: "5 мест, 150 л.с., просторный салон", extras: { mileage: 1500, delivery: 2500 } },
+  { value: "lixiang-l6", label: "LiXiang L6", price: 23000, deposit: 35000, category: "tech" as CarCategory, specs: "449 л.с., гибрид, полный привод", extras: { mileage: 3000, delivery: 2500 } },
 ];
 
 export const extrasConfig = [
