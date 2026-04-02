@@ -144,15 +144,19 @@ const BookingPage = () => {
                 <button
                   type="button"
                   onClick={next}
-                  disabled={!canNext()}
+                  disabled={!canNext() || saving}
                   className={cn(
                     "flex-1 flex items-center justify-center gap-2 py-3 rounded-lg font-semibold text-sm transition-all",
-                    canNext()
+                    canNext() && !saving
                       ? "bg-gradient-gold text-primary-foreground hover:opacity-90"
                       : "bg-secondary text-muted-foreground cursor-not-allowed"
                   )}
                 >
-                  {step === 5 ? "Подтвердить бронирование" : "Далее"} <ArrowRight className="w-4 h-4" />
+                  {saving ? (
+                    <><Loader2 className="w-4 h-4 animate-spin" /> Сохранение...</>
+                  ) : (
+                    <>{step === 5 ? "Подтвердить бронирование" : "Далее"} <ArrowRight className="w-4 h-4" /></>
+                  )}
                 </button>
               </div>
             )}
