@@ -43,6 +43,7 @@ export type Database = {
           payment_method: string
           payment_status: string
           phone: string
+          preferred_messenger: string | null
           prepay: number
           promo_code: string | null
           remaining: number
@@ -79,6 +80,7 @@ export type Database = {
           payment_method: string
           payment_status?: string
           phone: string
+          preferred_messenger?: string | null
           prepay: number
           promo_code?: string | null
           remaining: number
@@ -115,6 +117,7 @@ export type Database = {
           payment_method?: string
           payment_status?: string
           phone?: string
+          preferred_messenger?: string | null
           prepay?: number
           promo_code?: string | null
           remaining?: number
