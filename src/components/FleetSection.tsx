@@ -145,7 +145,7 @@ const FleetSection = () => {
           {cars.map((car, i) => (
             <AnimatedItem key={car.name} delay={i * 0.15}>
               <div className="group h-full overflow-hidden rounded-2xl bg-card-gradient gold-border transition-all duration-500 hover:gold-glow">
-                <div className="relative h-56 overflow-hidden md:h-64 car-plate-overlay">
+                <div className="relative h-56 overflow-hidden md:h-64">
                   <CarImageCarousel images={car.images} name={car.name} />
                   <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-card to-transparent" />
                   <div className="pointer-events-none absolute bottom-4 left-4">
