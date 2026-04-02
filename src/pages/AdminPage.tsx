@@ -9,22 +9,36 @@ import Footer from "@/components/Footer";
 interface Booking {
   id: string;
   car_label: string;
+  car_value: string;
   date_from: string;
   date_to: string;
   days: number;
+  daily_rate: number;
+  extras_cost: number;
   total_cost: number;
   prepay: number;
+  remaining: number;
   deposit: number;
   last_name: string;
   first_name: string;
   middle_name: string | null;
   phone: string;
   email: string;
+  passport_series: string | null;
+  passport_number: string | null;
+  passport_date: string | null;
+  passport_code: string | null;
+  license_number: string | null;
+  license_date: string | null;
   payment_method: string;
   payment_status: string;
   status: string;
   created_at: string;
   city: string;
+  delivery_time: string | null;
+  age_category: string;
+  experience_category: string;
+  selected_extras: string[] | null;
   promo_code: string | null;
 }
 
