@@ -80,6 +80,32 @@ const Step2Calculator = ({ state, onChange }: Step2Props) => {
         </div>
       </div>
 
+      {/* Date presets */}
+      <div className="space-y-2">
+        <label className="text-sm font-medium">Быстрый выбор дат</label>
+        <div className="flex flex-wrap gap-2">
+          {[
+            { label: "Завтра", getRange: () => ({ from: addDays(today, 1), to: addDays(today, 2) }) },
+            { label: "На выходные", getRange: () => {
+              const sat = isSaturday(today) ? today : nextSaturday(today);
+              const sun = isSaturday(sat) ? addDays(sat, 1) : nextSunday(today);
+              return { from: sat, to: sun };
+            }},
+            { label: "На неделю", getRange: () => ({ from: addDays(today, 1), to: addDays(today, 8) }) },
+            { label: "На 2 недели", getRange: () => ({ from: addDays(today, 1), to: addDays(today, 15) }) },
+          ].map((preset) => (
+            <button
+              key={preset.label}
+              type="button"
+              onClick={() => { const r = preset.getRange(); onChange({ dateFrom: r.from, dateTo: r.to }); }}
+              className="px-3 py-1.5 rounded-full text-xs font-medium border border-border bg-secondary/50 hover:border-primary hover:text-primary transition-colors"
+            >
+              {preset.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
       {/* Dates */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div className="space-y-2">
