@@ -9,6 +9,7 @@ import PrivacyPolicy from "./pages/PrivacyPolicy.tsx";
 import BookingPage from "./pages/BookingPage.tsx";
 import AdminPage from "./pages/AdminPage.tsx";
 import TourismPage from "./pages/TourismPage.tsx";
+import FeaturesPage from "./pages/FeaturesPage.tsx";
 
 const queryClient = new QueryClient();
 
