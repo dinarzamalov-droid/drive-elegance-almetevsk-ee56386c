@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { format } from "date-fns";
+import { format, addDays, nextSaturday, nextSunday, isSaturday } from "date-fns";
 import { ru } from "date-fns/locale";
 import { CalendarIcon, User, Clock, Gauge, Shield, UserCheck, Check, Gift, Heart, Tag, Percent, Car } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -77,6 +77,32 @@ const Step2Calculator = ({ state, onChange }: Step2Props) => {
               {experienceOptions.map((o) => <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>)}
             </SelectContent>
           </Select>
+        </div>
+      </div>
+
+      {/* Date presets */}
+      <div className="space-y-2">
+        <label className="text-sm font-medium">Быстрый выбор дат</label>
+        <div className="flex flex-wrap gap-2">
+          {[
+            { label: "Завтра", getRange: () => ({ from: addDays(today, 1), to: addDays(today, 2) }) },
+            { label: "На выходные", getRange: () => {
+              const sat = isSaturday(today) ? today : nextSaturday(today);
+              const sun = isSaturday(sat) ? addDays(sat, 1) : nextSunday(today);
+              return { from: sat, to: sun };
+            }},
+            { label: "На неделю", getRange: () => ({ from: addDays(today, 1), to: addDays(today, 8) }) },
+            { label: "На 2 недели", getRange: () => ({ from: addDays(today, 1), to: addDays(today, 15) }) },
+          ].map((preset) => (
+            <button
+              key={preset.label}
+              type="button"
+              onClick={() => { const r = preset.getRange(); onChange({ dateFrom: r.from, dateTo: r.to }); }}
+              className="px-3 py-1.5 rounded-full text-xs font-medium border border-border bg-secondary/50 hover:border-primary hover:text-primary transition-colors"
+            >
+              {preset.label}
+            </button>
+          ))}
         </div>
       </div>
 

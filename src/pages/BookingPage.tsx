@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { ArrowLeft, ArrowRight, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -33,7 +33,34 @@ const BookingPage = () => {
   });
 
   const update = useCallback((partial: Partial<BookingState>) => {
-    setState((prev) => ({ ...prev, ...partial }));
+    setState((prev) => {
+      const next = { ...prev, ...partial };
+      try {
+        const serializable = {
+          ...next,
+          dateFrom: next.dateFrom?.toISOString() ?? null,
+          dateTo: next.dateTo?.toISOString() ?? null,
+        };
+        localStorage.setItem("3ddrive_booking", JSON.stringify(serializable));
+      } catch {}
+      return next;
+    });
+  }, []);
+
+  // Restore from localStorage on mount
+  useEffect(() => {
+    if (preselectedCar) return; // don't restore if car preselected via URL
+    try {
+      const saved = localStorage.getItem("3ddrive_booking");
+      if (!saved) return;
+      const parsed = JSON.parse(saved);
+      setState((prev) => ({
+        ...prev,
+        ...parsed,
+        dateFrom: parsed.dateFrom ? new Date(parsed.dateFrom) : undefined,
+        dateTo: parsed.dateTo ? new Date(parsed.dateTo) : undefined,
+      }));
+    } catch {}
   }, []);
 
   const calc = getBookingCalculations(state);
