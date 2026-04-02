@@ -67,7 +67,7 @@ const ChauffeurSection = () => {
 
         {/* Hero image */}
         <AnimatedSection delay={0.1} className="mb-14">
-          <div className="relative rounded-2xl overflow-hidden car-plate-overlay">
+          <div className="relative rounded-2xl overflow-hidden">
             <img
               src={chauffeurHero}
               alt="Аренда автомобиля с водителем — премиальный сервис 3D Drive"
