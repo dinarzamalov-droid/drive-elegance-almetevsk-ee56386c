@@ -9,6 +9,7 @@ import PrivacyPolicy from "./pages/PrivacyPolicy.tsx";
 import BookingPage from "./pages/BookingPage.tsx";
 import AdminPage from "./pages/AdminPage.tsx";
 import TourismPage from "./pages/TourismPage.tsx";
+import FeaturesPage from "./pages/FeaturesPage.tsx";
 
 const queryClient = new QueryClient();
 
@@ -24,6 +25,7 @@ const App = () => (
           <Route path="/privacy-policy" element={<PrivacyPolicy />} />
           <Route path="/admin" element={<AdminPage />} />
           <Route path="/tourism" element={<TourismPage />} />
+          <Route path="/features" element={<FeaturesPage />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

@@ -12,6 +12,7 @@ const navItems = [
   { label: "Клуб", href: "#club" },
   { label: "Контакты", href: "#contact" },
   { label: "Туристам", href: "/tourism" },
+  { label: "Удобства", href: "/features" },
 ];
 
 const Navbar = () => {
