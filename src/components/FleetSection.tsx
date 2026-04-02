@@ -166,14 +166,12 @@ const FleetSection = () => {
                       <span className="text-sm font-semibold text-foreground">{car.deposit} ₽</span>
                     </div>
                   </div>
-                  <a
-                    href="https://wa.me/79868262332"
-                    target="_blank"
-                    rel="noopener noreferrer"
+                  <Link
+                    to={`/booking?car=${encodeURIComponent(car.name === "BMW 420i" ? "bmw-420i" : car.name === "Porsche Macan" ? "porsche-macan" : car.name === "Mercedes GLB" ? "mercedes-glb" : "lixiang-l6")}`}
                     className="block w-full rounded-lg bg-gradient-gold py-3 text-center text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90"
                   >
                     Забронировать
-                  </a>
+                  </Link>
                 </div>
               </div>
             </AnimatedItem>
