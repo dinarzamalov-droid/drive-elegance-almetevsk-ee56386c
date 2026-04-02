@@ -183,6 +183,13 @@ const AdminPage = () => {
             <h1 className="text-2xl font-bold">Бронирования ({bookings.length})</h1>
             <div className="flex gap-2">
               <button
+                onClick={exportCsv}
+                disabled={filtered.length === 0}
+                className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium bg-primary/10 text-primary hover:bg-primary/20 transition-colors disabled:opacity-50"
+              >
+                <Download className="w-4 h-4" /> CSV
+              </button>
+              <button
                 onClick={() => fetchBookings(storedPassword)}
                 className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium bg-secondary text-foreground hover:bg-secondary/80 transition-colors"
               >
