@@ -26,11 +26,17 @@ const Footer = () => {
           </div>
 
           <div className="flex flex-wrap justify-center gap-6">
-            {footerLinks.map((l) => (
-              <a key={l.href} href={l.href} className="text-xs text-muted-foreground hover:text-primary transition-colors">
-                {l.label}
-              </a>
-            ))}
+            {footerLinks.map((l) =>
+              l.href.startsWith("/") ? (
+                <Link key={l.href} to={l.href} className="text-xs text-muted-foreground hover:text-primary transition-colors">
+                  {l.label}
+                </Link>
+              ) : (
+                <a key={l.href} href={l.href} className="text-xs text-muted-foreground hover:text-primary transition-colors">
+                  {l.label}
+                </a>
+              )
+            )}
           </div>
 
           <div className="flex gap-3">
