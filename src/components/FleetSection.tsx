@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import bmwImg from "@/assets/bmw-420i.jpg";
 import bmw1 from "@/assets/bmw-1.jpg";
