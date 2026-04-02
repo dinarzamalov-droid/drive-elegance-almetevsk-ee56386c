@@ -3,13 +3,13 @@ import { Fuel, MapPin, Calculator } from "lucide-react";
 import { cars } from "@/lib/bookingData";
 
 const carFuelData: Record<string, { consumption: number; fuelType: string }> = {
-  "bmw-420i": { consumption: 8, fuelType: "АИ-95" },
-  "porsche-macan": { consumption: 10, fuelType: "АИ-98" },
-  "mercedes-glb": { consumption: 7, fuelType: "АИ-95" },
-  "lixiang-l6": { consumption: 6, fuelType: "Гибрид" },
+  "bmw-420i": { consumption: 8, fuelType: "АИ-100" },
+  "porsche-macan": { consumption: 10, fuelType: "АИ-100" },
+  "mercedes-glb": { consumption: 7, fuelType: "АИ-100" },
+  "lixiang-l6": { consumption: 6, fuelType: "АИ-100" },
 };
 
-const FUEL_PRICE = 56; // средняя цена АИ-95
+const FUEL_PRICE = 75; // средняя цена АИ-100
 
 const FuelCalculator = () => {
   const [selectedCar, setSelectedCar] = useState(cars[0].value);
