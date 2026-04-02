@@ -60,6 +60,20 @@ const methodLabels: Record<string, string> = {
   online: "Онлайн",
 };
 
+const Section = ({ title, children }: { title: string; children: React.ReactNode }) => (
+  <div>
+    <h3 className="font-semibold text-xs text-muted-foreground uppercase tracking-wider mb-2 mt-2">{title}</h3>
+    <div className="bg-secondary/50 rounded-lg p-3 space-y-1.5">{children}</div>
+  </div>
+);
+
+const Row = ({ label, value, bold }: { label: string; value: string; bold?: boolean }) => (
+  <div className="flex justify-between gap-4">
+    <span className="text-muted-foreground shrink-0">{label}</span>
+    <span className={`text-right ${bold ? "font-bold" : ""}`}>{value}</span>
+  </div>
+);
+
 const AdminPage = () => {
   const [authenticated, setAuthenticated] = useState(false);
   const [password, setPassword] = useState("");
