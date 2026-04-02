@@ -36,20 +36,18 @@ const AuthPage = () => {
           toast.error("Введите имя и фамилию");
           return;
         }
-        const { data, error } = await supabase.auth.signUp({
+        const { error } = await supabase.auth.signUp({
           email: form.email,
           password: form.password,
+          options: {
+            data: {
+              first_name: form.firstName.trim(),
+              last_name: form.lastName.trim(),
+              phone: form.phone.trim(),
+            },
+          },
         });
         if (error) throw error;
-
-        // Update profile with name and phone
-        if (data.user) {
-          await supabase.from("profiles").update({
-            first_name: form.firstName.trim(),
-            last_name: form.lastName.trim(),
-            phone: form.phone.trim(),
-          }).eq("user_id", data.user.id);
-        }
 
         toast.success("Проверьте email для подтверждения регистрации");
       }
