@@ -118,5 +118,6 @@ export const initialBookingState: BookingState = {
   licenseNumber: "",
   licenseDate: "",
   agreed: false,
+  preferredMessenger: "",
   paymentMethod: "",
 };
