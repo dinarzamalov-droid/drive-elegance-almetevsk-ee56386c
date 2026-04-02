@@ -1,4 +1,4 @@
-import { Shield, Gauge, UserCheck } from "lucide-react";
+import { Gauge } from "lucide-react";
 
 export type CarCategory = "premium" | "tech";
 
