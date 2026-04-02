@@ -1,29 +1,52 @@
 import { useState, useEffect } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import { Menu, X, Phone } from "lucide-react";
 import logo from "@/assets/logo.png";
 
 const navItems = [
   { label: "О нас", href: "#about" },
   { label: "Автопарк", href: "#fleet" },
+  { label: "Сравнение", href: "#compare" },
   { label: "Условия", href: "#terms" },
   { label: "Преимущества", href: "#why-us" },
   { label: "Отзывы", href: "#reviews" },
-  { label: "Сертификаты", href: "#certificates" },
-  { label: "Клуб", href: "#club" },
+  { label: "Удобства", href: "#features" },
+  { label: "Туристам", href: "#tourism" },
   { label: "Контакты", href: "#contact" },
-  { label: "Туристам", href: "/tourism" },
-  { label: "Удобства", href: "/features" },
 ];
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 50);
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
+  const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
+    e.preventDefault();
+    setIsOpen(false);
+
+    if (href.startsWith("#")) {
+      if (location.pathname !== "/") {
+        // Navigate to home first, then scroll to section
+        navigate("/");
+        setTimeout(() => {
+          const el = document.querySelector(href);
+          el?.scrollIntoView({ behavior: "smooth" });
+        }, 300);
+      } else {
+        const el = document.querySelector(href);
+        el?.scrollIntoView({ behavior: "smooth" });
+      }
+    } else {
+      navigate(href);
+    }
+  };
 
   return (
     <nav
@@ -32,7 +55,14 @@ const Navbar = () => {
       }`}
     >
       <div className="container mx-auto px-4 flex items-center justify-between h-20">
-        <a href="#">
+        <a
+          href="/"
+          onClick={(e) => {
+            e.preventDefault();
+            navigate("/");
+            window.scrollTo({ top: 0, behavior: "smooth" });
+          }}
+        >
           <img src={logo} alt="3D Drive" className="h-9" />
         </a>
 
@@ -41,6 +71,7 @@ const Navbar = () => {
             <a
               key={item.href}
               href={item.href}
+              onClick={(e) => handleNavClick(e, item.href)}
               className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors"
             >
               {item.label}
@@ -70,7 +101,7 @@ const Navbar = () => {
               <a
                 key={item.href}
                 href={item.href}
-                onClick={() => setIsOpen(false)}
+                onClick={(e) => handleNavClick(e, item.href)}
                 className="text-base font-medium text-muted-foreground hover:text-primary transition-colors py-2"
               >
                 {item.label}
