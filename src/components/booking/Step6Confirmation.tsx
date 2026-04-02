@@ -89,6 +89,20 @@ const Step6Confirmation = ({ state }: Step6Props) => {
         <button onClick={handleDownload} className="w-full flex items-center justify-center gap-2 px-6 py-3 rounded-lg font-semibold text-sm border border-primary text-primary hover:bg-primary/10 transition-colors">
           <FileText className="w-4 h-4" /> Скачать договор PDF
         </button>
+        {state.dateFrom && state.dateTo && (
+          <button
+            onClick={() => {
+              const from = format(state.dateFrom!, "yyyyMMdd");
+              const to = format(state.dateTo!, "yyyyMMdd");
+              const title = encodeURIComponent(`Аренда ${selectedCar?.label} — 3D Drive`);
+              const details = encodeURIComponent(`Автомобиль: ${selectedCar?.label}\nТелефон: ${state.phone}\nПредоплата: ${calc.prepay.toLocaleString("ru-RU")} ₽`);
+              window.open(`https://calendar.google.com/calendar/render?action=TEMPLATE&text=${title}&dates=${from}/${to}&details=${details}`, "_blank");
+            }}
+            className="w-full flex items-center justify-center gap-2 px-6 py-3 rounded-lg font-semibold text-sm border border-border text-muted-foreground hover:text-foreground hover:border-muted-foreground/60 transition-colors"
+          >
+            <CalendarPlus className="w-4 h-4" /> Добавить в календарь
+          </button>
+        )}
       </div>
     </div>
   );
