@@ -253,7 +253,11 @@ const AdminPage = () => {
                   </tr>
                 ) : (
                   filtered.map((b) => (
-                    <tr key={b.id} className="border-t border-border hover:bg-secondary/50 transition-colors">
+                    <tr
+                      key={b.id}
+                      onClick={() => setSelected(b)}
+                      className="border-t border-border hover:bg-secondary/50 transition-colors cursor-pointer"
+                    >
                       <td className="px-4 py-3 whitespace-nowrap text-muted-foreground">
                         {format(new Date(b.created_at), "dd.MM.yy HH:mm")}
                       </td>
@@ -274,7 +278,7 @@ const AdminPage = () => {
                       <td className="px-4 py-3 text-center">
                         <span className="text-xs">{methodLabels[b.payment_method] || b.payment_method}</span>
                       </td>
-                      <td className="px-4 py-3 text-center">
+                      <td className="px-4 py-3 text-center" onClick={(e) => e.stopPropagation()}>
                         <select
                           value={b.status}
                           onChange={(e) => updateStatus(b.id, e.target.value)}
