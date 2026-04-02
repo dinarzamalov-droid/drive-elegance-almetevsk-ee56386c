@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Lock, LogOut, RefreshCw, Search } from "lucide-react";
+import { Lock, LogOut, RefreshCw, Search, Download } from "lucide-react";
 import { format } from "date-fns";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -107,6 +107,28 @@ const AdminPage = () => {
     }
   };
 
+
+  const exportCsv = () => {
+    if (filtered.length === 0) return;
+    const headers = ["Дата создания","Фамилия","Имя","Телефон","Email","Авто","Дата начала","Дата окончания","Дней","Сумма","Предоплата","Залог","Оплата","Статус","Промокод","Город"];
+    const rows = filtered.map((b) => [
+      b.created_at, b.last_name, b.first_name, b.phone, b.email, b.car_label,
+      b.date_from, b.date_to, b.days, b.total_cost, b.prepay, b.deposit,
+      methodLabels[b.payment_method] || b.payment_method,
+      statusLabels[b.status] || b.status,
+      b.promo_code || "", b.city,
+    ]);
+    const csv = "\uFEFF" + [headers, ...rows].map((r) => r.map((v) => `"${v}"`).join(";")).join("\n");
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `bookings_${format(new Date(), "yyyy-MM-dd")}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+    toast.success("CSV экспортирован");
+  };
+
   const filtered = bookings.filter((b) => {
     const q = search.toLowerCase();
     return (
@@ -160,6 +182,13 @@ const AdminPage = () => {
           <div className="flex items-center justify-between mb-6 flex-wrap gap-3">
             <h1 className="text-2xl font-bold">Бронирования ({bookings.length})</h1>
             <div className="flex gap-2">
+              <button
+                onClick={exportCsv}
+                disabled={filtered.length === 0}
+                className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium bg-primary/10 text-primary hover:bg-primary/20 transition-colors disabled:opacity-50"
+              >
+                <Download className="w-4 h-4" /> CSV
+              </button>
               <button
                 onClick={() => fetchBookings(storedPassword)}
                 className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium bg-secondary text-foreground hover:bg-secondary/80 transition-colors"
