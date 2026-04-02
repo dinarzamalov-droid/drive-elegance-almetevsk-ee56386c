@@ -35,6 +35,7 @@ const Index = () => {
       <TermsSection />
       <WhyUsSection />
       <ForWhomSection />
+      <ChauffeurSection />
       <ReviewsSection />
       <HowItWorksSection />
       <HandoverSection />
