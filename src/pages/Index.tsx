@@ -44,7 +44,7 @@ const Index = () => {
       <GiftCertificatesSection />
       <ClubCardsSection />
       <ContactSection />
-      <PlansSection />
+      
       <Footer />
       <FloatingMessenger />
       <ThemeSwitcher />

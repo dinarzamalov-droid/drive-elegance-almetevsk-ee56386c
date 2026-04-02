@@ -11,8 +11,6 @@ export const cars = [
 
 export const extrasConfig = [
   { id: "mileage", label: "Безлимитный пробег", icon: Gauge },
-  { id: "insurance", label: "Страховка КАСКО", icon: Shield },
-  { id: "driver", label: "Аренда с водителем", icon: UserCheck },
 ] as const;
 
 export const ageOptions = [

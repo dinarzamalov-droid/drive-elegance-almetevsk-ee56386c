@@ -23,6 +23,7 @@ const Footer = () => {
               <img src={logo} alt="3D Drive" className="h-8" />
             </a>
             <p className="text-xs text-muted-foreground mt-2">Премиальная аренда автомобилей в Альметьевске</p>
+            <p className="text-xs text-muted-foreground mt-1">🚚 Доставка по Альметьевску — бесплатно</p>
           </div>
 
           <div className="flex flex-wrap justify-center gap-6">
