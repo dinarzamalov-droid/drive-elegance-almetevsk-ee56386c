@@ -1,14 +1,17 @@
 import { Phone, MessageCircle, Send, MapPin } from "lucide-react";
 import { useState } from "react";
+import MessengerSelect from "./MessengerSelect";
+import { MessengerType, openMessenger } from "@/lib/messengerUtils";
 import AnimatedSection, { AnimatedItem } from "./AnimatedSection";
 
 const ContactSection = () => {
   const [formData, setFormData] = useState({ name: "", phone: "", message: "" });
+  const [messenger, setMessenger] = useState<MessengerType>("whatsapp");
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    const text = encodeURIComponent(`Заявка с сайта 3D Drive\nИмя: ${formData.name}\nТелефон: ${formData.phone}\nСообщение: ${formData.message}`);
-    window.open(`https://wa.me/79868262332?text=${text}`, "_blank");
+    const text = `Заявка с сайта 3D Drive\nИмя: ${formData.name}\nТелефон: ${formData.phone}\nСообщение: ${formData.message}`;
+    openMessenger(messenger, text);
   };
 
   return (
@@ -80,6 +83,10 @@ const ContactSection = () => {
                 onChange={(e) => setFormData({ ...formData, message: e.target.value })}
                 className="w-full bg-secondary border border-border rounded-lg px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary transition-colors resize-none"
               />
+              <div className="space-y-2">
+                <label className="text-xs font-medium text-muted-foreground">Отправить через:</label>
+                <MessengerSelect value={messenger} onChange={setMessenger} />
+              </div>
               <button
                 type="submit"
                 className="w-full bg-gradient-gold text-primary-foreground py-3 rounded-lg font-semibold text-sm hover:opacity-90 transition-opacity"
