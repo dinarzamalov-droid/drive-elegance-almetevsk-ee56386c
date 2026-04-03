@@ -115,15 +115,15 @@ const ChauffeurSection = () => {
             <h3 className="text-xl md:text-2xl font-bold mb-6">Тарифы</h3>
             <div className="space-y-4 mb-6">
               {tiers.map((tier) => (
-                <div key={tier.cars} className="bg-card-gradient gold-border rounded-xl p-5 flex items-center justify-between gap-4">
+                <div key={tier.cars} className="bg-card-gradient gold-border rounded-xl p-5 grid grid-cols-1 sm:grid-cols-[minmax(0,1fr)_auto] gap-4 items-center">
                   <div className="flex items-center gap-3 min-w-0">
                     <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
                       <Car className="w-5 h-5 text-primary" />
                     </div>
-                    <span className="font-semibold text-sm whitespace-nowrap">{tier.cars}</span>
+                    <span className="font-semibold text-sm md:text-base leading-tight tracking-normal break-words sm:whitespace-nowrap">{tier.cars}</span>
                   </div>
-                  <div className="text-right shrink-0">
-                    <span className="text-gradient-gold text-xl font-bold">{tier.price} ₽</span>
+                  <div className="text-left sm:text-right shrink-0 pl-[3.25rem] sm:pl-0">
+                    <span className="text-gradient-gold text-xl md:text-2xl font-bold leading-none tracking-normal">{tier.price} ₽</span>
                     <span className="text-muted-foreground text-xs block">/час</span>
                   </div>
                 </div>
