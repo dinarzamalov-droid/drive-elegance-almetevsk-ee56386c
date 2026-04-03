@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { Car, Clock, Camera, Heart, Briefcase, Plane, PartyPopper, MapPin, Phone, Send, User, CheckCircle2 } from "lucide-react";
 import AnimatedSection, { AnimatedItem } from "./AnimatedSection";
-import { toast } from "sonner";
+import MessengerSelect from "./MessengerSelect";
+import { MessengerType, openMessenger } from "@/lib/messengerUtils";
 import chauffeurHero from "@/assets/chauffeur-hero.jpg";
 
 const occasions = [
@@ -30,19 +31,17 @@ const features = [
 const ChauffeurSection = () => {
   const [form, setForm] = useState({ name: "", phone: "", occasion: "", date: "" });
   const [sending, setSending] = useState(false);
+  const [messenger, setMessenger] = useState<MessengerType>("whatsapp");
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!form.name.trim() || !form.phone.trim()) {
-      toast.error("Введите имя и телефон");
       return;
     }
     setSending(true);
-    const text = encodeURIComponent(
-      `Заказ с водителем от 3D Drive\nИмя: ${form.name}\nТелефон: ${form.phone}\nПовод: ${form.occasion || "не указан"}\nДата: ${form.date || "не указана"}`
-    );
-    window.open(`https://wa.me/79868262332?text=${text}`, "_blank");
-    toast.success("Заявка отправлена в WhatsApp!");
+    const text =
+      `Заказ с водителем от 3D Drive\nИмя: ${form.name}\nТелефон: ${form.phone}\nПовод: ${form.occasion || "не указан"}\nДата: ${form.date || "не указана"}`;
+    openMessenger(messenger, text);
     setSending(false);
   };
 
@@ -177,13 +176,17 @@ const ChauffeurSection = () => {
                 onChange={(e) => setForm({ ...form, date: e.target.value })}
                 className={inputClass}
               />
+              <div className="space-y-2">
+                <label className="text-xs font-medium text-muted-foreground">Отправить через:</label>
+                <MessengerSelect value={messenger} onChange={setMessenger} />
+              </div>
               <button
                 type="submit"
                 disabled={sending}
                 className="w-full py-3 rounded-lg font-semibold text-sm bg-gradient-gold text-primary-foreground hover:opacity-90 disabled:opacity-50 transition-all flex items-center justify-center gap-2"
               >
                 <Send className="w-4 h-4" />
-                Отправить заявку в WhatsApp
+                Отправить заявку
               </button>
             </form>
           </AnimatedSection>
