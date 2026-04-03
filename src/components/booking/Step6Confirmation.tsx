@@ -1,4 +1,5 @@
-import { CheckCircle, FileText, MessageCircle, Send, CalendarPlus, Download } from "lucide-react";
+import { CheckCircle, FileText, MessageCircle, Send, CalendarPlus, Download, Phone } from "lucide-react";
+import { openMessenger } from "@/lib/messengerUtils";
 import { format } from "date-fns";
 import { cars, ageOptions, experienceOptions, extrasConfig, PREPAY_PERCENT } from "@/lib/bookingData";
 import { getBookingCalculations } from "@/lib/bookingCalculations";
@@ -28,14 +29,8 @@ const Step6Confirmation = ({ state }: Step6Props) => {
     return `Бронирование с сайта 3D Drive\nФИО: ${fullName}\nТелефон: ${state.phone}\nEmail: ${state.email}\nАвтомобиль: ${selectedCar?.label}\nВозраст: ${ageLabel}\nСтаж: ${expLabel}\nДаты: ${from} — ${to} (${calc.days} сут.)\nГород: ${state.city}, ${state.deliveryTime}${extrasText}\n\nИтого: ${calc.totalCost.toLocaleString("ru-RU")} ₽\nПредоплата: ${calc.prepay.toLocaleString("ru-RU")} ₽\nОстаток: ${calc.remaining.toLocaleString("ru-RU")} ₽\nЗалог: ${calc.deposit.toLocaleString("ru-RU")} ₽\nСпособ оплаты: ${paymentLabel}`;
   };
 
-  const sendWhatsApp = () => {
-    const text = encodeURIComponent(buildMessageText());
-    window.open(`https://wa.me/79868262332?text=${text}`, "_blank");
-  };
-
-  const sendTelegram = () => {
-    const text = encodeURIComponent(buildMessageText());
-    window.open(`https://t.me/share/url?url=${encodeURIComponent("3D Drive")}&text=${text}`, "_blank");
+  const sendVia = (m: "whatsapp" | "telegram" | "max") => {
+    openMessenger(m, buildMessageText());
   };
 
   const handleDownload = () => {
@@ -79,12 +74,15 @@ const Step6Confirmation = ({ state }: Step6Props) => {
 
       <div className="space-y-3">
         <p className="text-sm font-medium">Отправить бронь менеджеру:</p>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          <button onClick={sendWhatsApp} className="flex items-center justify-center gap-2 py-3 rounded-lg font-semibold text-sm bg-gradient-gold text-primary-foreground hover:opacity-90 transition-opacity">
-            <MessageCircle className="w-4 h-4" /> WhatsApp
+        <div className="grid grid-cols-3 gap-3">
+          <button onClick={() => sendVia("whatsapp")} className="flex items-center justify-center gap-2 py-3 rounded-lg font-semibold text-sm bg-[#25D366] text-white hover:opacity-90 transition-opacity">
+            <Phone className="w-4 h-4" /> WhatsApp
           </button>
-          <button onClick={sendTelegram} className="flex items-center justify-center gap-2 py-3 rounded-lg font-semibold text-sm bg-[hsl(200,80%,50%)] text-primary-foreground hover:opacity-90 transition-opacity">
+          <button onClick={() => sendVia("telegram")} className="flex items-center justify-center gap-2 py-3 rounded-lg font-semibold text-sm bg-[#26A5E4] text-white hover:opacity-90 transition-opacity">
             <Send className="w-4 h-4" /> Telegram
+          </button>
+          <button onClick={() => sendVia("max")} className="flex items-center justify-center gap-2 py-3 rounded-lg font-semibold text-sm bg-gradient-to-r from-[#1a1a1a] to-[#333] text-white border border-primary/30 hover:opacity-90 transition-opacity">
+            <MessageCircle className="w-4 h-4" /> МАХ
           </button>
         </div>
         <button onClick={handleDownload} className="w-full flex items-center justify-center gap-2 px-6 py-3 rounded-lg font-semibold text-sm border border-primary text-primary hover:bg-primary/10 transition-colors">
