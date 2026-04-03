@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { Gift, Check } from "lucide-react";
 import AnimatedSection from "./AnimatedSection";
+import MessengerSelect from "./MessengerSelect";
+import { MessengerType, openMessenger } from "@/lib/messengerUtils";
 import { cn } from "@/lib/utils";
 
 const presetAmounts = [3000, 5000, 10000, 15000, 20000, 30000, 50000];
@@ -15,6 +17,7 @@ const CustomCertificateForm = () => {
   const [greeting, setGreeting] = useState("");
   const [delivery, setDelivery] = useState<"email" | "physical">("email");
   const [agreed, setAgreed] = useState(false);
+  const [messenger, setMessenger] = useState<MessengerType>("whatsapp");
 
   const deliveryCost = delivery === "physical" ? 300 : 0;
   const total = amount + deliveryCost;
@@ -51,8 +54,7 @@ const CustomCertificateForm = () => {
       .filter(Boolean)
       .join("\n");
 
-    const text = encodeURIComponent(lines);
-    window.open(`https://wa.me/79868262332?text=${text}`, "_blank");
+    openMessenger(messenger, lines);
   };
 
   const inputClass =
@@ -241,6 +243,12 @@ const CustomCertificateForm = () => {
             <span className="text-foreground">Итого к оплате</span>
             <span className="text-gradient-gold text-lg">{total.toLocaleString("ru-RU")} ₽</span>
           </div>
+        </div>
+
+        {/* Messenger */}
+        <div className="space-y-2">
+          <label className="text-sm font-medium text-foreground">Отправить через:</label>
+          <MessengerSelect value={messenger} onChange={setMessenger} />
         </div>
 
         {/* Agreement */}

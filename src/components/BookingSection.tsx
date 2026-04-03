@@ -1,8 +1,9 @@
 import { useState } from "react";
 import { format } from "date-fns";
 import { ru } from "date-fns/locale";
-import { CalendarIcon, Car, Shield, Gauge, UserCheck, Check, User, Clock, FileText, Gift, Heart, Tag, Percent, MessageCircle, Send } from "lucide-react";
+import { CalendarIcon, Car, Shield, Gauge, UserCheck, Check, User, Clock, FileText, Gift, Heart, Tag, Percent, MessageCircle, Send, Phone } from "lucide-react";
 import { generateContract } from "@/lib/generateContract";
+import { openMessenger } from "@/lib/messengerUtils";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
@@ -183,21 +184,14 @@ const BookingSection = () => {
 
   const isFormValid = lastName.trim() && firstName.trim() && middleName.trim() && phone.trim() && car && dateFrom && dateTo && agreed;
 
-  const sendViaWhatsApp = () => {
+  const sendVia = (m: "whatsapp" | "telegram" | "max") => {
     if (!isFormValid) return;
-    const text = encodeURIComponent(buildMessageText());
-    window.open(`https://wa.me/79868262332?text=${text}`, "_blank");
-  };
-
-  const sendViaTelegram = () => {
-    if (!isFormValid) return;
-    const text = encodeURIComponent(buildMessageText());
-    window.open(`https://t.me/share/url?url=${encodeURIComponent("3D Drive")}&text=${text}`, "_blank");
+    openMessenger(m, buildMessageText());
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    sendViaWhatsApp();
+    sendVia("whatsapp");
   };
 
   const today = new Date();
@@ -639,24 +633,33 @@ const BookingSection = () => {
 
             <div className="space-y-3">
               <label className="text-sm font-medium text-foreground">Отправить бронирование через:</label>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div className="grid grid-cols-3 gap-3">
                 <button
                   type="button"
                   disabled={!isFormValid}
-                  onClick={sendViaWhatsApp}
-                  className="flex items-center justify-center gap-2 py-3.5 rounded-lg font-semibold text-sm bg-gradient-gold text-primary-foreground hover:opacity-90 transition-opacity disabled:opacity-40 disabled:cursor-not-allowed"
+                  onClick={() => sendVia("whatsapp")}
+                  className="flex items-center justify-center gap-2 py-3.5 rounded-lg font-semibold text-sm bg-[#25D366] text-white hover:opacity-90 transition-opacity disabled:opacity-40 disabled:cursor-not-allowed"
                 >
-                  <MessageCircle className="w-4 h-4" />
+                  <Phone className="w-4 h-4" />
                   WhatsApp
                 </button>
                 <button
                   type="button"
                   disabled={!isFormValid}
-                  onClick={sendViaTelegram}
-                  className="flex items-center justify-center gap-2 py-3.5 rounded-lg font-semibold text-sm bg-[hsl(200,80%,50%)] text-primary-foreground hover:opacity-90 transition-opacity disabled:opacity-40 disabled:cursor-not-allowed"
+                  onClick={() => sendVia("telegram")}
+                  className="flex items-center justify-center gap-2 py-3.5 rounded-lg font-semibold text-sm bg-[#26A5E4] text-white hover:opacity-90 transition-opacity disabled:opacity-40 disabled:cursor-not-allowed"
                 >
                   <Send className="w-4 h-4" />
                   Telegram
+                </button>
+                <button
+                  type="button"
+                  disabled={!isFormValid}
+                  onClick={() => sendVia("max")}
+                  className="flex items-center justify-center gap-2 py-3.5 rounded-lg font-semibold text-sm bg-gradient-to-r from-[#1a1a1a] to-[#333] text-white border border-primary/30 hover:opacity-90 transition-opacity disabled:opacity-40 disabled:cursor-not-allowed"
+                >
+                  <MessageCircle className="w-4 h-4" />
+                  МАХ
                 </button>
               </div>
               <button

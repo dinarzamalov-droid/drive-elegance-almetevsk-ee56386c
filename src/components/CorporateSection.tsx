@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { Building2, FileText, Send } from "lucide-react";
+import MessengerSelect from "./MessengerSelect";
+import { MessengerType, openMessenger } from "@/lib/messengerUtils";
 import AnimatedSection, { AnimatedItem } from "./AnimatedSection";
 
 const CorporateSection = () => {
@@ -13,6 +15,7 @@ const CorporateSection = () => {
     deferred: false,
     message: "",
   });
+  const [messenger, setMessenger] = useState<MessengerType>("whatsapp");
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -22,10 +25,10 @@ const CorporateSection = () => {
     const deferredLine = form.deferred ? "Нужна отсрочка платежа" : "";
     const extras = [docsLine, deferredLine].filter(Boolean).join(", ");
 
-    const text = encodeURIComponent(
+    const text =
       `Корпоративная заявка с сайта 3D Drive\n\nКомпания: ${form.company}\nИНН: ${form.inn || "не указан"}\nКонтактное лицо: ${form.contact}\nТелефон: ${form.phone}\nEmail: ${form.email || "не указан"}${extras ? `\n\n${extras}` : ""}${form.message ? `\n\nСообщение: ${form.message}` : ""}`
-    );
-    window.open(`https://wa.me/79868262332?text=${text}`, "_blank");
+    ;
+    openMessenger(messenger, text);
   };
 
   const inputClass =
@@ -170,6 +173,11 @@ const CorporateSection = () => {
                 onChange={(e) => setForm({ ...form, message: e.target.value })}
                 className={`${inputClass} resize-none`}
               />
+
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-foreground">Отправить через:</label>
+                <MessengerSelect value={messenger} onChange={setMessenger} />
+              </div>
 
               <button
                 type="submit"
