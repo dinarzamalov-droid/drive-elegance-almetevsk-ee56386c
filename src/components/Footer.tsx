@@ -26,14 +26,14 @@ const Footer = () => {
             <p className="text-xs text-muted-foreground mt-1">🚚 Доставка по Альметьевску — бесплатно</p>
           </div>
 
-          <div className="flex flex-wrap justify-center gap-6">
+          <div className="flex flex-wrap justify-center gap-x-6 gap-y-1 md:gap-y-2">
             {footerLinks.map((l) =>
               l.href.startsWith("/") ? (
-                <Link key={l.href} to={l.href} className="text-xs text-muted-foreground hover:text-primary transition-colors">
+                <Link key={l.href} to={l.href} className="text-sm md:text-xs text-muted-foreground hover:text-primary transition-colors py-2 px-1 min-h-[44px] flex items-center">
                   {l.label}
                 </Link>
               ) : (
-                <a key={l.href} href={l.href} className="text-xs text-muted-foreground hover:text-primary transition-colors">
+                <a key={l.href} href={l.href} className="text-sm md:text-xs text-muted-foreground hover:text-primary transition-colors py-2 px-1 min-h-[44px] flex items-center">
                   {l.label}
                 </a>
               )
