@@ -47,19 +47,37 @@ const BookingPage = () => {
     });
   }, []);
 
-  // Restore from localStorage on mount
+  // Restore client data from localStorage on mount (always), full state if no preselected car
   useEffect(() => {
-    if (preselectedCar) return; // don't restore if car preselected via URL
     try {
       const saved = localStorage.getItem("3ddrive_booking");
       if (!saved) return;
       const parsed = JSON.parse(saved);
-      setState((prev) => ({
-        ...prev,
-        ...parsed,
-        dateFrom: parsed.dateFrom ? new Date(parsed.dateFrom) : undefined,
-        dateTo: parsed.dateTo ? new Date(parsed.dateTo) : undefined,
-      }));
+      if (preselectedCar) {
+        // Only restore client/personal fields, keep preselected car & fresh calculator
+        const clientFields = {
+          lastName: parsed.lastName || "",
+          firstName: parsed.firstName || "",
+          middleName: parsed.middleName || "",
+          phone: parsed.phone || "",
+          email: parsed.email || "",
+          passportSeries: parsed.passportSeries || "",
+          passportNumber: parsed.passportNumber || "",
+          passportDate: parsed.passportDate || "",
+          passportCode: parsed.passportCode || "",
+          licenseNumber: parsed.licenseNumber || "",
+          licenseDate: parsed.licenseDate || "",
+          preferredMessenger: parsed.preferredMessenger || "",
+        };
+        setState((prev) => ({ ...prev, ...clientFields }));
+      } else {
+        setState((prev) => ({
+          ...prev,
+          ...parsed,
+          dateFrom: parsed.dateFrom ? new Date(parsed.dateFrom) : undefined,
+          dateTo: parsed.dateTo ? new Date(parsed.dateTo) : undefined,
+        }));
+      }
     } catch {}
   }, []);
 
