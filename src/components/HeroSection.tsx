@@ -1,5 +1,6 @@
-import { useState, useEffect } from "react";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { useState, useEffect, useRef } from "react";
+import { ChevronLeft, ChevronRight, Phone, Send, MessageCircle, ChevronDown } from "lucide-react";
+import { cn } from "@/lib/utils";
 import heroBg from "@/assets/hero-bg.jpg";
 import bmwImg from "@/assets/bmw-420i.jpg";
 import porscheImg from "@/assets/porsche-macan.jpg";
@@ -7,8 +8,27 @@ import mercedesImg from "@/assets/mercedes-glb.jpg";
 
 const slides = [heroBg, bmwImg, porscheImg, mercedesImg];
 
+const messengerOptions = [
+  { key: "whatsapp", label: "WhatsApp", href: "https://wa.me/79868262332", icon: Phone, color: "bg-[#25D366]" },
+  { key: "telegram", label: "Telegram", href: "https://t.me/3ddrive", icon: Send, color: "bg-[#26A5E4]" },
+  { key: "max", label: "МАХ", href: "https://max.ru/user/79868262332", icon: MessageCircle, color: "bg-gradient-to-r from-[#1a1a1a] to-[#333]" },
+];
+
 const HeroSection = () => {
   const [current, setCurrent] = useState(0);
+  const [messengerOpen, setMessengerOpen] = useState(false);
+  const [selectedMessenger, setSelectedMessenger] = useState(messengerOptions[0]);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+        setMessengerOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   useEffect(() => {
     const timer = setInterval(() => setCurrent((p) => (p + 1) % slides.length), 5000);
@@ -55,14 +75,42 @@ const HeroSection = () => {
             >
               Забронировать авто
             </a>
-            <a
-              href="https://wa.me/79868262332"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="border border-primary/30 text-foreground px-8 py-4 rounded-lg text-base font-medium hover:border-primary/60 transition-colors text-center"
-            >
-              Написать в WhatsApp
-            </a>
+            <div className="relative" ref={dropdownRef}>
+              <div className="flex">
+                <a
+                  href={selectedMessenger.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="border border-primary/30 text-foreground px-6 py-4 rounded-l-lg text-base font-medium hover:border-primary/60 transition-colors text-center flex items-center gap-2"
+                >
+                  <selectedMessenger.icon className="w-5 h-5" />
+                  Написать в {selectedMessenger.label}
+                </a>
+                <button
+                  onClick={() => setMessengerOpen(!messengerOpen)}
+                  className="border border-l-0 border-primary/30 text-foreground px-3 py-4 rounded-r-lg hover:border-primary/60 transition-colors flex items-center"
+                >
+                  <ChevronDown className={cn("w-4 h-4 transition-transform", messengerOpen && "rotate-180")} />
+                </button>
+              </div>
+              {messengerOpen && (
+                <div className="absolute top-full mt-2 left-0 w-full bg-card border border-border rounded-lg shadow-xl overflow-hidden z-20 animate-in fade-in slide-in-from-top-2 duration-150">
+                  {messengerOptions.map((m) => (
+                    <button
+                      key={m.key}
+                      onClick={() => { setSelectedMessenger(m); setMessengerOpen(false); }}
+                      className={cn(
+                        "w-full flex items-center gap-3 px-4 py-3 text-sm font-medium hover:bg-secondary transition-colors text-foreground",
+                        selectedMessenger.key === m.key && "bg-secondary"
+                      )}
+                    >
+                      <m.icon className="w-4 h-4" />
+                      {m.label}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </div>
