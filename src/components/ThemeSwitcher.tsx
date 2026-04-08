@@ -23,7 +23,7 @@ const ThemeSwitcher = () => {
   const { theme, setTheme } = useColorTheme();
 
   return (
-    <div className="fixed bottom-24 right-6 z-50 flex flex-col gap-2">
+    <div className="fixed bottom-[88px] right-4 md:bottom-24 md:right-6 z-50 flex flex-col gap-2">
       <button
         onClick={() => setTheme(theme === "silver" ? "orange" : "silver")}
         className="w-12 h-12 rounded-full bg-card border border-border flex items-center justify-center shadow-lg hover:scale-110 transition-transform"
