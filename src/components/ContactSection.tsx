@@ -28,8 +28,9 @@ const ContactSection = () => {
           <div className="space-y-6">
             {[
               { href: "tel:+79868262332", icon: <Phone className="w-5 h-5 text-primary" />, label: "Телефон", value: "+7 (986) 826 23 32" },
-              { href: "https://wa.me/79868262332", icon: <MessageCircle className="w-5 h-5 text-primary" />, label: "WhatsApp", value: "Написать сообщение", external: true },
+              { href: "https://wa.me/79868262332", icon: <Phone className="w-5 h-5 text-primary" />, label: "WhatsApp", value: "Написать сообщение", external: true },
               { href: "https://t.me/3ddrive", icon: <Send className="w-5 h-5 text-primary" />, label: "Telegram", value: "@3ddrive", external: true },
+              { href: "https://max.ru/user/79868262332", icon: <MessageCircle className="w-5 h-5 text-primary" />, label: "МАХ", value: "Написать сообщение", external: true },
             ].map((item, i) => (
               <AnimatedItem key={item.label} delay={i * 0.1}>
                 <a
