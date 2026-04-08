@@ -1,7 +1,7 @@
 import { Phone, MessageCircle, Send, MapPin } from "lucide-react";
 import { useState } from "react";
 import MessengerSelect from "./MessengerSelect";
-import { MessengerType, openMessenger } from "@/lib/messengerUtils";
+import { MessengerType, openMessenger, messengerMeta } from "@/lib/messengerUtils";
 import AnimatedSection, { AnimatedItem } from "./AnimatedSection";
 
 const ContactSection = () => {
