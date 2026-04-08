@@ -81,9 +81,9 @@ const HeroSection = () => {
                   href={selectedMessenger.href}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="border border-primary/30 text-foreground px-6 py-4 rounded-l-lg text-base font-medium hover:border-primary/60 transition-colors text-center flex items-center gap-2"
+                  className="flex-1 border border-primary/30 text-foreground px-6 py-4 rounded-l-lg text-base font-medium hover:border-primary/60 transition-colors flex items-center justify-center gap-2"
                 >
-                  <selectedMessenger.icon className="w-5 h-5" />
+                  <selectedMessenger.icon className="w-5 h-5 shrink-0" />
                   Написать в {selectedMessenger.label}
                 </a>
                 <button
@@ -94,7 +94,7 @@ const HeroSection = () => {
                 </button>
               </div>
               {messengerOpen && (
-                <div className="absolute top-full mt-2 left-0 w-full bg-card border border-border rounded-lg shadow-xl overflow-hidden z-20 animate-in fade-in slide-in-from-top-2 duration-150">
+                <div className="absolute bottom-full mb-2 left-0 w-full bg-card border border-border rounded-lg shadow-xl overflow-hidden z-30 animate-in fade-in slide-in-from-bottom-2 duration-150">
                   {messengerOptions.map((m) => (
                     <button
                       key={m.key}
@@ -104,7 +104,7 @@ const HeroSection = () => {
                         selectedMessenger.key === m.key && "bg-secondary"
                       )}
                     >
-                      <m.icon className="w-4 h-4" />
+                      <m.icon className="w-4 h-4 shrink-0" />
                       {m.label}
                     </button>
                   ))}
