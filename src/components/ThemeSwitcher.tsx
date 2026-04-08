@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { Palette } from "lucide-react";
+import { useFooterVisible } from "@/hooks/use-footer-visible";
 
 export type ColorTheme = "silver" | "orange";
 

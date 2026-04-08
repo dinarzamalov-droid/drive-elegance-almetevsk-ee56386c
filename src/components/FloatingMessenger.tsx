@@ -1,12 +1,17 @@
 import { useState } from "react";
 import { MessageCircle, X, Send, Phone, ExternalLink } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useFooterVisible } from "@/hooks/use-footer-visible";
 
 const FloatingMessenger = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const isFooterVisible = useFooterVisible();
 
   return (
-    <div className="fixed bottom-4 right-4 md:bottom-6 md:right-6 z-50 flex flex-col items-end gap-3">
+    <div className={cn(
+      "fixed bottom-4 right-4 md:bottom-6 md:right-6 z-50 flex flex-col items-end gap-3 transition-opacity duration-300",
+      isFooterVisible ? "opacity-0 pointer-events-none" : "opacity-100"
+    )}>
       {isOpen && (
         <div className="flex flex-col gap-2 animate-in fade-in slide-in-from-bottom-4 duration-200">
           {/* МАХ — основной */}
