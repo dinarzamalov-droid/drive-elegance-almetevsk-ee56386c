@@ -38,14 +38,14 @@ const HeroSection = () => {
 
       <div className="relative z-10 h-full flex flex-col justify-end pb-20 md:pb-32 container mx-auto px-4">
         <div className="max-w-3xl">
-          <p className="text-primary font-semibold text-sm md:text-base tracking-widest uppercase mb-4 animate-fade-up">
+          <p className="text-primary font-semibold text-sm md:text-base tracking-widest uppercase mb-4 animate-fade-up drop-shadow-[0_1px_4px_rgba(0,0,0,0.8)]">
             3D Drive · Альметьевск
           </p>
-          <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold leading-tight mb-6 animate-fade-up-delay-1">
+          <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold leading-tight mb-6 animate-fade-up-delay-1 text-foreground drop-shadow-[0_2px_8px_rgba(0,0,0,0.9)]">
             Премиальная аренда{" "}
             <span className="text-gradient-gold">автомобилей</span>
           </h1>
-          <p className="text-lg md:text-xl text-muted-foreground max-w-xl mb-8 animate-fade-up-delay-2">
+          <p className="text-lg md:text-xl text-foreground/90 max-w-xl mb-8 animate-fade-up-delay-2 drop-shadow-[0_1px_4px_rgba(0,0,0,0.8)]">
             Для тех, кто ценит статус, свободу и безупречный сервис.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 animate-fade-up-delay-3">
