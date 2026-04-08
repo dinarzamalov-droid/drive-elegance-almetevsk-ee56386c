@@ -21,7 +21,7 @@ export function openMessenger(messenger: MessengerType, messageText: string) {
       window.open(`https://t.me/${TG_USER}?text=${text}`, "_blank");
       break;
     case "max":
-      window.open(`https://max.ru/user/${PHONE}`, "_blank");
+      window.open(`https://max.ru/user/${PHONE}?text=${text}`, "_blank");
       break;
   }
   toast.success(`Заявка отправлена в ${messengerMeta[messenger].label}!`);
