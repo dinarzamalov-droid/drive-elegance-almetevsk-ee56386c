@@ -1,5 +1,6 @@
-import { useState, useEffect } from "react";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { useState, useEffect, useRef } from "react";
+import { ChevronLeft, ChevronRight, Phone, Send, MessageCircle, ChevronDown } from "lucide-react";
+import { cn } from "@/lib/utils";
 import heroBg from "@/assets/hero-bg.jpg";
 import bmwImg from "@/assets/bmw-420i.jpg";
 import porscheImg from "@/assets/porsche-macan.jpg";
