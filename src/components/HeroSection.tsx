@@ -8,8 +8,27 @@ import mercedesImg from "@/assets/mercedes-glb.jpg";
 
 const slides = [heroBg, bmwImg, porscheImg, mercedesImg];
 
+const messengerOptions = [
+  { key: "whatsapp", label: "WhatsApp", href: "https://wa.me/79868262332", icon: Phone, color: "bg-[#25D366]" },
+  { key: "telegram", label: "Telegram", href: "https://t.me/3ddrive", icon: Send, color: "bg-[#26A5E4]" },
+  { key: "max", label: "МАХ", href: "https://max.ru/user/79868262332", icon: MessageCircle, color: "bg-gradient-to-r from-[#1a1a1a] to-[#333]" },
+];
+
 const HeroSection = () => {
   const [current, setCurrent] = useState(0);
+  const [messengerOpen, setMessengerOpen] = useState(false);
+  const [selectedMessenger, setSelectedMessenger] = useState(messengerOptions[0]);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+        setMessengerOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   useEffect(() => {
     const timer = setInterval(() => setCurrent((p) => (p + 1) % slides.length), 5000);
