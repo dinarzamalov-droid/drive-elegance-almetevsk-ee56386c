@@ -52,7 +52,7 @@ const ContactSection = () => {
                 <MapPin className="w-5 h-5 text-primary" />
                 <div>
                   <div className="text-xs text-muted-foreground">Адрес</div>
-                  <div className="font-semibold text-sm">Альметьевск (офис откроется в 2026 году)</div>
+                  <div className="font-semibold text-sm">Альметьевск</div>
                 </div>
               </div>
             </AnimatedItem>
