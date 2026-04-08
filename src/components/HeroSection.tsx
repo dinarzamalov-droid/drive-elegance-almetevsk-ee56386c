@@ -75,14 +75,42 @@ const HeroSection = () => {
             >
               Забронировать авто
             </a>
-            <a
-              href="https://wa.me/79868262332"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="border border-primary/30 text-foreground px-8 py-4 rounded-lg text-base font-medium hover:border-primary/60 transition-colors text-center"
-            >
-              Написать в WhatsApp
-            </a>
+            <div className="relative" ref={dropdownRef}>
+              <div className="flex">
+                <a
+                  href={selectedMessenger.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="border border-primary/30 text-foreground px-6 py-4 rounded-l-lg text-base font-medium hover:border-primary/60 transition-colors text-center flex items-center gap-2"
+                >
+                  <selectedMessenger.icon className="w-5 h-5" />
+                  Написать в {selectedMessenger.label}
+                </a>
+                <button
+                  onClick={() => setMessengerOpen(!messengerOpen)}
+                  className="border border-l-0 border-primary/30 text-foreground px-3 py-4 rounded-r-lg hover:border-primary/60 transition-colors flex items-center"
+                >
+                  <ChevronDown className={cn("w-4 h-4 transition-transform", messengerOpen && "rotate-180")} />
+                </button>
+              </div>
+              {messengerOpen && (
+                <div className="absolute top-full mt-2 left-0 w-full bg-card border border-border rounded-lg shadow-xl overflow-hidden z-20 animate-in fade-in slide-in-from-top-2 duration-150">
+                  {messengerOptions.map((m) => (
+                    <button
+                      key={m.key}
+                      onClick={() => { setSelectedMessenger(m); setMessengerOpen(false); }}
+                      className={cn(
+                        "w-full flex items-center gap-3 px-4 py-3 text-sm font-medium hover:bg-secondary transition-colors text-foreground",
+                        selectedMessenger.key === m.key && "bg-secondary"
+                      )}
+                    >
+                      <m.icon className="w-4 h-4" />
+                      {m.label}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </div>
