@@ -14,14 +14,14 @@ const carDetails: Record<string, {
   features: string[];
 }> = {
   "bmw-420i": {
-    power: "245 л.с.",
-    acceleration: "5,8 сек",
+    power: "184 л.с.",
+    acceleration: "7,5 сек",
     drive: "Задний",
     seats: 4,
-    fuelType: "АИ-100",
-    consumption: "8 л/100 км",
+    fuelType: "АИ-95",
+    consumption: "7 л/100 км",
     trunk: "440 л",
-    features: ["Купе", "M-пакет", "Harman Kardon", "Камера 360°"],
+    features: ["Купе", "2.0 л", "Harman Kardon", "Камера 360°"],
   },
   "porsche-macan": {
     power: "252 л.с. + Stage 1",
