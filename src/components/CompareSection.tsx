@@ -18,7 +18,7 @@ const carDetails: Record<string, {
     acceleration: "7,5 сек",
     drive: "Задний",
     seats: 4,
-    fuelType: "АИ-95",
+    fuelType: "АИ-100",
     consumption: "7 л/100 км",
     trunk: "440 л",
     features: ["Купе", "2.0 л", "Harman Kardon", "Камера 360°"],
