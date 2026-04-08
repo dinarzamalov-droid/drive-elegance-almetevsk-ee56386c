@@ -20,7 +20,6 @@ const AboutSection = () => {
           </p>
           <p className="text-muted-foreground text-base md:text-lg leading-relaxed mt-4">
             Мы не просто выдаем ключи. Мы обеспечиваем прозрачные условия, честные залоги и безупречное состояние каждого авто.
-            Наша цель — стать №1 в России, и мы уже на пути к этому.
           </p>
         </AnimatedSection>
 
