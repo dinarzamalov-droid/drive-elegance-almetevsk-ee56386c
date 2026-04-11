@@ -1,6 +1,7 @@
 import Navbar from "@/components/Navbar";
 import HeroSection from "@/components/HeroSection";
 import FloatingMessenger from "@/components/FloatingMessenger";
+import AIChatBot from "@/components/AIChatBot";
 import ThemeSwitcher from "@/components/ThemeSwitcher";
 import AboutSection from "@/components/AboutSection";
 import FleetSection from "@/components/FleetSection";
@@ -48,6 +49,7 @@ const Index = () => {
       <ContactSection />
       
       <Footer />
+      <AIChatBot />
       <FloatingMessenger />
       <ThemeSwitcher />
     </div>
