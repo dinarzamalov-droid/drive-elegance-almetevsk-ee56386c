@@ -182,6 +182,15 @@ const Step2Calculator = ({ state, onChange }: Step2Props) => {
         </div>
       )}
 
+      {/* Early booking discount */}
+      {calc.earlyBookingPercent > 0 && (
+        <div className="bg-green-500/10 border border-green-500/20 rounded-lg p-3 text-sm">
+          <span className="text-green-600 dark:text-green-400 font-medium">
+            🕐 Скидка за раннее бронирование: {calc.earlyBookingPercent}% (−{calc.earlyBookingAmount.toLocaleString("ru-RU")} ₽)
+          </span>
+        </div>
+      )}
+
       {/* Discounts */}
       <div className="space-y-3">
         <label className="text-sm font-medium">Скидки 🔥</label>
@@ -282,7 +291,8 @@ const Step2Calculator = ({ state, onChange }: Step2Props) => {
             {calc.extrasCost > 0 && <div className="flex justify-between"><span className="text-muted-foreground">Доп. опции</span><span>{calc.extrasCost.toLocaleString("ru-RU")} ₽</span></div>}
             {calc.firstDayDiscount > 0 && <div className="flex justify-between"><span className="text-muted-foreground">🔥 Скидка</span><span className="text-primary font-medium">−{calc.firstDayDiscount.toLocaleString("ru-RU")} ₽</span></div>}
             {calc.promoDiscountAmount > 0 && <div className="flex justify-between"><span className="text-muted-foreground">🏷 Промокод</span><span className="text-primary font-medium">−{calc.promoDiscountAmount.toLocaleString("ru-RU")} ₽</span></div>}
-            {calc.totalSavings > 0 && <div className="flex justify-between"><span className="text-muted-foreground">💰 Экономия</span><span className="text-green-500 font-medium">−{calc.totalSavings.toLocaleString("ru-RU")} ₽</span></div>}
+            {calc.earlyBookingAmount > 0 && <div className="flex justify-between"><span className="text-muted-foreground">🕐 Раннее бронирование ({calc.earlyBookingPercent}%)</span><span className="text-green-600 dark:text-green-400 font-medium">−{calc.earlyBookingAmount.toLocaleString("ru-RU")} ₽</span></div>}
+            {calc.totalSavings > 0 && <div className="flex justify-between"><span className="text-muted-foreground">💰 Экономия</span><span className="text-green-600 dark:text-green-400 font-medium">−{calc.totalSavings.toLocaleString("ru-RU")} ₽</span></div>}
             <div className="border-t border-border pt-2 flex justify-between font-semibold">
               <span>Итого</span><span className="text-gradient-gold text-lg">{calc.totalCost.toLocaleString("ru-RU")} ₽</span>
             </div>
