@@ -149,12 +149,8 @@ const AIChatBot = () => {
   };
 
   return (
-    <div
-      className={cn(
-        "fixed bottom-[80px] right-4 md:bottom-[92px] md:right-6 z-50 flex flex-col items-end gap-2 transition-opacity duration-300",
-        isFooterVisible ? "opacity-0 pointer-events-none" : "opacity-100"
-      )}
-    >
+    <div className="flex flex-col items-end gap-2">
+
       {isOpen && (
         <div className="w-[340px] max-w-[calc(100vw-2rem)] h-[480px] max-h-[calc(100vh-10rem)] bg-card border border-border rounded-2xl shadow-2xl flex flex-col animate-in fade-in slide-in-from-bottom-4 duration-200 overflow-hidden">
           {/* Header */}
