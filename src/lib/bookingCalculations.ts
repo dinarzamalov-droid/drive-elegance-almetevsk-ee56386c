@@ -32,6 +32,12 @@ export function getBookingCalculations(state: BookingState) {
     ? promoCodes[state.appliedPromo].percent
     : 0;
 
+  // Early booking discount (automatic)
+  const daysUntilStart = state.dateFrom
+    ? Math.floor((state.dateFrom.getTime() - Date.now()) / 86400000)
+    : 0;
+  const earlyBookingPercent = daysUntilStart >= 14 ? 5 : daysUntilStart >= 7 ? 3 : 0;
+
   // Savings calculation
   const savingsFixed = state.selectedSavings.reduce((sum, id) => {
     const s = savingsConfig.find((c) => c.id === id);
@@ -47,9 +53,12 @@ export function getBookingCalculations(state: BookingState) {
   const subtotal = baseCost + extrasCost - firstDayDiscount;
   const promoDiscountAmount = Math.round(subtotal * promoDiscount / 100);
   const afterPromo = subtotal - promoDiscountAmount;
-  const savingsPercentAmount = Math.round(afterPromo * savingsPercent / 100);
+  const earlyBookingAmount = Math.round(afterPromo * earlyBookingPercent / 100);
+  const savingsPercentAmount = Math.round((afterPromo - earlyBookingAmount) * savingsPercent / 100);
   const totalSavings = savingsFixed + savingsPercentAmount;
-  const totalCost = Math.max(0, afterPromo - totalSavings);
+  const totalCost = Math.max(0, afterPromo - earlyBookingAmount - totalSavings);
+  const prepay = Math.round((totalCost * PREPAY_PERCENT) / 100);
+  const remaining = totalCost - prepay;
   const prepay = Math.round((totalCost * PREPAY_PERCENT) / 100);
   const remaining = totalCost - prepay;
   const ageDepositExtra = ageOpt?.depositExtra ?? 0;
@@ -79,6 +88,8 @@ export function getBookingCalculations(state: BookingState) {
     subtotal,
     promoDiscountAmount,
     totalSavings,
+    earlyBookingPercent,
+    earlyBookingAmount,
     totalCost,
     prepay,
     remaining,
