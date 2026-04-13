@@ -59,8 +59,6 @@ export function getBookingCalculations(state: BookingState) {
   const totalCost = Math.max(0, afterPromo - earlyBookingAmount - totalSavings);
   const prepay = Math.round((totalCost * PREPAY_PERCENT) / 100);
   const remaining = totalCost - prepay;
-  const prepay = Math.round((totalCost * PREPAY_PERCENT) / 100);
-  const remaining = totalCost - prepay;
   const ageDepositExtra = ageOpt?.depositExtra ?? 0;
   const expDepositExtra = expOpt?.depositExtra ?? 0;
   const deposit = (selectedCar?.deposit ?? 0) + ageDepositExtra + expDepositExtra;
