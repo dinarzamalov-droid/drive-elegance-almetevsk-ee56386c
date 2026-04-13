@@ -252,12 +252,15 @@ const Step2Calculator = ({ state, onChange }: Step2Props) => {
             ? `−${saving.discount.toLocaleString("ru-RU")} ₽`
             : `−${saving.discount}%`;
           return (
-            <button key={saving.id} type="button" onClick={() => toggleSaving(saving.id)} className={cn("w-full flex items-center gap-3 p-3 rounded-lg border text-left transition-all", isSelected ? "border-green-500 bg-green-500/10" : "border-border bg-secondary/50 hover:border-muted-foreground/40")}>
-              <div className={cn("w-5 h-5 rounded border flex items-center justify-center shrink-0", isSelected ? "bg-green-500 border-green-500" : "border-muted-foreground/40")}>
-                {isSelected && <Check className="w-3 h-3 text-white" />}
+            <button key={saving.id} type="button" onClick={() => toggleSaving(saving.id)} className={cn("w-full flex flex-col gap-1 p-3 rounded-lg border text-left transition-all", isSelected ? "border-green-500 bg-green-500/10" : "border-border bg-secondary/50 hover:border-muted-foreground/40")}>
+              <div className="flex items-center gap-3 w-full">
+                <div className={cn("w-5 h-5 rounded border flex items-center justify-center shrink-0", isSelected ? "bg-green-500 border-green-500" : "border-muted-foreground/40")}>
+                  {isSelected && <Check className="w-3 h-3 text-white" />}
+                </div>
+                <span className={cn("text-sm flex-1", isSelected ? "text-foreground font-medium" : "text-muted-foreground")}>{saving.label}</span>
+                <span className={cn("text-xs font-medium", isSelected ? "text-green-500" : "text-muted-foreground")}>{discountLabel}</span>
               </div>
-              <span className={cn("text-sm flex-1", isSelected ? "text-foreground font-medium" : "text-muted-foreground")}>{saving.label}</span>
-              <span className={cn("text-xs font-medium", isSelected ? "text-green-500" : "text-muted-foreground")}>{discountLabel}</span>
+              {saving.hint && <p className="text-xs text-muted-foreground pl-8 leading-relaxed">{saving.hint}</p>}
             </button>
           );
         })}

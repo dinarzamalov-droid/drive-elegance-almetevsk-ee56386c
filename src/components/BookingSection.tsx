@@ -62,9 +62,9 @@ const cars = [
 ];
 
 const savingsConfig = [
-  { id: "no-wash", label: "Подача без мойки", discount: 500, type: "fixed" as const },
-  { id: "empty-tank", label: "Возврат с пустым баком", discount: 1500, type: "fixed" as const },
-  { id: "economy-pack", label: "Пакет «Эконом» (без мойки + пустой бак)", discount: 10, type: "percent" as const },
+  { id: "no-wash", label: "Подача без мойки", hint: "Автомобиль подаётся чистым, но без полировки. При возврате состояние оценивается менеджером — всё честно и прозрачно 🙌", discount: 500, type: "fixed" as const },
+  { id: "empty-tank", label: "Возврат с пустым баком", hint: "Не нужно искать заправку перед возвратом — остаток топлива рассчитывается по рыночной цене и просто удерживается из залога ⛽", discount: 1500, type: "fixed" as const },
+  { id: "economy-pack", label: "Пакет «Эконом» (без мойки + пустой бак)", hint: "Максимальная экономия — объединяет обе опции со скидкой", discount: 10, type: "percent" as const },
 ];
 
 const extrasConfig = [
@@ -504,12 +504,15 @@ const BookingSection = () => {
                   ? `−${saving.discount.toLocaleString("ru-RU")} ₽`
                   : `−${saving.discount}%`;
                 return (
-                  <button key={saving.id} type="button" onClick={() => toggleSaving(saving.id)} className={cn("w-full flex items-center gap-3 p-3 rounded-lg border text-left transition-all", isSelected ? "border-green-500 bg-green-500/10" : "border-border bg-secondary/50 hover:border-muted-foreground/40")}>
-                    <div className={cn("w-5 h-5 rounded border flex items-center justify-center shrink-0", isSelected ? "bg-green-500 border-green-500" : "border-muted-foreground/40")}>
-                      {isSelected && <Check className="w-3 h-3 text-white" />}
+                  <button key={saving.id} type="button" onClick={() => toggleSaving(saving.id)} className={cn("w-full flex flex-col gap-1 p-3 rounded-lg border text-left transition-all", isSelected ? "border-green-500 bg-green-500/10" : "border-border bg-secondary/50 hover:border-muted-foreground/40")}>
+                    <div className="flex items-center gap-3 w-full">
+                      <div className={cn("w-5 h-5 rounded border flex items-center justify-center shrink-0", isSelected ? "bg-green-500 border-green-500" : "border-muted-foreground/40")}>
+                        {isSelected && <Check className="w-3 h-3 text-white" />}
+                      </div>
+                      <span className={cn("text-sm flex-1", isSelected ? "text-foreground font-medium" : "text-muted-foreground")}>{saving.label}</span>
+                      <span className={cn("text-xs font-medium", isSelected ? "text-green-500" : "text-muted-foreground")}>{discountLabel}</span>
                     </div>
-                    <span className={cn("text-sm flex-1", isSelected ? "text-foreground font-medium" : "text-muted-foreground")}>{saving.label}</span>
-                    <span className={cn("text-xs font-medium", isSelected ? "text-green-500" : "text-muted-foreground")}>{discountLabel}</span>
+                    {saving.hint && <p className="text-xs text-muted-foreground pl-8 leading-relaxed">{saving.hint}</p>}
                   </button>
                 );
               })}
