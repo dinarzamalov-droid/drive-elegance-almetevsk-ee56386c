@@ -182,14 +182,8 @@ const Step2Calculator = ({ state, onChange }: Step2Props) => {
         </div>
       )}
 
-      {/* Early booking discount */}
-      {calc.earlyBookingPercent > 0 && (
-        <div className="bg-green-500/10 border border-green-500/20 rounded-lg p-3 text-sm">
-          <span className="text-green-600 dark:text-green-400 font-medium">
-            🕐 Скидка за раннее бронирование: {calc.earlyBookingPercent}% (−{calc.earlyBookingAmount.toLocaleString("ru-RU")} ₽)
-          </span>
-        </div>
-      )}
+
+
 
       {/* Discounts */}
       <div className="space-y-3">
