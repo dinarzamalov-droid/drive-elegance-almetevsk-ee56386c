@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import { Palette } from "lucide-react";
-import { useFooterVisible } from "@/hooks/use-footer-visible";
 
 export type ColorTheme = "silver" | "orange";
 
@@ -22,36 +21,15 @@ const useColorTheme = () => {
 
 const ThemeSwitcher = () => {
   const { theme, setTheme } = useColorTheme();
-  const isFooterVisible = useFooterVisible();
 
   return (
-    <div className={`fixed bottom-[136px] right-4 md:bottom-[152px] md:right-6 z-50 flex flex-col gap-2 transition-opacity duration-300 ${isFooterVisible ? "opacity-0 pointer-events-none" : "opacity-100"}`}>
-      <button
-        onClick={() => setTheme(theme === "silver" ? "orange" : "silver")}
-        className="w-12 h-12 rounded-full bg-card border border-border flex items-center justify-center shadow-lg hover:scale-110 transition-transform"
-        title="Сменить тему"
-      >
-        <Palette className="w-5 h-5 text-primary" />
-      </button>
-      <div className="flex flex-col gap-1 items-center">
-        <button
-          onClick={() => setTheme("silver")}
-          className={`w-6 h-6 rounded-full border-2 transition-all ${
-            theme === "silver" ? "border-foreground scale-110" : "border-muted-foreground/30"
-          }`}
-          style={{ background: "linear-gradient(135deg, hsl(210,15%,65%), hsl(215,12%,50%))" }}
-          title="Серебро"
-        />
-        <button
-          onClick={() => setTheme("orange")}
-          className={`w-6 h-6 rounded-full border-2 transition-all ${
-            theme === "orange" ? "border-foreground scale-110" : "border-muted-foreground/30"
-          }`}
-          style={{ background: "linear-gradient(135deg, hsl(18,91%,55%), hsl(14,85%,48%))" }}
-          title="Оранжевый"
-        />
-      </div>
-    </div>
+    <button
+      onClick={() => setTheme(theme === "silver" ? "orange" : "silver")}
+      className="w-11 h-11 rounded-full bg-card border border-border flex items-center justify-center shadow-lg hover:scale-110 transition-transform"
+      title={theme === "silver" ? "Оранжевая тема" : "Серебряная тема"}
+    >
+      <Palette className="w-5 h-5 text-primary" />
+    </button>
   );
 };
 

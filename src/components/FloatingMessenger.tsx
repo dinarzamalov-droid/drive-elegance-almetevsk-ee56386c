@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { MessageCircle, X, Phone, Send } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { useFooterVisible } from "@/hooks/use-footer-visible";
 
 const messengers = [
   { key: "whatsapp", label: "WhatsApp", href: "https://wa.me/79868262332", icon: Phone, bg: "bg-[#25D366]" },
@@ -11,13 +10,9 @@ const messengers = [
 
 const FloatingMessenger = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const isFooterVisible = useFooterVisible();
 
   return (
-    <div className={cn(
-      "fixed bottom-4 right-4 md:bottom-6 md:right-6 z-50 flex flex-col items-end gap-2 transition-opacity duration-300",
-      isFooterVisible ? "opacity-0 pointer-events-none" : "opacity-100"
-    )}>
+    <div className="flex flex-col items-end gap-2">
       {isOpen && (
         <div className="flex flex-col gap-2 animate-in fade-in slide-in-from-bottom-4 duration-200">
           {messengers.map((m) => (

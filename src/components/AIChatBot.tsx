@@ -1,7 +1,6 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import { MessageCircle, X, Send, Bot, User } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { useFooterVisible } from "@/hooks/use-footer-visible";
 import ReactMarkdown from "react-markdown";
 
 type Msg = { role: "user" | "assistant"; content: string };
@@ -27,7 +26,7 @@ const AIChatBot = () => {
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
-  const isFooterVisible = useFooterVisible();
+  
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -150,12 +149,8 @@ const AIChatBot = () => {
   };
 
   return (
-    <div
-      className={cn(
-        "fixed bottom-[76px] right-4 md:bottom-[88px] md:right-6 z-50 flex flex-col items-end gap-2 transition-opacity duration-300",
-        isFooterVisible ? "opacity-0 pointer-events-none" : "opacity-100"
-      )}
-    >
+    <div className="flex flex-col items-end gap-2">
+
       {isOpen && (
         <div className="w-[340px] max-w-[calc(100vw-2rem)] h-[480px] max-h-[calc(100vh-10rem)] bg-card border border-border rounded-2xl shadow-2xl flex flex-col animate-in fade-in slide-in-from-bottom-4 duration-200 overflow-hidden">
           {/* Header */}
