@@ -77,6 +77,7 @@ export interface BookingState {
   city: string;
   deliveryTime: string;
   selectedExtras: string[];
+  selectedSavings: string[];
   isBirthday: boolean;
   isWedding: boolean;
   promoCode: string;
