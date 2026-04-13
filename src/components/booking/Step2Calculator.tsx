@@ -38,9 +38,9 @@ const Step2Calculator = ({ state, onChange }: Step2Props) => {
 
     // Economy package is mutually exclusive with individual options it includes
     if (id === "economy-pack" && next.includes("economy-pack")) {
-      next = next.filter((s) => !["no-wash", "empty-tank", "off-peak"].includes(s));
+      next = next.filter((s) => !["no-wash", "empty-tank"].includes(s));
       next.push("economy-pack");
-    } else if (["no-wash", "empty-tank", "off-peak"].includes(id) && next.includes("economy-pack")) {
+    } else if (["no-wash", "empty-tank"].includes(id) && next.includes("economy-pack")) {
       next = next.filter((s) => s !== "economy-pack");
     }
 
@@ -237,6 +237,21 @@ const Step2Calculator = ({ state, onChange }: Step2Props) => {
           <PiggyBank className="w-4 h-4 text-primary" /> Экономия 💰
         </label>
         <p className="text-xs text-muted-foreground -mt-1">Снизьте стоимость, отказавшись от необязательных услуг</p>
+
+        {/* Early booking info */}
+        <div className="bg-green-500/10 border border-green-500/20 rounded-lg p-3 text-sm space-y-1">
+          <span className="text-green-600 dark:text-green-400 font-medium block">🕐 Скидка за раннее бронирование</span>
+          <span className="text-muted-foreground text-xs block">Бронируйте заранее — скидка применяется автоматически:</span>
+          <div className="flex gap-4 mt-1">
+            <span className={`text-xs font-medium ${calc.earlyBookingPercent === 3 ? "text-green-500" : "text-muted-foreground"}`}>• 7+ дней → 3%</span>
+            <span className={`text-xs font-medium ${calc.earlyBookingPercent === 5 ? "text-green-500" : "text-muted-foreground"}`}>• 14+ дней → 5%</span>
+          </div>
+          {calc.earlyBookingPercent > 0 && (
+            <span className="text-green-600 dark:text-green-400 text-xs font-semibold block mt-1">
+              ✅ Применена скидка {calc.earlyBookingPercent}% (−{calc.earlyBookingAmount.toLocaleString("ru-RU")} ₽)
+            </span>
+          )}
+        </div>
         {savingsConfig.map((saving) => {
           const isSelected = state.selectedSavings.includes(saving.id);
           const discountLabel = saving.type === "fixed"
