@@ -396,14 +396,8 @@ const BookingSection = () => {
               </div>
             )}
 
-            {/* Early booking discount */}
-            {earlyBookingPercent > 0 && (
-              <div className="bg-green-500/10 border border-green-500/20 rounded-lg p-3 text-sm">
-                <span className="text-green-600 dark:text-green-400 font-medium">
-                  🕐 Скидка за раннее бронирование: {earlyBookingPercent}% (−{earlyBookingAmount.toLocaleString("ru-RU")} ₽)
-                </span>
-              </div>
-            )}
+
+
 
             {/* Discounts */}
             <div className="space-y-3">
