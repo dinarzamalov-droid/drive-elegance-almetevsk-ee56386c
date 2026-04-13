@@ -189,9 +189,9 @@ const BookingSection = () => {
     setSelectedSavings((prev) => {
       let next = prev.includes(id) ? prev.filter((s) => s !== id) : [...prev, id];
       if (id === "economy-pack" && next.includes("economy-pack")) {
-        next = next.filter((s) => !["no-wash", "empty-tank", "off-peak"].includes(s));
+        next = next.filter((s) => !["no-wash", "empty-tank"].includes(s));
         next.push("economy-pack");
-      } else if (["no-wash", "empty-tank", "off-peak"].includes(id) && next.includes("economy-pack")) {
+      } else if (["no-wash", "empty-tank"].includes(id) && next.includes("economy-pack")) {
         next = next.filter((s) => s !== "economy-pack");
       }
       return next;
