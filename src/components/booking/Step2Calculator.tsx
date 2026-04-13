@@ -219,7 +219,7 @@ const Step2Calculator = ({ state, onChange }: Step2Props) => {
               </div>
               <Icon className={cn("w-4 h-4 shrink-0", isSelected ? "text-primary" : "text-muted-foreground")} />
               <span className={cn("text-sm flex-1", isSelected ? "text-foreground font-medium" : "text-muted-foreground")}>{extra.label}</span>
-              <span className="text-xs text-muted-foreground">+{extraPrice.toLocaleString("ru-RU")} ₽/сут</span>
+              <span className="text-xs text-muted-foreground">{extra.id === "delivery" ? `+${extraPrice.toLocaleString("ru-RU")} ₽/час` : `+${extraPrice.toLocaleString("ru-RU")} ₽/сут`}</span>
             </button>
           );
         })}
