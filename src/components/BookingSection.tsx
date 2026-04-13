@@ -62,9 +62,9 @@ const cars = [
 ];
 
 const savingsConfig = [
-  { id: "no-wash", label: "Подача без мойки", discount: 500, type: "fixed" as const },
-  { id: "empty-tank", label: "Возврат с пустым баком", discount: 1500, type: "fixed" as const },
-  { id: "economy-pack", label: "Пакет «Эконом» (без мойки + пустой бак)", discount: 10, type: "percent" as const },
+  { id: "no-wash", label: "Подача без мойки", hint: "Автомобиль подаётся чистым, но без полировки. При возврате состояние оценивается менеджером — всё честно и прозрачно 🙌", discount: 500, type: "fixed" as const },
+  { id: "empty-tank", label: "Возврат с пустым баком", hint: "Не нужно искать заправку перед возвратом — остаток топлива рассчитывается по рыночной цене и просто удерживается из залога ⛽", discount: 1500, type: "fixed" as const },
+  { id: "economy-pack", label: "Пакет «Эконом» (без мойки + пустой бак)", hint: "Максимальная экономия — объединяет обе опции со скидкой", discount: 10, type: "percent" as const },
 ];
 
 const extrasConfig = [
