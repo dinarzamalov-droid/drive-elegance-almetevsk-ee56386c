@@ -110,6 +110,7 @@ export const initialBookingState: BookingState = {
   city: "Альметьевск",
   deliveryTime: "10:00",
   selectedExtras: [],
+  selectedSavings: [],
   isBirthday: false,
   isWedding: false,
   promoCode: "",
