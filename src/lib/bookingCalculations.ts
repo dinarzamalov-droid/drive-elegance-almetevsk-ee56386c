@@ -1,4 +1,4 @@
-import { cars, ageOptions, experienceOptions, getDurationDiscount, promoCodes, PREPAY_PERCENT, extrasConfig } from "./bookingData";
+import { cars, ageOptions, experienceOptions, getDurationDiscount, promoCodes, PREPAY_PERCENT, extrasConfig, savingsConfig } from "./bookingData";
 import type { BookingState } from "./bookingData";
 
 export function getBookingCalculations(state: BookingState) {
@@ -32,11 +32,24 @@ export function getBookingCalculations(state: BookingState) {
     ? promoCodes[state.appliedPromo].percent
     : 0;
 
+  // Savings calculation
+  const savingsFixed = state.selectedSavings.reduce((sum, id) => {
+    const s = savingsConfig.find((c) => c.id === id);
+    return s && s.type === "fixed" ? sum + s.discount : sum;
+  }, 0);
+  const savingsPercent = state.selectedSavings.reduce((sum, id) => {
+    const s = savingsConfig.find((c) => c.id === id);
+    return s && s.type === "percent" ? sum + s.discount : sum;
+  }, 0);
+
   const baseCost = adjustedRate * days;
   const extrasCost = extrasPerDay * days;
   const subtotal = baseCost + extrasCost - firstDayDiscount;
   const promoDiscountAmount = Math.round(subtotal * promoDiscount / 100);
-  const totalCost = subtotal - promoDiscountAmount;
+  const afterPromo = subtotal - promoDiscountAmount;
+  const savingsPercentAmount = Math.round(afterPromo * savingsPercent / 100);
+  const totalSavings = savingsFixed + savingsPercentAmount;
+  const totalCost = Math.max(0, afterPromo - totalSavings);
   const prepay = Math.round((totalCost * PREPAY_PERCENT) / 100);
   const remaining = totalCost - prepay;
   const ageDepositExtra = ageOpt?.depositExtra ?? 0;
