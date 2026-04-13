@@ -470,7 +470,7 @@ const BookingSection = () => {
                       {extra.label}
                     </span>
                     <span className="text-xs text-muted-foreground whitespace-nowrap">
-                      +{extraPrice.toLocaleString("ru-RU")} ₽/сут
+                      {extra.id === "delivery" ? `+${extraPrice.toLocaleString("ru-RU")} ₽/час` : `+${extraPrice.toLocaleString("ru-RU")} ₽/сут`}
                     </span>
                   </button>
                 );
