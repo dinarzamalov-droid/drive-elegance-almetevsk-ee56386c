@@ -9,7 +9,7 @@ const carFuelData: Record<string, { consumption: number; fuelType: string }> = {
   "lixiang-l6": { consumption: 6, fuelType: "АИ-100" },
 };
 
-const FUEL_PRICE = 75; // средняя цена АИ-100
+const FUEL_PRICE = 89; // средняя цена АИ-100
 
 const FuelCalculator = () => {
   const [selectedCar, setSelectedCar] = useState(cars[0].value);
