@@ -152,7 +152,7 @@ const AIChatBot = () => {
   return (
     <div
       className={cn(
-        "fixed bottom-20 right-4 md:bottom-24 md:right-6 z-50 flex flex-col items-end gap-3 transition-opacity duration-300",
+        "fixed bottom-[76px] right-4 md:bottom-[88px] md:right-6 z-50 flex flex-col items-end gap-2 transition-opacity duration-300",
         isFooterVisible ? "opacity-0 pointer-events-none" : "opacity-100"
       )}
     >

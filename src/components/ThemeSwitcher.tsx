@@ -25,7 +25,7 @@ const ThemeSwitcher = () => {
   const isFooterVisible = useFooterVisible();
 
   return (
-    <div className={`fixed bottom-[120px] right-4 md:bottom-32 md:right-6 z-50 flex flex-col gap-2 transition-opacity duration-300 ${isFooterVisible ? "opacity-0 pointer-events-none" : "opacity-100"}`}>
+    <div className={`fixed bottom-[136px] right-4 md:bottom-[152px] md:right-6 z-50 flex flex-col gap-2 transition-opacity duration-300 ${isFooterVisible ? "opacity-0 pointer-events-none" : "opacity-100"}`}>
       <button
         onClick={() => setTheme(theme === "silver" ? "orange" : "silver")}
         className="w-12 h-12 rounded-full bg-card border border-border flex items-center justify-center shadow-lg hover:scale-110 transition-transform"
