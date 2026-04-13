@@ -404,7 +404,7 @@ const BookingSection = () => {
                   🕐 Скидка за раннее бронирование: {earlyBookingPercent}% (−{earlyBookingAmount.toLocaleString("ru-RU")} ₽)
                 </span>
               </div>
-            )
+            )}
 
             {/* Discounts */}
             <div className="space-y-3">
