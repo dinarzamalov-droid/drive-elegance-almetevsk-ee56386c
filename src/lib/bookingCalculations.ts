@@ -78,6 +78,7 @@ export function getBookingCalculations(state: BookingState) {
     extrasCost,
     subtotal,
     promoDiscountAmount,
+    totalSavings,
     totalCost,
     prepay,
     remaining,
