@@ -186,6 +186,19 @@ const BookingSection = () => {
     );
   };
 
+  const toggleSaving = (id: string) => {
+    setSelectedSavings((prev) => {
+      let next = prev.includes(id) ? prev.filter((s) => s !== id) : [...prev, id];
+      if (id === "economy-pack" && next.includes("economy-pack")) {
+        next = next.filter((s) => !["no-wash", "empty-tank", "off-peak"].includes(s));
+        next.push("economy-pack");
+      } else if (["no-wash", "empty-tank", "off-peak"].includes(id) && next.includes("economy-pack")) {
+        next = next.filter((s) => s !== "economy-pack");
+      }
+      return next;
+    });
+  };
+
   const buildMessageText = () => {
     const fullName = `${lastName.trim()} ${firstName.trim()} ${middleName.trim()}`;
     const carLabel = selectedCar?.label ?? car;
