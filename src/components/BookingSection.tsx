@@ -64,8 +64,7 @@ const cars = [
 const savingsConfig = [
   { id: "no-wash", label: "Подача без мойки", discount: 500, type: "fixed" as const },
   { id: "empty-tank", label: "Возврат с пустым баком", discount: 1500, type: "fixed" as const },
-  { id: "off-peak", label: "Подача в непопулярное время (до 8:00 / после 21:00)", discount: 500, type: "fixed" as const },
-  { id: "economy-pack", label: "Пакет «Эконом» (без мойки + пустой бак + непопулярное время)", discount: 10, type: "percent" as const },
+  { id: "economy-pack", label: "Пакет «Эконом» (без мойки + пустой бак)", discount: 10, type: "percent" as const },
 ];
 
 const extrasConfig = [
