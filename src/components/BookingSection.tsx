@@ -64,8 +64,7 @@ const cars = [
 const savingsConfig = [
   { id: "no-wash", label: "Подача без мойки", discount: 500, type: "fixed" as const },
   { id: "empty-tank", label: "Возврат с пустым баком", discount: 1500, type: "fixed" as const },
-  { id: "off-peak", label: "Подача в непопулярное время (до 8:00 / после 21:00)", discount: 500, type: "fixed" as const },
-  { id: "economy-pack", label: "Пакет «Эконом» (без мойки + пустой бак + непопулярное время)", discount: 10, type: "percent" as const },
+  { id: "economy-pack", label: "Пакет «Эконом» (без мойки + пустой бак)", discount: 10, type: "percent" as const },
 ];
 
 const extrasConfig = [
@@ -190,9 +189,9 @@ const BookingSection = () => {
     setSelectedSavings((prev) => {
       let next = prev.includes(id) ? prev.filter((s) => s !== id) : [...prev, id];
       if (id === "economy-pack" && next.includes("economy-pack")) {
-        next = next.filter((s) => !["no-wash", "empty-tank", "off-peak"].includes(s));
+        next = next.filter((s) => !["no-wash", "empty-tank"].includes(s));
         next.push("economy-pack");
-      } else if (["no-wash", "empty-tank", "off-peak"].includes(id) && next.includes("economy-pack")) {
+      } else if (["no-wash", "empty-tank"].includes(id) && next.includes("economy-pack")) {
         next = next.filter((s) => s !== "economy-pack");
       }
       return next;
@@ -397,14 +396,8 @@ const BookingSection = () => {
               </div>
             )}
 
-            {/* Early booking discount */}
-            {earlyBookingPercent > 0 && (
-              <div className="bg-green-500/10 border border-green-500/20 rounded-lg p-3 text-sm">
-                <span className="text-green-600 dark:text-green-400 font-medium">
-                  🕐 Скидка за раннее бронирование: {earlyBookingPercent}% (−{earlyBookingAmount.toLocaleString("ru-RU")} ₽)
-                </span>
-              </div>
-            )}
+
+
 
             {/* Discounts */}
             <div className="space-y-3">
@@ -490,6 +483,21 @@ const BookingSection = () => {
                 <PiggyBank className="w-4 h-4 text-primary" /> Экономия 💰
               </label>
               <p className="text-xs text-muted-foreground -mt-1">Снизьте стоимость, отказавшись от необязательных услуг</p>
+
+              {/* Early booking info */}
+              <div className="bg-green-500/10 border border-green-500/20 rounded-lg p-3 text-sm space-y-1">
+                <span className="text-green-600 dark:text-green-400 font-medium block">🕐 Скидка за раннее бронирование</span>
+                <span className="text-muted-foreground text-xs block">Бронируйте заранее — скидка применяется автоматически:</span>
+                <div className="flex gap-4 mt-1">
+                  <span className={`text-xs font-medium ${earlyBookingPercent === 3 ? "text-green-500" : "text-muted-foreground"}`}>• 7+ дней → 3%</span>
+                  <span className={`text-xs font-medium ${earlyBookingPercent === 5 ? "text-green-500" : "text-muted-foreground"}`}>• 14+ дней → 5%</span>
+                </div>
+                {earlyBookingPercent > 0 && (
+                  <span className="text-green-600 dark:text-green-400 text-xs font-semibold block mt-1">
+                    ✅ Применена скидка {earlyBookingPercent}% (−{earlyBookingAmount.toLocaleString("ru-RU")} ₽)
+                  </span>
+                )}
+              </div>
               {savingsConfig.map((saving) => {
                 const isSelected = selectedSavings.includes(saving.id);
                 const discountLabel = saving.type === "fixed"
