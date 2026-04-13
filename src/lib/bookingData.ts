@@ -14,6 +14,14 @@ export const extrasConfig = [
   { id: "delivery", label: "Доставка автомобиля (1 час водителя)", icon: Gauge },
 ] as const;
 
+export const savingsConfig = [
+  { id: "no-wash", label: "Подача без мойки", discount: 500, type: "fixed" as const },
+  { id: "empty-tank", label: "Возврат с пустым баком", discount: 1500, type: "fixed" as const },
+  { id: "off-peak", label: "Подача в непопулярное время (до 8:00 / после 21:00)", discount: 500, type: "fixed" as const },
+  { id: "early-7", label: "Бронирование за 7+ дней", discount: 3, type: "percent" as const },
+  { id: "economy-pack", label: "Пакет «Эконом» (без мойки + пустой бак + непопулярное время)", discount: 10, type: "percent" as const },
+] as const;
+
 export const ageOptions = [
   { value: "21+", label: "21 год и старше", multiplier: 1.0, depositExtra: 0 },
   { value: "19-20", label: "19–20 лет", multiplier: 1.15, depositExtra: 5000 },
@@ -69,6 +77,7 @@ export interface BookingState {
   city: string;
   deliveryTime: string;
   selectedExtras: string[];
+  selectedSavings: string[];
   isBirthday: boolean;
   isWedding: boolean;
   promoCode: string;
@@ -101,6 +110,7 @@ export const initialBookingState: BookingState = {
   city: "Альметьевск",
   deliveryTime: "10:00",
   selectedExtras: [],
+  selectedSavings: [],
   isBirthday: false,
   isWedding: false,
   promoCode: "",

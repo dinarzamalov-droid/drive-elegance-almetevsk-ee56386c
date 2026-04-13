@@ -1,13 +1,13 @@
 import { useState } from "react";
 import { format, addDays, nextSaturday, nextSunday, isSaturday } from "date-fns";
 import { ru } from "date-fns/locale";
-import { CalendarIcon, User, Clock, Gauge, Shield, UserCheck, Check, Gift, Heart, Tag, Percent, Car } from "lucide-react";
+import { CalendarIcon, User, Clock, Gauge, Shield, UserCheck, Check, Gift, Heart, Tag, Percent, Car, PiggyBank } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { cars, ageOptions, experienceOptions, extrasConfig, promoCodes, PREPAY_PERCENT } from "@/lib/bookingData";
+import { cars, ageOptions, experienceOptions, extrasConfig, savingsConfig, promoCodes, PREPAY_PERCENT } from "@/lib/bookingData";
 import { getBookingCalculations } from "@/lib/bookingCalculations";
 import type { BookingState } from "@/lib/bookingData";
 
@@ -29,6 +29,22 @@ const Step2Calculator = ({ state, onChange }: Step2Props) => {
       ? state.selectedExtras.filter((e) => e !== id)
       : [...state.selectedExtras, id];
     onChange({ selectedExtras: next });
+  };
+
+  const toggleSaving = (id: string) => {
+    let next = state.selectedSavings.includes(id)
+      ? state.selectedSavings.filter((s) => s !== id)
+      : [...state.selectedSavings, id];
+
+    // Economy package is mutually exclusive with individual options it includes
+    if (id === "economy-pack" && next.includes("economy-pack")) {
+      next = next.filter((s) => !["no-wash", "empty-tank", "off-peak"].includes(s));
+      next.push("economy-pack");
+    } else if (["no-wash", "empty-tank", "off-peak"].includes(id) && next.includes("economy-pack")) {
+      next = next.filter((s) => s !== "economy-pack");
+    }
+
+    onChange({ selectedSavings: next });
   };
 
   const applyPromo = () => {
@@ -206,6 +222,29 @@ const Step2Calculator = ({ state, onChange }: Step2Props) => {
         })}
       </div>
 
+      {/* Savings / Economy options */}
+      <div className="space-y-3">
+        <label className="text-sm font-medium flex items-center gap-2">
+          <PiggyBank className="w-4 h-4 text-primary" /> Экономия 💰
+        </label>
+        <p className="text-xs text-muted-foreground -mt-1">Снизьте стоимость, отказавшись от необязательных услуг</p>
+        {savingsConfig.map((saving) => {
+          const isSelected = state.selectedSavings.includes(saving.id);
+          const discountLabel = saving.type === "fixed"
+            ? `−${saving.discount.toLocaleString("ru-RU")} ₽`
+            : `−${saving.discount}%`;
+          return (
+            <button key={saving.id} type="button" onClick={() => toggleSaving(saving.id)} className={cn("w-full flex items-center gap-3 p-3 rounded-lg border text-left transition-all", isSelected ? "border-green-500 bg-green-500/10" : "border-border bg-secondary/50 hover:border-muted-foreground/40")}>
+              <div className={cn("w-5 h-5 rounded border flex items-center justify-center shrink-0", isSelected ? "bg-green-500 border-green-500" : "border-muted-foreground/40")}>
+                {isSelected && <Check className="w-3 h-3 text-white" />}
+              </div>
+              <span className={cn("text-sm flex-1", isSelected ? "text-foreground font-medium" : "text-muted-foreground")}>{saving.label}</span>
+              <span className={cn("text-xs font-medium", isSelected ? "text-green-500" : "text-muted-foreground")}>{discountLabel}</span>
+            </button>
+          );
+        })}
+      </div>
+
       {/* Promo */}
       <div className="space-y-2">
         <label className="text-sm font-medium flex items-center gap-2"><Tag className="w-4 h-4 text-primary" /> Промокод</label>
@@ -243,6 +282,7 @@ const Step2Calculator = ({ state, onChange }: Step2Props) => {
             {calc.extrasCost > 0 && <div className="flex justify-between"><span className="text-muted-foreground">Доп. опции</span><span>{calc.extrasCost.toLocaleString("ru-RU")} ₽</span></div>}
             {calc.firstDayDiscount > 0 && <div className="flex justify-between"><span className="text-muted-foreground">🔥 Скидка</span><span className="text-primary font-medium">−{calc.firstDayDiscount.toLocaleString("ru-RU")} ₽</span></div>}
             {calc.promoDiscountAmount > 0 && <div className="flex justify-between"><span className="text-muted-foreground">🏷 Промокод</span><span className="text-primary font-medium">−{calc.promoDiscountAmount.toLocaleString("ru-RU")} ₽</span></div>}
+            {calc.totalSavings > 0 && <div className="flex justify-between"><span className="text-muted-foreground">💰 Экономия</span><span className="text-green-500 font-medium">−{calc.totalSavings.toLocaleString("ru-RU")} ₽</span></div>}
             <div className="border-t border-border pt-2 flex justify-between font-semibold">
               <span>Итого</span><span className="text-gradient-gold text-lg">{calc.totalCost.toLocaleString("ru-RU")} ₽</span>
             </div>
