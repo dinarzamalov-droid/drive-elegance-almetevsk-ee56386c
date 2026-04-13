@@ -1,8 +1,6 @@
 import Navbar from "@/components/Navbar";
 import HeroSection from "@/components/HeroSection";
-import FloatingMessenger from "@/components/FloatingMessenger";
-import AIChatBot from "@/components/AIChatBot";
-import ThemeSwitcher from "@/components/ThemeSwitcher";
+import FloatingActions from "@/components/FloatingActions";
 import AboutSection from "@/components/AboutSection";
 import FleetSection from "@/components/FleetSection";
 import CompareSection from "@/components/CompareSection";
@@ -19,7 +17,6 @@ import ContactSection from "@/components/ContactSection";
 import CorporateSection from "@/components/CorporateSection";
 import GiftCertificatesSection from "@/components/GiftCertificatesSection";
 import ClubCardsSection from "@/components/ClubCardsSection";
-
 import TourismSection from "@/components/TourismSection";
 import FeaturesSection from "@/components/FeaturesSection";
 import Footer from "@/components/Footer";
@@ -49,9 +46,7 @@ const Index = () => {
       <ContactSection />
       
       <Footer />
-      <AIChatBot />
-      <FloatingMessenger />
-      <ThemeSwitcher />
+      <FloatingActions />
     </div>
   );
 };
