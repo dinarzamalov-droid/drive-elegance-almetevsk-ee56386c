@@ -132,11 +132,31 @@ const BookingSection = () => {
     ? promoCodes[appliedPromo].percent
     : 0;
 
+  // Early booking discount
+  const daysUntilStart = dateFrom
+    ? Math.floor((dateFrom.getTime() - Date.now()) / 86400000)
+    : 0;
+  const earlyBookingPercent = daysUntilStart >= 14 ? 5 : daysUntilStart >= 7 ? 3 : 0;
+
+  // Savings calculation
+  const savingsFixed = selectedSavings.reduce((sum, id) => {
+    const s = savingsConfig.find((c) => c.id === id);
+    return s && s.type === "fixed" ? sum + s.discount : sum;
+  }, 0);
+  const savingsPercent = selectedSavings.reduce((sum, id) => {
+    const s = savingsConfig.find((c) => c.id === id);
+    return s && s.type === "percent" ? sum + s.discount : sum;
+  }, 0);
+
   const baseCost = adjustedRate * days;
   const extrasCost = extrasPerDay * days;
   const subtotal = baseCost + extrasCost - firstDayDiscount;
   const promoDiscountAmount = Math.round(subtotal * promoDiscount / 100);
-  const totalCost = subtotal - promoDiscountAmount;
+  const afterPromo = subtotal - promoDiscountAmount;
+  const earlyBookingAmount = Math.round(afterPromo * earlyBookingPercent / 100);
+  const savingsPercentAmount = Math.round((afterPromo - earlyBookingAmount) * savingsPercent / 100);
+  const totalSavings = savingsFixed + savingsPercentAmount;
+  const totalCost = Math.max(0, afterPromo - earlyBookingAmount - totalSavings);
   const prepay = Math.round((totalCost * PREPAY_PERCENT) / 100);
   const remaining = totalCost - prepay;
   const ageDepositExtra = ageOptions.find((a) => a.value === age)?.depositExtra ?? 0;
