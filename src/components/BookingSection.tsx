@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { format } from "date-fns";
 import { ru } from "date-fns/locale";
-import { CalendarIcon, Car, Shield, Gauge, UserCheck, Check, User, Clock, FileText, Gift, Heart, Tag, Percent, MessageCircle, Send, Phone } from "lucide-react";
+import { CalendarIcon, Car, Shield, Gauge, UserCheck, Check, User, Clock, FileText, Gift, Heart, Tag, Percent, MessageCircle, Send, Phone, PiggyBank } from "lucide-react";
 import { generateContract } from "@/lib/generateContract";
 import { openMessenger } from "@/lib/messengerUtils";
 import { cn } from "@/lib/utils";
@@ -61,6 +61,13 @@ const cars = [
   { value: "lixiang-l6", label: "LiXiang L6", price: 23000, deposit: 35000, category: "tech" as CarCategory, extras: { mileage: 3000, delivery: 2500 } },
 ];
 
+const savingsConfig = [
+  { id: "no-wash", label: "Подача без мойки", discount: 500, type: "fixed" as const },
+  { id: "empty-tank", label: "Возврат с пустым баком", discount: 1500, type: "fixed" as const },
+  { id: "off-peak", label: "Подача в непопулярное время (до 8:00 / после 21:00)", discount: 500, type: "fixed" as const },
+  { id: "economy-pack", label: "Пакет «Эконом» (без мойки + пустой бак + непопулярное время)", discount: 10, type: "percent" as const },
+];
+
 const extrasConfig = [
   { id: "mileage", label: "Безлимитный пробег", icon: Gauge },
   { id: "delivery", label: "Доставка автомобиля (1 час водителя)", icon: UserCheck },
@@ -96,7 +103,7 @@ const BookingSection = () => {
   const [promoError, setPromoError] = useState("");
   const [isBirthday, setIsBirthday] = useState(false);
   const [isWedding, setIsWedding] = useState(false);
-
+  const [selectedSavings, setSelectedSavings] = useState<string[]>([]);
   const selectedCar = cars.find((c) => c.value === car);
   const ageMultiplier = ageOptions.find((a) => a.value === age)?.multiplier ?? 1;
   const expMultiplier = experienceOptions.find((e) => e.value === experience)?.multiplier ?? 1;
@@ -125,11 +132,31 @@ const BookingSection = () => {
     ? promoCodes[appliedPromo].percent
     : 0;
 
+  // Early booking discount
+  const daysUntilStart = dateFrom
+    ? Math.floor((dateFrom.getTime() - Date.now()) / 86400000)
+    : 0;
+  const earlyBookingPercent = daysUntilStart >= 14 ? 5 : daysUntilStart >= 7 ? 3 : 0;
+
+  // Savings calculation
+  const savingsFixed = selectedSavings.reduce((sum, id) => {
+    const s = savingsConfig.find((c) => c.id === id);
+    return s && s.type === "fixed" ? sum + s.discount : sum;
+  }, 0);
+  const savingsPercent = selectedSavings.reduce((sum, id) => {
+    const s = savingsConfig.find((c) => c.id === id);
+    return s && s.type === "percent" ? sum + s.discount : sum;
+  }, 0);
+
   const baseCost = adjustedRate * days;
   const extrasCost = extrasPerDay * days;
   const subtotal = baseCost + extrasCost - firstDayDiscount;
   const promoDiscountAmount = Math.round(subtotal * promoDiscount / 100);
-  const totalCost = subtotal - promoDiscountAmount;
+  const afterPromo = subtotal - promoDiscountAmount;
+  const earlyBookingAmount = Math.round(afterPromo * earlyBookingPercent / 100);
+  const savingsPercentAmount = Math.round((afterPromo - earlyBookingAmount) * savingsPercent / 100);
+  const totalSavings = savingsFixed + savingsPercentAmount;
+  const totalCost = Math.max(0, afterPromo - earlyBookingAmount - totalSavings);
   const prepay = Math.round((totalCost * PREPAY_PERCENT) / 100);
   const remaining = totalCost - prepay;
   const ageDepositExtra = ageOptions.find((a) => a.value === age)?.depositExtra ?? 0;
@@ -157,6 +184,19 @@ const BookingSection = () => {
     setSelectedExtras((prev) =>
       prev.includes(id) ? prev.filter((e) => e !== id) : [...prev, id]
     );
+  };
+
+  const toggleSaving = (id: string) => {
+    setSelectedSavings((prev) => {
+      let next = prev.includes(id) ? prev.filter((s) => s !== id) : [...prev, id];
+      if (id === "economy-pack" && next.includes("economy-pack")) {
+        next = next.filter((s) => !["no-wash", "empty-tank", "off-peak"].includes(s));
+        next.push("economy-pack");
+      } else if (["no-wash", "empty-tank", "off-peak"].includes(id) && next.includes("economy-pack")) {
+        next = next.filter((s) => s !== "economy-pack");
+      }
+      return next;
+    });
   };
 
   const buildMessageText = () => {
@@ -357,6 +397,15 @@ const BookingSection = () => {
               </div>
             )}
 
+            {/* Early booking discount */}
+            {earlyBookingPercent > 0 && (
+              <div className="bg-green-500/10 border border-green-500/20 rounded-lg p-3 text-sm">
+                <span className="text-green-600 dark:text-green-400 font-medium">
+                  🕐 Скидка за раннее бронирование: {earlyBookingPercent}% (−{earlyBookingAmount.toLocaleString("ru-RU")} ₽)
+                </span>
+              </div>
+            )}
+
             {/* Discounts */}
             <div className="space-y-3">
               <label className="text-sm font-medium text-foreground">Скидки 🔥</label>
@@ -435,7 +484,29 @@ const BookingSection = () => {
               })}
             </div>
 
-            {/* Promo code */}
+            {/* Savings / Economy options */}
+            <div className="space-y-3">
+              <label className="text-sm font-medium flex items-center gap-2">
+                <PiggyBank className="w-4 h-4 text-primary" /> Экономия 💰
+              </label>
+              <p className="text-xs text-muted-foreground -mt-1">Снизьте стоимость, отказавшись от необязательных услуг</p>
+              {savingsConfig.map((saving) => {
+                const isSelected = selectedSavings.includes(saving.id);
+                const discountLabel = saving.type === "fixed"
+                  ? `−${saving.discount.toLocaleString("ru-RU")} ₽`
+                  : `−${saving.discount}%`;
+                return (
+                  <button key={saving.id} type="button" onClick={() => toggleSaving(saving.id)} className={cn("w-full flex items-center gap-3 p-3 rounded-lg border text-left transition-all", isSelected ? "border-green-500 bg-green-500/10" : "border-border bg-secondary/50 hover:border-muted-foreground/40")}>
+                    <div className={cn("w-5 h-5 rounded border flex items-center justify-center shrink-0", isSelected ? "bg-green-500 border-green-500" : "border-muted-foreground/40")}>
+                      {isSelected && <Check className="w-3 h-3 text-white" />}
+                    </div>
+                    <span className={cn("text-sm flex-1", isSelected ? "text-foreground font-medium" : "text-muted-foreground")}>{saving.label}</span>
+                    <span className={cn("text-xs font-medium", isSelected ? "text-green-500" : "text-muted-foreground")}>{discountLabel}</span>
+                  </button>
+                );
+              })}
+            </div>
+
             <div className="space-y-2">
               <label className="text-sm font-medium text-foreground flex items-center gap-2">
                 <Tag className="w-4 h-4 text-primary" />
@@ -535,6 +606,18 @@ const BookingSection = () => {
                         🏷 Промокод {appliedPromo} ({promoDiscount}%)
                       </span>
                       <span className="text-primary font-medium">−{promoDiscountAmount.toLocaleString("ru-RU")} ₽</span>
+                    </div>
+                  )}
+                  {earlyBookingAmount > 0 && (
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">🕐 Раннее бронирование ({earlyBookingPercent}%)</span>
+                      <span className="text-green-600 dark:text-green-400 font-medium">−{earlyBookingAmount.toLocaleString("ru-RU")} ₽</span>
+                    </div>
+                  )}
+                  {totalSavings > 0 && (
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">💰 Экономия</span>
+                      <span className="text-green-600 dark:text-green-400 font-medium">−{totalSavings.toLocaleString("ru-RU")} ₽</span>
                     </div>
                   )}
                   <div className="border-t border-border pt-2 flex justify-between font-semibold">
