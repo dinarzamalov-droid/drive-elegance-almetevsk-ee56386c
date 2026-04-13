@@ -608,6 +608,18 @@ const BookingSection = () => {
                       <span className="text-primary font-medium">−{promoDiscountAmount.toLocaleString("ru-RU")} ₽</span>
                     </div>
                   )}
+                  {earlyBookingAmount > 0 && (
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">🕐 Раннее бронирование ({earlyBookingPercent}%)</span>
+                      <span className="text-green-600 dark:text-green-400 font-medium">−{earlyBookingAmount.toLocaleString("ru-RU")} ₽</span>
+                    </div>
+                  )}
+                  {totalSavings > 0 && (
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">💰 Экономия</span>
+                      <span className="text-green-600 dark:text-green-400 font-medium">−{totalSavings.toLocaleString("ru-RU")} ₽</span>
+                    </div>
+                  )}
                   <div className="border-t border-border pt-2 flex justify-between font-semibold">
                     <span className="text-foreground">Итого</span>
                     <span className="text-gradient-gold text-lg">{totalCost.toLocaleString("ru-RU")} ₽</span>
