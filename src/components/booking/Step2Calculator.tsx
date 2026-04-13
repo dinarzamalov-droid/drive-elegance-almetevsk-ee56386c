@@ -1,13 +1,13 @@
 import { useState } from "react";
 import { format, addDays, nextSaturday, nextSunday, isSaturday } from "date-fns";
 import { ru } from "date-fns/locale";
-import { CalendarIcon, User, Clock, Gauge, Shield, UserCheck, Check, Gift, Heart, Tag, Percent, Car } from "lucide-react";
+import { CalendarIcon, User, Clock, Gauge, Shield, UserCheck, Check, Gift, Heart, Tag, Percent, Car, PiggyBank } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { cars, ageOptions, experienceOptions, extrasConfig, promoCodes, PREPAY_PERCENT } from "@/lib/bookingData";
+import { cars, ageOptions, experienceOptions, extrasConfig, savingsConfig, promoCodes, PREPAY_PERCENT } from "@/lib/bookingData";
 import { getBookingCalculations } from "@/lib/bookingCalculations";
 import type { BookingState } from "@/lib/bookingData";
 
@@ -29,6 +29,22 @@ const Step2Calculator = ({ state, onChange }: Step2Props) => {
       ? state.selectedExtras.filter((e) => e !== id)
       : [...state.selectedExtras, id];
     onChange({ selectedExtras: next });
+  };
+
+  const toggleSaving = (id: string) => {
+    let next = state.selectedSavings.includes(id)
+      ? state.selectedSavings.filter((s) => s !== id)
+      : [...state.selectedSavings, id];
+
+    // Economy package is mutually exclusive with individual options it includes
+    if (id === "economy-pack" && next.includes("economy-pack")) {
+      next = next.filter((s) => !["no-wash", "empty-tank", "off-peak"].includes(s));
+      next.push("economy-pack");
+    } else if (["no-wash", "empty-tank", "off-peak"].includes(id) && next.includes("economy-pack")) {
+      next = next.filter((s) => s !== "economy-pack");
+    }
+
+    onChange({ selectedSavings: next });
   };
 
   const applyPromo = () => {
