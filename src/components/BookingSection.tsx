@@ -103,7 +103,7 @@ const BookingSection = () => {
   const [promoError, setPromoError] = useState("");
   const [isBirthday, setIsBirthday] = useState(false);
   const [isWedding, setIsWedding] = useState(false);
-
+  const [selectedSavings, setSelectedSavings] = useState<string[]>([]);
   const selectedCar = cars.find((c) => c.value === car);
   const ageMultiplier = ageOptions.find((a) => a.value === age)?.multiplier ?? 1;
   const expMultiplier = experienceOptions.find((e) => e.value === experience)?.multiplier ?? 1;
