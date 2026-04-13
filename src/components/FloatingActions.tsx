@@ -10,7 +10,7 @@ const FloatingActions = () => {
   return (
     <div
       className={cn(
-        "fixed bottom-4 right-4 md:bottom-6 md:right-6 z-50 flex flex-col items-end gap-3 transition-opacity duration-300",
+        "fixed bottom-4 right-4 md:bottom-6 md:right-6 z-50 flex flex-col items-end gap-4 transition-opacity duration-300",
         isFooterVisible ? "opacity-0 pointer-events-none" : "opacity-100"
       )}
     >
