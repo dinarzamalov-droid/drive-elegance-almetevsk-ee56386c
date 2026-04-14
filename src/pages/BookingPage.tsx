@@ -61,6 +61,7 @@ const BookingPage = () => {
           middleName: parsed.middleName || "",
           phone: parsed.phone || "",
           email: parsed.email || "",
+          birthDate: parsed.birthDate || "",
           passportSeries: parsed.passportSeries || "",
           passportNumber: parsed.passportNumber || "",
           passportDate: parsed.passportDate || "",
