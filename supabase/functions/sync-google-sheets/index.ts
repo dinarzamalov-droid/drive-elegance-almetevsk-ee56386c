@@ -44,14 +44,24 @@ async function getAccessToken(): Promise<string> {
 
   const unsignedToken = `${enc(header)}.${enc(payload)}`;
 
-  // Import the private key — handle escaped newlines
-  const cleanedPem = privateKeyPem.replace(/\\n/g, "\n");
+  // Import the private key — handle escaped newlines and various formats
+  let cleanedPem = privateKeyPem;
+  // Handle JSON-escaped newlines
+  if (cleanedPem.includes("\\n")) {
+    cleanedPem = cleanedPem.replace(/\\n/g, "\n");
+  }
+  // Remove PEM headers/footers and whitespace
   const keyData = cleanedPem
     .replace(/-----BEGIN PRIVATE KEY-----/g, "")
     .replace(/-----END PRIVATE KEY-----/g, "")
-    .replace(/\s/g, "");
+    .replace(/[\s\r\n]/g, "");
 
-  const binaryKey = Uint8Array.from(atob(keyData), (c) => c.charCodeAt(0));
+  console.log("Key data length:", keyData.length, "first 20 chars:", keyData.substring(0, 20));
+
+  // Use standard base64 decode
+  const raw = atob(keyData);
+  const binaryKey = new Uint8Array(raw.length);
+  for (let i = 0; i < raw.length; i++) binaryKey[i] = raw.charCodeAt(i);
 
   const cryptoKey = await crypto.subtle.importKey(
     "pkcs8",
