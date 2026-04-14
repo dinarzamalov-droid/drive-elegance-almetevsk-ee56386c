@@ -86,6 +86,7 @@ export interface BookingState {
   middleName: string;
   phone: string;
   email: string;
+  birthDate: string;
   passportSeries: string;
   passportNumber: string;
   passportDate: string;
@@ -118,6 +119,7 @@ export const initialBookingState: BookingState = {
   middleName: "",
   phone: "",
   email: "",
+  birthDate: "",
   passportSeries: "",
   passportNumber: "",
   passportDate: "",
