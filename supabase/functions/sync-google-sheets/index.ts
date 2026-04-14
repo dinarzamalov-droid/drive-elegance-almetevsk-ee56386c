@@ -31,13 +31,23 @@ async function getAccessToken(): Promise<string> {
     exp: now + 3600,
   };
 
-  const enc = (obj: unknown) =>
-    btoa(JSON.stringify(obj)).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+  const toBase64Url = (buf: ArrayBuffer) => {
+    const bytes = new Uint8Array(buf);
+    let binary = "";
+    for (const b of bytes) binary += String.fromCharCode(b);
+    return btoa(binary).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+  };
+
+  const enc = (obj: unknown) => {
+    const str = JSON.stringify(obj);
+    return btoa(str).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+  };
 
   const unsignedToken = `${enc(header)}.${enc(payload)}`;
 
-  // Import the private key
-  const keyData = privateKeyPem
+  // Import the private key — handle escaped newlines
+  const cleanedPem = privateKeyPem.replace(/\\n/g, "\n");
+  const keyData = cleanedPem
     .replace(/-----BEGIN PRIVATE KEY-----/g, "")
     .replace(/-----END PRIVATE KEY-----/g, "")
     .replace(/\s/g, "");
