@@ -40,6 +40,14 @@ const Step3ClientData = ({ state, onChange }: Step3Props) => {
         </div>
       </div>
 
+      {/* Birth date */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div className="space-y-2">
+          <label className="text-sm font-medium">Дата рождения *</label>
+          <input type="date" required value={state.birthDate} onChange={(e) => onChange({ birthDate: e.target.value })} className={inputClass} />
+        </div>
+      </div>
+
       {/* Passport */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div className="space-y-2">
