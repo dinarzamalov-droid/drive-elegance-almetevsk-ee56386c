@@ -67,7 +67,7 @@ async function getAccessToken(): Promise<string> {
     new TextEncoder().encode(unsignedToken)
   );
 
-  const sig = toBase64Url(signature);
+  const sig = toBase64Url(new Uint8Array(signature));
 
   const jwt = `${unsignedToken}.${sig}`;
 
