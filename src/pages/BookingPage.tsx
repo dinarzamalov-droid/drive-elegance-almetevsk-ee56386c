@@ -161,6 +161,19 @@ const BookingPage = () => {
 
   const next = async () => {
     if (step < TOTAL_STEPS && canNext()) {
+      // Birthday validation on leaving step 3
+      if (step === 3) {
+        const inRange = isBirthdayInRange(state.birthDate, state.dateFrom, state.dateTo);
+        if (state.isBirthday && !inRange) {
+          toast.error("Дата рождения не совпадает с периодом аренды. Скидка «День рождения» не может быть применена.");
+          update({ isBirthday: false });
+          return;
+        }
+        if (!state.isBirthday && inRange) {
+          update({ isBirthday: true });
+          toast.success("🎂 Поздравляем! Мы заметили, что ваш день рождения совпадает с арендой — скидка 10% на первый день применена автоматически!");
+        }
+      }
       if (step === 5) {
         await saveBooking();
       }
