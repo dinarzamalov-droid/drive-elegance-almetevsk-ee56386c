@@ -83,6 +83,22 @@ const BookingPage = () => {
 
   const calc = getBookingCalculations(state);
 
+  // Check if birthday falls within ±3 days of rental period
+  const isBirthdayInRange = useCallback((birthDate: string, dateFrom?: Date, dateTo?: Date): boolean => {
+    if (!birthDate || !dateFrom || !dateTo) return false;
+    const bd = new Date(birthDate);
+    const year1 = dateFrom.getFullYear();
+    const year2 = dateTo.getFullYear();
+    const years = new Set([year1, year2]);
+    for (const y of years) {
+      const bdThisYear = new Date(y, bd.getMonth(), bd.getDate());
+      const rangeStart = new Date(dateFrom.getTime() - 3 * 86400000);
+      const rangeEnd = new Date(dateTo.getTime() + 3 * 86400000);
+      if (bdThisYear >= rangeStart && bdThisYear <= rangeEnd) return true;
+    }
+    return false;
+  }, []);
+
   const canNext = (): boolean => {
     switch (step) {
       case 1: return !!state.car;
@@ -90,7 +106,7 @@ const BookingPage = () => {
       case 3:
         return !!(state.lastName.trim() && state.firstName.trim() && state.middleName.trim() &&
           state.phone.trim() && state.email.trim() && state.passportSeries && state.passportNumber &&
-          state.licenseNumber && state.agreed);
+          state.licenseNumber && state.agreed && state.birthDate);
       case 4: return true;
       case 5: return !!state.paymentMethod;
       default: return false;
