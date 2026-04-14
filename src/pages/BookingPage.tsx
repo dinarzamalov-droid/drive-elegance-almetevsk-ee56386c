@@ -152,6 +152,51 @@ const BookingPage = () => {
       } as any);
       if (error) throw error;
       toast.success("Бронирование сохранено!");
+
+      // Sync to Google Sheets in background
+      try {
+        await supabase.functions.invoke("sync-google-sheets", {
+          body: {
+            action: "append_booking",
+            booking: {
+              car_value: state.car,
+              car_label: calc.selectedCar.label,
+              date_from: state.dateFrom!.toISOString().split("T")[0],
+              date_to: state.dateTo!.toISOString().split("T")[0],
+              days: calc.days,
+              city: state.city,
+              delivery_time: state.deliveryTime,
+              age_category: state.age,
+              experience_category: state.experience,
+              selected_extras: state.selectedExtras,
+              daily_rate: calc.adjustedRate,
+              extras_cost: calc.extrasCost,
+              total_cost: calc.totalCost,
+              prepay: calc.prepay,
+              remaining: calc.remaining,
+              deposit: calc.deposit,
+              promo_code: state.appliedPromo,
+              last_name: state.lastName.trim(),
+              first_name: state.firstName.trim(),
+              middle_name: state.middleName.trim(),
+              phone: state.phone.trim(),
+              email: state.email.trim(),
+              passport_series: state.passportSeries,
+              passport_number: state.passportNumber,
+              passport_date: state.passportDate,
+              passport_code: state.passportCode,
+              license_number: state.licenseNumber,
+              license_date: state.licenseDate,
+              payment_method: state.paymentMethod,
+              preferred_messenger: state.preferredMessenger,
+              status: "new",
+              created_at: new Date().toISOString(),
+            },
+          },
+        });
+      } catch (sheetErr) {
+        console.error("Google Sheets sync error:", sheetErr);
+      }
     } catch (err) {
       console.error("Booking save error:", err);
       toast.error("Ошибка сохранения бронирования");
