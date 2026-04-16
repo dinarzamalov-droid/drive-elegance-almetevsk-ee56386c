@@ -20,6 +20,8 @@ interface Profile {
   passport_number: string;
   passport_date: string;
   passport_code: string;
+  passport_issued_by: string;
+  registration_address: string;
   license_number: string;
   license_date: string;
   loyalty_level: string;
@@ -194,6 +196,8 @@ const ProfilePage = () => {
                     <div><label className="text-xs text-muted-foreground mb-1 block">Телефон</label><input value={editForm.phone ?? profile.phone} onChange={(e) => setEditForm({ ...editForm, phone: e.target.value })} className={inputClass} /></div>
                     <div><label className="text-xs text-muted-foreground mb-1 block">Серия паспорта</label><input value={editForm.passport_series ?? profile.passport_series} onChange={(e) => setEditForm({ ...editForm, passport_series: e.target.value })} className={inputClass} /></div>
                     <div><label className="text-xs text-muted-foreground mb-1 block">Номер паспорта</label><input value={editForm.passport_number ?? profile.passport_number} onChange={(e) => setEditForm({ ...editForm, passport_number: e.target.value })} className={inputClass} /></div>
+                    <div><label className="text-xs text-muted-foreground mb-1 block">Кем выдан паспорт</label><input value={editForm.passport_issued_by ?? profile.passport_issued_by} onChange={(e) => setEditForm({ ...editForm, passport_issued_by: e.target.value })} className={inputClass} /></div>
+                    <div className="sm:col-span-2"><label className="text-xs text-muted-foreground mb-1 block">Адрес регистрации</label><input value={editForm.registration_address ?? profile.registration_address} onChange={(e) => setEditForm({ ...editForm, registration_address: e.target.value })} className={inputClass} /></div>
                     <div><label className="text-xs text-muted-foreground mb-1 block">Номер ВУ</label><input value={editForm.license_number ?? profile.license_number} onChange={(e) => setEditForm({ ...editForm, license_number: e.target.value })} className={inputClass} /></div>
                     <div><label className="text-xs text-muted-foreground mb-1 block">Дата выдачи ВУ</label><input value={editForm.license_date ?? profile.license_date} onChange={(e) => setEditForm({ ...editForm, license_date: e.target.value })} className={inputClass} /></div>
                   </div>
@@ -210,6 +214,8 @@ const ProfilePage = () => {
                       ["Телефон", profile.phone || "—"],
                       ["Email", profile.email],
                       ["Паспорт", profile.passport_series && profile.passport_number ? `${profile.passport_series} ${profile.passport_number}` : "—"],
+                      ["Кем выдан", profile.passport_issued_by || "—"],
+                      ["Адрес", profile.registration_address || "—"],
                       ["ВУ", profile.license_number || "—"],
                     ].map(([label, value]) => (
                       <div key={label} className="flex justify-between gap-2 bg-secondary/50 rounded-lg p-3">
