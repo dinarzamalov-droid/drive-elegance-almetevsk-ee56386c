@@ -11,6 +11,8 @@ interface ContractData {
   passportNumber?: string;
   passportDate?: string;
   passportCode?: string;
+  passportIssuedBy?: string;
+  registrationAddress?: string;
   licenseNumber?: string;
   licenseDate?: string;
   carLabel: string;
@@ -216,6 +218,8 @@ export function generateContract(data: ContractData) {
   addText(9, "normal", `ФИО: ${data.name}`);
   addText(9, "normal", `Дата рождения: ${data.birthDate || "—"}`);
   addText(9, "normal", `Паспорт: ${data.passportSeries || ""} ${data.passportNumber || "—"} выдан ${data.passportDate || "—"}, код ${data.passportCode || "—"}`);
+  addText(9, "normal", `Кем выдан: ${data.passportIssuedBy || "—"}`);
+  addText(9, "normal", `Адрес регистрации: ${data.registrationAddress || "—"}`);
   addText(9, "normal", `Телефон: ${data.phone}`);
   addText(9, "normal", `Email: ${data.email || "—"}`);
   addText(9, "normal", `Водительское удостоверение: ${data.licenseNumber || "—"} выдан ${data.licenseDate || "—"}`);

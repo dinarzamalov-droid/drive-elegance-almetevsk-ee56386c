@@ -91,6 +91,8 @@ export interface BookingState {
   passportNumber: string;
   passportDate: string;
   passportCode: string;
+  passportIssuedBy: string;
+  registrationAddress: string;
   licenseNumber: string;
   licenseDate: string;
   agreed: boolean;
@@ -124,6 +126,8 @@ export const initialBookingState: BookingState = {
   passportNumber: "",
   passportDate: "",
   passportCode: "",
+  passportIssuedBy: "",
+  registrationAddress: "",
   licenseNumber: "",
   licenseDate: "",
   agreed: false,
