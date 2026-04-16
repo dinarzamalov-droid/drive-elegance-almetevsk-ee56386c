@@ -5,14 +5,14 @@ import { ROBOTO_BOLD_BASE64 } from "./robotoBoldFont";
 interface ContractData {
   name: string;
   phone: string;
-  email: string;
-  birthDate: string;
-  passportSeries: string;
-  passportNumber: string;
-  passportDate: string;
-  passportCode: string;
-  licenseNumber: string;
-  licenseDate: string;
+  email?: string;
+  birthDate?: string;
+  passportSeries?: string;
+  passportNumber?: string;
+  passportDate?: string;
+  passportCode?: string;
+  licenseNumber?: string;
+  licenseDate?: string;
   carLabel: string;
   dateFrom: string;
   dateTo: string;
@@ -26,8 +26,8 @@ interface ContractData {
   deposit: number;
   ageLabel: string;
   experienceLabel: string;
-  city: string;
-  vehicle: {
+  city?: string;
+  vehicle?: {
     year: number;
     vin: string;
     enginePower: number;
