@@ -91,7 +91,7 @@ export function generateContract(data: ContractData) {
   const today = new Date();
   const todayStr = `${String(today.getDate()).padStart(2, "0")}.${String(today.getMonth() + 1).padStart(2, "0")}.${today.getFullYear()}`;
   const contractNo = Math.floor(Math.random() * 900 + 100);
-  const city = data.city || "Альметьевск";
+  const city = city || "Альметьевск";
   const v = data.vehicle || { year: 0, vin: "—", enginePower: 0, plate: "—", certNumber: "—", body: "—", color: "—", fuel: "—", fuelLevel: 0, fuelType: "—", mileageLimit: 300 };
 
   // === HEADER ===
@@ -99,11 +99,11 @@ export function generateContract(data: ContractData) {
   gap(2);
   doc.setFontSize(9);
   doc.setFont("Roboto", "normal");
-  doc.text(`г. ${data.city}`, marginL, y);
+  doc.text(`г. ${city}`, marginL, y);
   doc.text(todayStr, W - marginR, y, { align: "right" });
   y += 6;
 
-  addText(9, "normal", `Индивидуальный предприниматель Замалов Динар Рамисович, именуемый в дальнейшем «Арендодатель», с одной стороны и ${data.name}, ${data.birthDate} г.р., именуемый в дальнейшем «Арендатор», с другой стороны, заключили настоящий договор о следующем.`);
+  addText(9, "normal", `Индивидуальный предприниматель Замалов Динар Рамисович, именуемый в дальнейшем «Арендодатель», с одной стороны и ${data.name}, ${data.birthDate || "—"} г.р., именуемый в дальнейшем «Арендатор», с другой стороны, заключили настоящий договор о следующем.`);
   gap(4);
 
   // === 1. ПРЕДМЕТ ДОГОВОРА ===
@@ -131,7 +131,7 @@ export function generateContract(data: ContractData) {
   gap(2);
 
   addText(9, "normal", `1.2. Срок аренды: с ${data.dateFrom} до ${data.dateTo}. Всего: ${data.days} суток.`);
-  addText(9, "normal", `1.3. Место передачи ТС: г. ${data.city}.`);
+  addText(9, "normal", `1.3. Место передачи ТС: г. ${city}.`);
   addText(9, "normal", "1.4. ТС предоставляется в аренду исключительно для личного пользования.");
   addText(9, "normal", "1.5. ТС может использоваться только в пределах Республики Татарстан. Выезд за пределы — только по письменному согласованию.");
   gap(4);
@@ -214,11 +214,11 @@ export function generateContract(data: ContractData) {
   addText(11, "bold", "5. ДАННЫЕ АРЕНДАТОРА");
   gap(1);
   addText(9, "normal", `ФИО: ${data.name}`);
-  addText(9, "normal", `Дата рождения: ${data.birthDate}`);
-  addText(9, "normal", `Паспорт: ${data.passportSeries} ${data.passportNumber} выдан ${data.passportDate}, код ${data.passportCode}`);
+  addText(9, "normal", `Дата рождения: ${data.birthDate || "—"}`);
+  addText(9, "normal", `Паспорт: ${data.passportSeries || ""} ${data.passportNumber || "—"} выдан ${data.passportDate || "—"}, код ${data.passportCode || "—"}`);
   addText(9, "normal", `Телефон: ${data.phone}`);
-  addText(9, "normal", `Email: ${data.email}`);
-  addText(9, "normal", `Водительское удостоверение: ${data.licenseNumber} выдан ${data.licenseDate}`);
+  addText(9, "normal", `Email: ${data.email || "—"}`);
+  addText(9, "normal", `Водительское удостоверение: ${data.licenseNumber || "—"} выдан ${data.licenseDate || "—"}`);
   gap(4);
 
   // === 6. ПОМОЩЬ НА ДОРОГЕ ===
@@ -255,7 +255,7 @@ export function generateContract(data: ContractData) {
   gap(2);
   doc.setFontSize(9);
   doc.setFont("Roboto", "normal");
-  doc.text(`г. ${data.city}`, marginL, y);
+  doc.text(`г. ${city}`, marginL, y);
   doc.text(todayStr, W - marginR, y, { align: "right" });
   y += 5;
   addText(9, "normal", `Арендодатель передал, а Арендатор принял автомобиль ${data.carLabel}, госномер ${v.plate}, в технически исправном состоянии, чистым, с полным баком топлива.`);
