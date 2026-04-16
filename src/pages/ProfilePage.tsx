@@ -23,6 +23,7 @@ interface Profile {
   passport_code: string;
   passport_issued_by: string;
   registration_address: string;
+  birth_date: string;
   license_number: string;
   license_date: string;
   loyalty_level: string;
@@ -194,6 +195,7 @@ const ProfilePage = () => {
                     <div><label className="text-xs text-muted-foreground mb-1 block">Фамилия</label><input value={editForm.last_name ?? profile.last_name} onChange={(e) => setEditForm({ ...editForm, last_name: e.target.value })} className={inputClass} /></div>
                     <div><label className="text-xs text-muted-foreground mb-1 block">Имя</label><input value={editForm.first_name ?? profile.first_name} onChange={(e) => setEditForm({ ...editForm, first_name: e.target.value })} className={inputClass} /></div>
                     <div><label className="text-xs text-muted-foreground mb-1 block">Отчество</label><input value={editForm.middle_name ?? profile.middle_name} onChange={(e) => setEditForm({ ...editForm, middle_name: e.target.value })} className={inputClass} /></div>
+                    <div><label className="text-xs text-muted-foreground mb-1 block">Дата рождения</label><input type="date" value={editForm.birth_date ?? profile.birth_date} onChange={(e) => setEditForm({ ...editForm, birth_date: e.target.value })} className={inputClass} /></div>
                     <div><label className="text-xs text-muted-foreground mb-1 block">Телефон</label><input value={formatPhone(editForm.phone ?? profile.phone)} onChange={(e) => setEditForm({ ...editForm, phone: stripPhone(e.target.value) })} className={inputClass} placeholder="+7 (___) ___-__-__" /></div>
                     <div><label className="text-xs text-muted-foreground mb-1 block">Серия паспорта</label><input value={formatPassportSeries(editForm.passport_series ?? profile.passport_series)} onChange={(e) => setEditForm({ ...editForm, passport_series: stripDigits(e.target.value, 4) })} className={inputClass} placeholder="12 34" maxLength={5} /></div>
                     <div><label className="text-xs text-muted-foreground mb-1 block">Номер паспорта</label><input value={formatPassportNumber(editForm.passport_number ?? profile.passport_number)} onChange={(e) => setEditForm({ ...editForm, passport_number: stripDigits(e.target.value, 6) })} className={inputClass} placeholder="567890" maxLength={6} /></div>
@@ -213,6 +215,7 @@ const ProfilePage = () => {
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
                     {[
                       ["ФИО", `${profile.last_name} ${profile.first_name} ${profile.middle_name || ""}`],
+                      ["Дата рождения", profile.birth_date || "—"],
                       ["Телефон", profile.phone || "—"],
                       ["Email", profile.email],
                       ["Паспорт", profile.passport_series && profile.passport_number ? `${profile.passport_series} ${profile.passport_number}` : "—"],
