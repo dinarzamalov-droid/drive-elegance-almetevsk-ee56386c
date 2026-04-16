@@ -28,6 +28,7 @@ const BookingPage = () => {
   const [step, setStep] = useState(preselectedCar ? 2 : 1);
   const [saving, setSaving] = useState(false);
   const [step3Attempted, setStep3Attempted] = useState(false);
+  const [profileAutoFilled, setProfileAutoFilled] = useState(false);
   const [state, setState] = useState<BookingState>({
     ...initialBookingState,
     car: preselectedCar || initialBookingState.car,
@@ -97,20 +98,25 @@ const BookingPage = () => {
             .single();
 
           if (profile) {
-            setState((prev) => ({
-              ...prev,
-              lastName: prev.lastName || (profile as any).last_name || "",
-              firstName: prev.firstName || (profile as any).first_name || "",
-              middleName: prev.middleName || (profile as any).middle_name || "",
-              phone: prev.phone || (profile as any).phone || "",
-              email: prev.email || (profile as any).email || "",
-              passportSeries: prev.passportSeries || (profile as any).passport_series || "",
-              passportNumber: prev.passportNumber || (profile as any).passport_number || "",
-              passportDate: prev.passportDate || (profile as any).passport_date || "",
-              passportCode: prev.passportCode || (profile as any).passport_code || "",
-              licenseNumber: prev.licenseNumber || (profile as any).license_number || "",
-              licenseDate: prev.licenseDate || (profile as any).license_date || "",
-            }));
+            const p = profile as any;
+            const hasData = p.first_name || p.last_name || p.phone || p.passport_series;
+            if (hasData) {
+              setState((prev) => ({
+                ...prev,
+                lastName: prev.lastName || p.last_name || "",
+                firstName: prev.firstName || p.first_name || "",
+                middleName: prev.middleName || p.middle_name || "",
+                phone: prev.phone || p.phone || "",
+                email: prev.email || p.email || "",
+                passportSeries: prev.passportSeries || p.passport_series || "",
+                passportNumber: prev.passportNumber || p.passport_number || "",
+                passportDate: prev.passportDate || p.passport_date || "",
+                passportCode: prev.passportCode || p.passport_code || "",
+                licenseNumber: prev.licenseNumber || p.license_number || "",
+                licenseDate: prev.licenseDate || p.license_date || "",
+              }));
+              setProfileAutoFilled(true);
+            }
           }
         }
       } catch {}
@@ -285,7 +291,7 @@ const BookingPage = () => {
               />
             )}
             {step === 2 && <Step2Calculator state={state} onChange={update} />}
-            {step === 3 && <Step3ClientData state={state} onChange={update} showErrors={step3Attempted} />}
+            {step === 3 && <Step3ClientData state={state} onChange={update} showErrors={step3Attempted} profileAutoFilled={profileAutoFilled} onDismissAutoFill={() => setProfileAutoFilled(false)} />}
             {step === 4 && <Step4Contract state={state} />}
             {step === 5 && <Step5Payment state={state} onChange={update} />}
             {step === 6 && <Step6Confirmation state={state} />}
