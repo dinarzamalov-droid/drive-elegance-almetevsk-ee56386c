@@ -194,7 +194,29 @@ const BookingPage = () => {
       if (error) throw error;
       toast.success("Бронирование сохранено!");
 
-      // Sync to Google Sheets in background
+      // Sync profile with latest client data
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session) {
+          await supabase.from("profiles").update({
+            first_name: state.firstName.trim(),
+            last_name: state.lastName.trim(),
+            middle_name: state.middleName.trim(),
+            phone: state.phone.trim(),
+            email: state.email.trim(),
+            passport_series: state.passportSeries,
+            passport_number: state.passportNumber,
+            passport_date: state.passportDate || null,
+            passport_code: state.passportCode || null,
+            passport_issued_by: state.passportIssuedBy || null,
+            registration_address: state.registrationAddress || null,
+            license_number: state.licenseNumber,
+            license_date: state.licenseDate || null,
+          } as any).eq("user_id", session.user.id);
+        }
+      } catch (profileErr) {
+        console.error("Profile sync error:", profileErr);
+      }
       try {
         await supabase.functions.invoke("sync-google-sheets", {
           body: {
