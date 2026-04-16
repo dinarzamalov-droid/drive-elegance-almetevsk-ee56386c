@@ -7,6 +7,7 @@ import { format } from "date-fns";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { cars } from "@/lib/bookingData";
+import { formatPhone, formatPassportSeries, formatPassportNumber, formatPassportCode, formatLicenseNumber, stripPhone, stripDigits } from "@/lib/formatUtils";
 
 interface Profile {
   id: string;
