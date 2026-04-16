@@ -291,7 +291,7 @@ const BookingPage = () => {
               />
             )}
             {step === 2 && <Step2Calculator state={state} onChange={update} />}
-            {step === 3 && <Step3ClientData state={state} onChange={update} showErrors={step3Attempted} />}
+            {step === 3 && <Step3ClientData state={state} onChange={update} showErrors={step3Attempted} profileAutoFilled={profileAutoFilled} onDismissAutoFill={() => setProfileAutoFilled(false)} />}
             {step === 4 && <Step4Contract state={state} />}
             {step === 5 && <Step5Payment state={state} onChange={update} />}
             {step === 6 && <Step6Confirmation state={state} />}
