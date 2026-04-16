@@ -28,6 +28,7 @@ const BookingPage = () => {
   const [step, setStep] = useState(preselectedCar ? 2 : 1);
   const [saving, setSaving] = useState(false);
   const [step3Attempted, setStep3Attempted] = useState(false);
+  const [profileAutoFilled, setProfileAutoFilled] = useState(false);
   const [state, setState] = useState<BookingState>({
     ...initialBookingState,
     car: preselectedCar || initialBookingState.car,
