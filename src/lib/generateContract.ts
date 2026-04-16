@@ -91,7 +91,8 @@ export function generateContract(data: ContractData) {
   const today = new Date();
   const todayStr = `${String(today.getDate()).padStart(2, "0")}.${String(today.getMonth() + 1).padStart(2, "0")}.${today.getFullYear()}`;
   const contractNo = Math.floor(Math.random() * 900 + 100);
-  const v = data.vehicle;
+  const city = data.city || "Альметьевск";
+  const v = data.vehicle || { year: 0, vin: "—", enginePower: 0, plate: "—", certNumber: "—", body: "—", color: "—", fuel: "—", fuelLevel: 0, fuelType: "—", mileageLimit: 300 };
 
   // === HEADER ===
   addText(14, "bold", `ДОГОВОР АРЕНДЫ ТС № ${contractNo}`, "center");
