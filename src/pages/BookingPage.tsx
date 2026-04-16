@@ -48,39 +48,75 @@ const BookingPage = () => {
     });
   }, []);
 
-  // Restore client data from localStorage on mount (always), full state if no preselected car
+  // Restore from localStorage + autofill from profile
   useEffect(() => {
-    try {
-      const saved = localStorage.getItem("3ddrive_booking");
-      if (!saved) return;
-      const parsed = JSON.parse(saved);
-      if (preselectedCar) {
-        // Only restore client/personal fields, keep preselected car & fresh calculator
-        const clientFields = {
-          lastName: parsed.lastName || "",
-          firstName: parsed.firstName || "",
-          middleName: parsed.middleName || "",
-          phone: parsed.phone || "",
-          email: parsed.email || "",
-          birthDate: parsed.birthDate || "",
-          passportSeries: parsed.passportSeries || "",
-          passportNumber: parsed.passportNumber || "",
-          passportDate: parsed.passportDate || "",
-          passportCode: parsed.passportCode || "",
-          licenseNumber: parsed.licenseNumber || "",
-          licenseDate: parsed.licenseDate || "",
-          preferredMessenger: parsed.preferredMessenger || "",
-        };
-        setState((prev) => ({ ...prev, ...clientFields }));
-      } else {
-        setState((prev) => ({
-          ...prev,
-          ...parsed,
-          dateFrom: parsed.dateFrom ? new Date(parsed.dateFrom) : undefined,
-          dateTo: parsed.dateTo ? new Date(parsed.dateTo) : undefined,
-        }));
-      }
-    } catch {}
+    const init = async () => {
+      // 1. Restore from localStorage
+      try {
+        const saved = localStorage.getItem("3ddrive_booking");
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          if (preselectedCar) {
+            const clientFields = {
+              lastName: parsed.lastName || "",
+              firstName: parsed.firstName || "",
+              middleName: parsed.middleName || "",
+              phone: parsed.phone || "",
+              email: parsed.email || "",
+              birthDate: parsed.birthDate || "",
+              passportSeries: parsed.passportSeries || "",
+              passportNumber: parsed.passportNumber || "",
+              passportDate: parsed.passportDate || "",
+              passportCode: parsed.passportCode || "",
+              passportIssuedBy: parsed.passportIssuedBy || "",
+              registrationAddress: parsed.registrationAddress || "",
+              licenseNumber: parsed.licenseNumber || "",
+              licenseDate: parsed.licenseDate || "",
+              preferredMessenger: parsed.preferredMessenger || "",
+            };
+            setState((prev) => ({ ...prev, ...clientFields }));
+          } else {
+            setState((prev) => ({
+              ...prev,
+              ...parsed,
+              dateFrom: parsed.dateFrom ? new Date(parsed.dateFrom) : undefined,
+              dateTo: parsed.dateTo ? new Date(parsed.dateTo) : undefined,
+            }));
+          }
+        }
+      } catch {}
+
+      // 2. Autofill from authenticated user profile
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session) {
+          const { data: profile } = await supabase
+            .from("profiles")
+            .select("first_name, last_name, middle_name, phone, email, passport_series, passport_number, passport_date, passport_code, license_number, license_date")
+            .eq("user_id", session.user.id)
+            .single();
+
+          if (profile) {
+            setState((prev) => ({
+              ...prev,
+              lastName: prev.lastName || (profile as any).last_name || "",
+              firstName: prev.firstName || (profile as any).first_name || "",
+              middleName: prev.middleName || (profile as any).middle_name || "",
+              phone: prev.phone || (profile as any).phone || "",
+              email: prev.email || (profile as any).email || "",
+              passportSeries: prev.passportSeries || (profile as any).passport_series || "",
+              passportNumber: prev.passportNumber || (profile as any).passport_number || "",
+              passportDate: prev.passportDate || (profile as any).passport_date || "",
+              passportCode: prev.passportCode || (profile as any).passport_code || "",
+              licenseNumber: prev.licenseNumber || (profile as any).license_number || "",
+              licenseDate: prev.licenseDate || (profile as any).license_date || "",
+            }));
+          }
+        }
+      } catch {}
+    };
+
+    init();
   }, []);
 
   const calc = getBookingCalculations(state);
