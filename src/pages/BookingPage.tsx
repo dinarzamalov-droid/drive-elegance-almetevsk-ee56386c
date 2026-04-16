@@ -112,6 +112,8 @@ const BookingPage = () => {
                 passportNumber: prev.passportNumber || p.passport_number || "",
                 passportDate: prev.passportDate || p.passport_date || "",
                 passportCode: prev.passportCode || p.passport_code || "",
+                passportIssuedBy: prev.passportIssuedBy || p.passport_issued_by || "",
+                registrationAddress: prev.registrationAddress || p.registration_address || "",
                 licenseNumber: prev.licenseNumber || p.license_number || "",
                 licenseDate: prev.licenseDate || p.license_date || "",
               }));
