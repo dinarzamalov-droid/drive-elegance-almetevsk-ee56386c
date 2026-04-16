@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { ArrowLeft, ArrowRight, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -10,7 +10,7 @@ import type { BookingState } from "@/lib/bookingData";
 import BookingProgress from "@/components/booking/BookingProgress";
 import Step1CarSelect from "@/components/booking/Step1CarSelect";
 import Step2Calculator from "@/components/booking/Step2Calculator";
-import Step3ClientData from "@/components/booking/Step3ClientData";
+import Step3ClientData, { validateStep3 } from "@/components/booking/Step3ClientData";
 import Step4Contract from "@/components/booking/Step4Contract";
 import Step5Payment from "@/components/booking/Step5Payment";
 import Step6Confirmation from "@/components/booking/Step6Confirmation";
@@ -27,6 +27,7 @@ const BookingPage = () => {
 
   const [step, setStep] = useState(preselectedCar ? 2 : 1);
   const [saving, setSaving] = useState(false);
+  const [step3Attempted, setStep3Attempted] = useState(false);
   const [state, setState] = useState<BookingState>({
     ...initialBookingState,
     car: preselectedCar || initialBookingState.car,
@@ -105,9 +106,7 @@ const BookingPage = () => {
       case 1: return !!state.car;
       case 2: return !!state.dateFrom && !!state.dateTo && calc.days > 0;
       case 3:
-        return !!(state.lastName.trim() && state.firstName.trim() && state.middleName.trim() &&
-          state.phone.trim() && state.email.trim() && state.passportSeries && state.passportNumber &&
-          state.licenseNumber && state.agreed && state.birthDate);
+        return validateStep3(state).length === 0;
       case 4: return true;
       case 5: return !!state.paymentMethod;
       default: return false;
@@ -206,6 +205,11 @@ const BookingPage = () => {
   };
 
   const next = async () => {
+    if (step === 3 && !canNext()) {
+      setStep3Attempted(true);
+      toast.error("Заполните все обязательные поля");
+      return;
+    }
     if (step < TOTAL_STEPS && canNext()) {
       // Birthday validation on leaving step 3
       if (step === 3) {
@@ -245,7 +249,7 @@ const BookingPage = () => {
               />
             )}
             {step === 2 && <Step2Calculator state={state} onChange={update} />}
-            {step === 3 && <Step3ClientData state={state} onChange={update} />}
+            {step === 3 && <Step3ClientData state={state} onChange={update} showErrors={step3Attempted} />}
             {step === 4 && <Step4Contract state={state} />}
             {step === 5 && <Step5Payment state={state} onChange={update} />}
             {step === 6 && <Step6Confirmation state={state} />}
