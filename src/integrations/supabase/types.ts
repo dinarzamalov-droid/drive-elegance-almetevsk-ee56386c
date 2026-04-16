@@ -214,6 +214,7 @@ export type Database = {
       }
       profiles: {
         Row: {
+          birth_date: string | null
           bonus_balance: number
           created_at: string
           email: string
@@ -238,6 +239,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          birth_date?: string | null
           bonus_balance?: number
           created_at?: string
           email?: string
@@ -262,6 +264,7 @@ export type Database = {
           user_id: string
         }
         Update: {
+          birth_date?: string | null
           bonus_balance?: number
           created_at?: string
           email?: string
