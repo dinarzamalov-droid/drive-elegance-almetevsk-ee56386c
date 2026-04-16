@@ -42,6 +42,8 @@ const Step4Contract = ({ state }: Step4Props) => {
           <p><span className="text-muted-foreground">Телефон:</span> {state.phone}</p>
           <p><span className="text-muted-foreground">Email:</span> {state.email}</p>
           <p><span className="text-muted-foreground">Паспорт:</span> {state.passportSeries} {state.passportNumber}</p>
+          <p><span className="text-muted-foreground">Кем выдан:</span> {state.passportIssuedBy || "—"}</p>
+          <p><span className="text-muted-foreground">Адрес:</span> {state.registrationAddress || "—"}</p>
           <p><span className="text-muted-foreground">ВУ:</span> {state.licenseNumber}</p>
         </div>
 

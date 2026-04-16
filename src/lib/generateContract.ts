@@ -11,6 +11,8 @@ interface ContractData {
   passportNumber?: string;
   passportDate?: string;
   passportCode?: string;
+  passportIssuedBy?: string;
+  registrationAddress?: string;
   licenseNumber?: string;
   licenseDate?: string;
   carLabel: string;
@@ -91,7 +93,7 @@ export function generateContract(data: ContractData) {
   const today = new Date();
   const todayStr = `${String(today.getDate()).padStart(2, "0")}.${String(today.getMonth() + 1).padStart(2, "0")}.${today.getFullYear()}`;
   const contractNo = Math.floor(Math.random() * 900 + 100);
-  const city = city || "Альметьевск";
+  const city = data.city || "Альметьевск";
   const v = data.vehicle || { year: 0, vin: "—", enginePower: 0, plate: "—", certNumber: "—", body: "—", color: "—", fuel: "—", fuelLevel: 0, fuelType: "—", mileageLimit: 300 };
 
   // === HEADER ===
@@ -216,6 +218,8 @@ export function generateContract(data: ContractData) {
   addText(9, "normal", `ФИО: ${data.name}`);
   addText(9, "normal", `Дата рождения: ${data.birthDate || "—"}`);
   addText(9, "normal", `Паспорт: ${data.passportSeries || ""} ${data.passportNumber || "—"} выдан ${data.passportDate || "—"}, код ${data.passportCode || "—"}`);
+  addText(9, "normal", `Кем выдан: ${data.passportIssuedBy || "—"}`);
+  addText(9, "normal", `Адрес регистрации: ${data.registrationAddress || "—"}`);
   addText(9, "normal", `Телефон: ${data.phone}`);
   addText(9, "normal", `Email: ${data.email || "—"}`);
   addText(9, "normal", `Водительское удостоверение: ${data.licenseNumber || "—"} выдан ${data.licenseDate || "—"}`);

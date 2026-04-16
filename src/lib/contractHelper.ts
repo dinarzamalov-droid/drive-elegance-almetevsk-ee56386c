@@ -19,6 +19,8 @@ export function buildContractData(state: BookingState) {
     passportNumber: state.passportNumber,
     passportDate: state.passportDate,
     passportCode: state.passportCode,
+    passportIssuedBy: state.passportIssuedBy,
+    registrationAddress: state.registrationAddress,
     licenseNumber: state.licenseNumber,
     licenseDate: state.licenseDate,
     carLabel: selectedCar.label,

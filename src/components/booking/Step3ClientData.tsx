@@ -71,6 +71,16 @@ const Step3ClientData = ({ state, onChange }: Step3Props) => {
         </div>
       </div>
 
+      <div className="space-y-2">
+        <label className="text-sm font-medium">Кем выдан паспорт *</label>
+        <input type="text" required placeholder="МВД по Республике Татарстан" value={state.passportIssuedBy} onChange={(e) => onChange({ passportIssuedBy: e.target.value })} className={inputClass} />
+      </div>
+
+      <div className="space-y-2">
+        <label className="text-sm font-medium">Адрес регистрации *</label>
+        <input type="text" required placeholder="г. Альметьевск, ул. Примерная, д.1" value={state.registrationAddress} onChange={(e) => onChange({ registrationAddress: e.target.value })} className={inputClass} />
+      </div>
+
       {/* License */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div className="space-y-2">
