@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Check, Send, Phone, MessageCircle } from "lucide-react";
+import { Check, Send, Phone, MessageCircle, UserCheck, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { BookingState } from "@/lib/bookingData";
 
@@ -7,6 +7,8 @@ interface Step3Props {
   state: BookingState;
   onChange: (partial: Partial<BookingState>) => void;
   showErrors?: boolean;
+  profileAutoFilled?: boolean;
+  onDismissAutoFill?: () => void;
 }
 
 function formatPhone(value: string): string {
