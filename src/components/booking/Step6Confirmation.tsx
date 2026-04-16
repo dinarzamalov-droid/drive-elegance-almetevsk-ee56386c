@@ -4,6 +4,7 @@ import { format } from "date-fns";
 import { cars, ageOptions, experienceOptions, extrasConfig, PREPAY_PERCENT } from "@/lib/bookingData";
 import { getBookingCalculations } from "@/lib/bookingCalculations";
 import { generateContract } from "@/lib/generateContract";
+import { buildContractData } from "@/lib/contractHelper";
 import { downloadIcsFile } from "@/lib/generateIcs";
 import type { BookingState } from "@/lib/bookingData";
 
@@ -34,24 +35,9 @@ const Step6Confirmation = ({ state }: Step6Props) => {
   };
 
   const handleDownload = () => {
-    if (!selectedCar || !state.dateFrom || !state.dateTo) return;
-    generateContract({
-      name: fullName,
-      phone: state.phone,
-      carLabel: selectedCar.label,
-      dateFrom: format(state.dateFrom, "dd.MM.yyyy"),
-      dateTo: format(state.dateTo, "dd.MM.yyyy"),
-      days: calc.days,
-      dailyRate: calc.adjustedRate,
-      extrasList: calc.extrasList,
-      extrasCost: calc.extrasCost,
-      totalCost: calc.totalCost,
-      prepay: calc.prepay,
-      remaining: calc.remaining,
-      deposit: calc.deposit,
-      ageLabel: ageOptions.find((a) => a.value === state.age)?.label ?? state.age,
-      experienceLabel: experienceOptions.find((e) => e.value === state.experience)?.label ?? state.experience,
-    });
+    const contractData = buildContractData(state);
+    if (!contractData) return;
+    generateContract(contractData);
   };
 
   return (
