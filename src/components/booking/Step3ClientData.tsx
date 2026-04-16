@@ -29,6 +29,19 @@ function formatPassportNumber(value: string): string {
   return value.replace(/\D/g, "").slice(0, 6);
 }
 
+function formatPassportCode(value: string): string {
+  const digits = value.replace(/\D/g, "").slice(0, 6);
+  if (digits.length <= 3) return digits;
+  return digits.slice(0, 3) + "-" + digits.slice(3);
+}
+
+function formatLicenseNumber(value: string): string {
+  const digits = value.replace(/\D/g, "").slice(0, 10);
+  if (digits.length <= 2) return digits;
+  if (digits.length <= 4) return digits.slice(0, 2) + " " + digits.slice(2);
+  return digits.slice(0, 2) + " " + digits.slice(2, 4) + " " + digits.slice(4);
+}
+
 const messengerOptions = [
   { value: "telegram" as const, label: "Telegram", icon: Send, color: "bg-[#26A5E4]", borderColor: "border-[#26A5E4]" },
   { value: "whatsapp" as const, label: "WhatsApp", icon: Phone, color: "bg-[#25D366]", borderColor: "border-[#25D366]" },
@@ -89,7 +102,7 @@ const Step3ClientData = ({ state, onChange }: Step3Props) => {
         </div>
         <div className="space-y-2">
           <label className="text-sm font-medium">Код подразделения</label>
-          <input type="text" placeholder="123-456" value={state.passportCode} onChange={(e) => onChange({ passportCode: e.target.value })} className={inputClass} />
+          <input type="text" placeholder="123-456" maxLength={7} value={formatPassportCode(state.passportCode)} onChange={(e) => onChange({ passportCode: e.target.value.replace(/\D/g, "").slice(0, 6) })} className={inputClass} />
         </div>
       </div>
 
@@ -107,7 +120,7 @@ const Step3ClientData = ({ state, onChange }: Step3Props) => {
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div className="space-y-2">
           <label className="text-sm font-medium">Водительское удостоверение *</label>
-          <input type="text" placeholder="Серия и номер ВУ" value={state.licenseNumber} onChange={(e) => onChange({ licenseNumber: e.target.value })} className={inputClass} />
+          <input type="text" placeholder="99 01 792618" maxLength={14} value={formatLicenseNumber(state.licenseNumber)} onChange={(e) => onChange({ licenseNumber: e.target.value.replace(/\D/g, "").slice(0, 10) })} className={inputClass} />
         </div>
         <div className="space-y-2">
           <label className="text-sm font-medium">Дата выдачи ВУ</label>
