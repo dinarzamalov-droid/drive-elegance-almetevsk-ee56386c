@@ -84,7 +84,7 @@ const messengerOptions = [
   { value: "max" as const, label: "МАХ", icon: MessageCircle, color: "bg-gradient-to-r from-[#1a1a1a] to-[#333]", borderColor: "border-primary", badge: "Быстрый ответ" },
 ];
 
-const Step3ClientData = ({ state, onChange, showErrors = false }: Step3Props) => {
+const Step3ClientData = ({ state, onChange, showErrors = false, profileAutoFilled = false, onDismissAutoFill }: Step3Props) => {
   const [touched, setTouched] = useState<Set<string>>(new Set());
 
   const markTouched = (field: string) => {
