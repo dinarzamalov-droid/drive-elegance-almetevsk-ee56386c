@@ -113,6 +113,21 @@ const Step3ClientData = ({ state, onChange, showErrors = false, profileAutoFille
         <p className="text-muted-foreground text-sm">Заполните для формирования договора</p>
       </div>
 
+      {profileAutoFilled && (
+        <div className="flex items-start gap-3 bg-primary/10 border border-primary/30 rounded-xl p-4">
+          <UserCheck className="w-5 h-5 text-primary shrink-0 mt-0.5" />
+          <div className="flex-1">
+            <p className="text-sm font-medium">Данные заполнены из профиля</p>
+            <p className="text-xs text-muted-foreground mt-0.5">Проверьте и при необходимости отредактируйте</p>
+          </div>
+          {onDismissAutoFill && (
+            <button type="button" onClick={onDismissAutoFill} className="text-muted-foreground hover:text-foreground transition-colors">
+              <X className="w-4 h-4" />
+            </button>
+          )}
+        </div>
+      )}
+
       {showErrors && validateStep3(state).length > 0 && (
         <div className="bg-destructive/10 border border-destructive/30 rounded-lg p-3 text-sm text-destructive">
           Заполните обязательные поля, отмеченные красным
