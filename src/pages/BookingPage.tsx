@@ -93,7 +93,7 @@ const BookingPage = () => {
         if (session) {
           const { data: profile } = await supabase
             .from("profiles")
-            .select("first_name, last_name, middle_name, phone, email, passport_series, passport_number, passport_date, passport_code, license_number, license_date")
+            .select("first_name, last_name, middle_name, phone, email, passport_series, passport_number, passport_date, passport_code, passport_issued_by, registration_address, license_number, license_date")
             .eq("user_id", session.user.id)
             .single();
 
@@ -112,6 +112,8 @@ const BookingPage = () => {
                 passportNumber: prev.passportNumber || p.passport_number || "",
                 passportDate: prev.passportDate || p.passport_date || "",
                 passportCode: prev.passportCode || p.passport_code || "",
+                passportIssuedBy: prev.passportIssuedBy || p.passport_issued_by || "",
+                registrationAddress: prev.registrationAddress || p.registration_address || "",
                 licenseNumber: prev.licenseNumber || p.license_number || "",
                 licenseDate: prev.licenseDate || p.license_date || "",
               }));
@@ -194,7 +196,29 @@ const BookingPage = () => {
       if (error) throw error;
       toast.success("Бронирование сохранено!");
 
-      // Sync to Google Sheets in background
+      // Sync profile with latest client data
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session) {
+          await supabase.from("profiles").update({
+            first_name: state.firstName.trim(),
+            last_name: state.lastName.trim(),
+            middle_name: state.middleName.trim(),
+            phone: state.phone.trim(),
+            email: state.email.trim(),
+            passport_series: state.passportSeries,
+            passport_number: state.passportNumber,
+            passport_date: state.passportDate || null,
+            passport_code: state.passportCode || null,
+            passport_issued_by: state.passportIssuedBy || null,
+            registration_address: state.registrationAddress || null,
+            license_number: state.licenseNumber,
+            license_date: state.licenseDate || null,
+          } as any).eq("user_id", session.user.id);
+        }
+      } catch (profileErr) {
+        console.error("Profile sync error:", profileErr);
+      }
       try {
         await supabase.functions.invoke("sync-google-sheets", {
           body: {

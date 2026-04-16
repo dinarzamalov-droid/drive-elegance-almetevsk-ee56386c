@@ -227,9 +227,11 @@ export type Database = {
           middle_name: string | null
           passport_code: string | null
           passport_date: string | null
+          passport_issued_by: string | null
           passport_number: string | null
           passport_series: string | null
           phone: string
+          registration_address: string | null
           total_rentals: number
           total_spent: number
           updated_at: string
@@ -249,9 +251,11 @@ export type Database = {
           middle_name?: string | null
           passport_code?: string | null
           passport_date?: string | null
+          passport_issued_by?: string | null
           passport_number?: string | null
           passport_series?: string | null
           phone?: string
+          registration_address?: string | null
           total_rentals?: number
           total_spent?: number
           updated_at?: string
@@ -271,9 +275,11 @@ export type Database = {
           middle_name?: string | null
           passport_code?: string | null
           passport_date?: string | null
+          passport_issued_by?: string | null
           passport_number?: string | null
           passport_series?: string | null
           phone?: string
+          registration_address?: string | null
           total_rentals?: number
           total_spent?: number
           updated_at?: string
