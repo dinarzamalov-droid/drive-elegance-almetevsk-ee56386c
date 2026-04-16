@@ -93,7 +93,7 @@ const BookingPage = () => {
         if (session) {
           const { data: profile } = await supabase
             .from("profiles")
-            .select("first_name, last_name, middle_name, phone, email, passport_series, passport_number, passport_date, passport_code, passport_issued_by, registration_address, license_number, license_date")
+            .select("first_name, last_name, middle_name, phone, email, birth_date, passport_series, passport_number, passport_date, passport_code, passport_issued_by, registration_address, license_number, license_date")
             .eq("user_id", session.user.id)
             .single();
 
@@ -108,6 +108,7 @@ const BookingPage = () => {
                 middleName: prev.middleName || p.middle_name || "",
                 phone: prev.phone || p.phone || "",
                 email: prev.email || p.email || "",
+                birthDate: prev.birthDate || p.birth_date || "",
                 passportSeries: prev.passportSeries || p.passport_series || "",
                 passportNumber: prev.passportNumber || p.passport_number || "",
                 passportDate: prev.passportDate || p.passport_date || "",
@@ -212,6 +213,7 @@ const BookingPage = () => {
             passport_code: state.passportCode || null,
             passport_issued_by: state.passportIssuedBy || null,
             registration_address: state.registrationAddress || null,
+            birth_date: state.birthDate || null,
             license_number: state.licenseNumber,
             license_date: state.licenseDate || null,
           } as any).eq("user_id", session.user.id);
