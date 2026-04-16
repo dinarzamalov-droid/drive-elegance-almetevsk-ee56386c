@@ -4,6 +4,14 @@ import { cn } from "@/lib/utils";
 import { formatPhone, formatPassportSeries, formatPassportNumber, formatPassportCode, formatLicenseNumber } from "@/lib/formatUtils";
 import type { BookingState } from "@/lib/bookingData";
 
+interface Step3Props {
+  state: BookingState;
+  onChange: (partial: Partial<BookingState>) => void;
+  showErrors?: boolean;
+  profileAutoFilled?: boolean;
+  onDismissAutoFill?: () => void;
+}
+
 const requiredFields: { key: keyof BookingState; label: string }[] = [
   { key: "lastName", label: "Фамилия" },
   { key: "firstName", label: "Имя" },
