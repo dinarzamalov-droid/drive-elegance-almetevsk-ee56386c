@@ -1,8 +1,9 @@
-import { format } from "date-fns";
 import { FileText } from "lucide-react";
-import { cars, ageOptions, experienceOptions, extrasConfig, PREPAY_PERCENT } from "@/lib/bookingData";
+import { cars, ageOptions, experienceOptions, PREPAY_PERCENT } from "@/lib/bookingData";
 import { getBookingCalculations } from "@/lib/bookingCalculations";
 import { generateContract } from "@/lib/generateContract";
+import { buildContractData } from "@/lib/contractHelper";
+import { format } from "date-fns";
 import type { BookingState } from "@/lib/bookingData";
 
 interface Step4Props {
@@ -18,24 +19,9 @@ const Step4Contract = ({ state }: Step4Props) => {
   const todayStr = `${String(today.getDate()).padStart(2, "0")}.${String(today.getMonth() + 1).padStart(2, "0")}.${today.getFullYear()}`;
 
   const handleDownload = () => {
-    if (!selectedCar || !state.dateFrom || !state.dateTo) return;
-    generateContract({
-      name: fullName,
-      phone: state.phone,
-      carLabel: selectedCar.label,
-      dateFrom: format(state.dateFrom, "dd.MM.yyyy"),
-      dateTo: format(state.dateTo, "dd.MM.yyyy"),
-      days: calc.days,
-      dailyRate: calc.adjustedRate,
-      extrasList: calc.extrasList,
-      extrasCost: calc.extrasCost,
-      totalCost: calc.totalCost,
-      prepay: calc.prepay,
-      remaining: calc.remaining,
-      deposit: calc.deposit,
-      ageLabel: ageOptions.find((a) => a.value === state.age)?.label ?? state.age,
-      experienceLabel: experienceOptions.find((e) => e.value === state.experience)?.label ?? state.experience,
-    });
+    const contractData = buildContractData(state);
+    if (!contractData) return;
+    generateContract(contractData);
   };
 
   return (
