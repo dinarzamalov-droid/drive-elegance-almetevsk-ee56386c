@@ -93,7 +93,7 @@ const BookingPage = () => {
         if (session) {
           const { data: profile } = await supabase
             .from("profiles")
-            .select("first_name, last_name, middle_name, phone, email, passport_series, passport_number, passport_date, passport_code, passport_issued_by, registration_address, license_number, license_date")
+            .select("first_name, last_name, middle_name, phone, email, birth_date, passport_series, passport_number, passport_date, passport_code, passport_issued_by, registration_address, license_number, license_date")
             .eq("user_id", session.user.id)
             .single();
 
