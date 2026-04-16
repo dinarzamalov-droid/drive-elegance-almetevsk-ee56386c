@@ -212,6 +212,7 @@ const BookingPage = () => {
             passport_code: state.passportCode || null,
             passport_issued_by: state.passportIssuedBy || null,
             registration_address: state.registrationAddress || null,
+            birth_date: state.birthDate || null,
             license_number: state.licenseNumber,
             license_date: state.licenseDate || null,
           } as any).eq("user_id", session.user.id);
