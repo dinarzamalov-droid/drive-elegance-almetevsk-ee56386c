@@ -7,6 +7,28 @@ interface Step3Props {
   onChange: (partial: Partial<BookingState>) => void;
 }
 
+function formatPhone(value: string): string {
+  const digits = value.replace(/\D/g, "").slice(0, 11);
+  if (!digits) return "";
+  let result = "+7";
+  if (digits.length > 1) result += " (" + digits.slice(1, 4);
+  if (digits.length >= 4) result += ")";
+  if (digits.length > 4) result += " " + digits.slice(4, 7);
+  if (digits.length > 7) result += "-" + digits.slice(7, 9);
+  if (digits.length > 9) result += "-" + digits.slice(9, 11);
+  return result;
+}
+
+function formatPassportSeries(value: string): string {
+  const digits = value.replace(/\D/g, "").slice(0, 4);
+  if (digits.length <= 2) return digits;
+  return digits.slice(0, 2) + " " + digits.slice(2);
+}
+
+function formatPassportNumber(value: string): string {
+  return value.replace(/\D/g, "").slice(0, 6);
+}
+
 const messengerOptions = [
   { value: "telegram" as const, label: "Telegram", icon: Send, color: "bg-[#26A5E4]", borderColor: "border-[#26A5E4]" },
   { value: "whatsapp" as const, label: "WhatsApp", icon: Phone, color: "bg-[#25D366]", borderColor: "border-[#25D366]" },
@@ -52,11 +74,11 @@ const Step3ClientData = ({ state, onChange }: Step3Props) => {
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div className="space-y-2">
           <label className="text-sm font-medium">Серия паспорта *</label>
-          <input type="text" placeholder="1234" maxLength={4} value={state.passportSeries} onChange={(e) => onChange({ passportSeries: e.target.value.replace(/\D/g, "").slice(0, 4) })} className={inputClass} />
+          <input type="text" placeholder="12 34" maxLength={5} value={formatPassportSeries(state.passportSeries)} onChange={(e) => onChange({ passportSeries: e.target.value.replace(/\D/g, "").slice(0, 4) })} className={inputClass} />
         </div>
         <div className="space-y-2">
           <label className="text-sm font-medium">Номер паспорта *</label>
-          <input type="text" placeholder="567890" maxLength={6} value={state.passportNumber} onChange={(e) => onChange({ passportNumber: e.target.value.replace(/\D/g, "").slice(0, 6) })} className={inputClass} />
+          <input type="text" placeholder="567890" maxLength={6} value={formatPassportNumber(state.passportNumber)} onChange={(e) => onChange({ passportNumber: e.target.value.replace(/\D/g, "").slice(0, 6) })} className={inputClass} />
         </div>
       </div>
 
@@ -97,7 +119,7 @@ const Step3ClientData = ({ state, onChange }: Step3Props) => {
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div className="space-y-2">
           <label className="text-sm font-medium">Телефон *</label>
-          <input type="tel" placeholder="+7 (___) ___-__-__" value={state.phone} onChange={(e) => onChange({ phone: e.target.value })} className={inputClass} />
+          <input type="tel" placeholder="+7 (___) ___-__-__" value={formatPhone(state.phone)} onChange={(e) => onChange({ phone: e.target.value.replace(/\D/g, "").slice(0, 11) })} className={inputClass} />
         </div>
         <div className="space-y-2">
           <label className="text-sm font-medium">Email *</label>
