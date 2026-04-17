@@ -1,5 +1,5 @@
-import { useEffect } from "react";
-import { Download, Check, X } from "lucide-react";
+import { useEffect, useRef } from "react";
+import { Download, Check, X, Printer } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
 
@@ -21,7 +21,24 @@ const ContractPreviewDialog = ({
   onDownload,
   onAgree,
   showAgreeButton = true,
-}: ContractPreviewDialogProps) => {
+  }: ContractPreviewDialogProps) => {
+  const iframeRef = useRef<HTMLIFrameElement>(null);
+
+  const handlePrint = () => {
+    const win = iframeRef.current?.contentWindow;
+    if (!win) return;
+    try {
+      win.focus();
+      win.print();
+    } catch {
+      // Fallback: open in new tab and trigger print
+      if (blobUrl) {
+        const w = window.open(blobUrl, "_blank");
+        w?.addEventListener("load", () => w.print());
+      }
+    }
+  };
+
   // Revoke blob URL on unmount to prevent memory leaks
   useEffect(() => {
     return () => {
@@ -55,6 +72,7 @@ const ContractPreviewDialog = ({
         <div className="flex-1 overflow-hidden bg-secondary/30">
           {blobUrl ? (
             <iframe
+              ref={iframeRef}
               src={blobUrl}
               title="Договор аренды"
               className="w-full h-full border-0"
@@ -74,6 +92,15 @@ const ContractPreviewDialog = ({
           >
             <Download className="w-4 h-4" />
             Скачать PDF
+          </button>
+          <button
+            type="button"
+            onClick={handlePrint}
+            disabled={!blobUrl}
+            className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg font-medium text-sm border border-border text-foreground hover:bg-secondary transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <Printer className="w-4 h-4" />
+            Печать
           </button>
           {showAgreeButton && onAgree && (
             <button
