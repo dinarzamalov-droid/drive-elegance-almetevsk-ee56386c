@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { format } from "date-fns";
 import { ru } from "date-fns/locale";
-import { CalendarIcon, Car, Shield, Gauge, UserCheck, Check, User, Clock, FileText, Gift, Heart, Tag, Percent, MessageCircle, Send, Phone, PiggyBank } from "lucide-react";
+import { CalendarIcon, Car, Shield, Gauge, UserCheck, Check, User, Clock, FileText, Gift, Heart, Tag, Percent, MessageCircle, Send, Phone, PiggyBank, Eye } from "lucide-react";
 import { generateContract } from "@/lib/generateContract";
 import { openMessenger } from "@/lib/messengerUtils";
 import { formatPhone } from "@/lib/formatUtils";
@@ -712,11 +712,58 @@ const BookingSection = () => {
               </div>
             </div>
 
+            {/* Contract preview button */}
+            <button
+              type="button"
+              disabled={!car || !dateFrom || !dateTo || !lastName.trim() || !firstName.trim() || !middleName.trim() || !phone.trim()}
+              onClick={() => {
+                if (!selectedCar || !dateFrom || !dateTo) {
+                  toast.error("Заполните автомобиль, даты и контактные данные");
+                  return;
+                }
+                try {
+                  const result = generateContract(
+                    {
+                      name: `${lastName.trim()} ${firstName.trim()} ${middleName.trim()}`,
+                      phone: formatPhone(phone),
+                      carLabel: selectedCar.label,
+                      dateFrom: format(dateFrom, "dd.MM.yyyy"),
+                      dateTo: format(dateTo, "dd.MM.yyyy"),
+                      days,
+                      dailyRate: adjustedRate,
+                      extrasList: selectedExtras.map((id) => extrasConfig.find((e) => e.id === id)?.label ?? id),
+                      extrasCost,
+                      totalCost,
+                      prepay,
+                      remaining,
+                      deposit,
+                      ageLabel: ageOptions.find((a) => a.value === age)?.label ?? age,
+                      experienceLabel: experienceOptions.find((e) => e.value === experience)?.label ?? experience,
+                    },
+                    { autoDownload: false }
+                  );
+                  setContractPreview({ blobUrl: result.blobUrl, fileName: result.fileName, download: result.download });
+                  setContractViewed(true);
+                } catch (err) {
+                  console.error("Contract generation error:", err);
+                  toast.error("Не удалось сгенерировать PDF. Попробуйте ещё раз.");
+                }
+              }}
+              className="w-full flex items-center justify-center gap-2 px-6 py-3.5 rounded-lg font-semibold text-sm border border-primary text-primary hover:bg-primary/10 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+            >
+              <Eye className="w-4 h-4" />
+              {contractViewed ? "Просмотреть договор снова" : "Просмотреть договор"}
+            </button>
+
             {/* Agreement */}
             <button
               type="button"
+              disabled={!contractViewed}
               onClick={() => setAgreed(!agreed)}
-              className="flex items-start gap-3 text-left w-full"
+              className={cn(
+                "flex items-start gap-3 text-left w-full transition-opacity",
+                !contractViewed && "opacity-50 cursor-not-allowed"
+              )}
             >
               <div
                 className={cn(
@@ -727,7 +774,9 @@ const BookingSection = () => {
                 {agreed && <Check className="w-3 h-3 text-primary-foreground" />}
               </div>
               <span className="text-xs text-muted-foreground leading-relaxed">
-                Нажимая кнопку, вы соглашаетесь с условиями договора аренды и подтверждаете бронирование.
+                {contractViewed
+                  ? "Я ознакомился с условиями договора аренды и подтверждаю бронирование."
+                  : "Сначала просмотрите договор выше, чтобы поставить отметку о согласии."}
               </span>
             </button>
 
@@ -762,45 +811,18 @@ const BookingSection = () => {
                   МАХ
                 </button>
               </div>
-              <button
-                type="button"
-                disabled={!car || !dateFrom || !dateTo || !lastName.trim() || !firstName.trim() || !middleName.trim() || !phone.trim()}
-                onClick={() => {
-                  if (!selectedCar || !dateFrom || !dateTo) {
-                    toast.error("Заполните автомобиль и даты аренды");
-                    return;
-                  }
-                  try {
-                    generateContract({
-                      name: `${lastName.trim()} ${firstName.trim()} ${middleName.trim()}`,
-                      phone: formatPhone(phone),
-                      carLabel: selectedCar.label,
-                      dateFrom: format(dateFrom, "dd.MM.yyyy"),
-                      dateTo: format(dateTo, "dd.MM.yyyy"),
-                      days,
-                      dailyRate: adjustedRate,
-                      extrasList: selectedExtras.map((id) => extrasConfig.find((e) => e.id === id)?.label ?? id),
-                      extrasCost,
-                      totalCost,
-                      prepay,
-                      remaining,
-                      deposit,
-                      ageLabel: ageOptions.find((a) => a.value === age)?.label ?? age,
-                      experienceLabel: experienceOptions.find((e) => e.value === experience)?.label ?? experience,
-                    });
-                    toast.success("Договор скачан");
-                  } catch (err) {
-                    console.error("Contract generation error:", err);
-                    toast.error("Не удалось сгенерировать PDF. Попробуйте ещё раз.");
-                  }
-                }}
-                className="w-full flex items-center justify-center gap-2 px-6 py-3.5 rounded-lg font-semibold text-sm border border-primary text-primary hover:bg-primary/10 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
-              >
-                <FileText className="w-4 h-4" />
-                Скачать договор
-              </button>
             </div>
           </form>
+
+          <ContractPreviewDialog
+            open={!!contractPreview}
+            onClose={() => setContractPreview(null)}
+            blobUrl={contractPreview?.blobUrl ?? null}
+            fileName={contractPreview?.fileName ?? ""}
+            onDownload={() => contractPreview?.download()}
+            onAgree={() => setAgreed(true)}
+            showAgreeButton={!agreed}
+          />
         </AnimatedSection>
       </div>
     </section>
