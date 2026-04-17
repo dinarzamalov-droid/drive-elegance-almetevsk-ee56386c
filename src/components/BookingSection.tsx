@@ -7,6 +7,7 @@ import { openMessenger } from "@/lib/messengerUtils";
 import { formatPhone } from "@/lib/formatUtils";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import ContractPreviewDialog from "./ContractPreviewDialog";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import {
@@ -99,6 +100,8 @@ const BookingSection = () => {
   const [dateTo, setDateTo] = useState<Date>();
   const [selectedExtras, setSelectedExtras] = useState<string[]>([]);
   const [agreed, setAgreed] = useState(false);
+  const [contractViewed, setContractViewed] = useState(false);
+  const [contractPreview, setContractPreview] = useState<{ blobUrl: string; fileName: string; download: () => void } | null>(null);
   const [promoCode, setPromoCode] = useState("");
   const [appliedPromo, setAppliedPromo] = useState<string | null>(null);
   const [promoError, setPromoError] = useState("");
