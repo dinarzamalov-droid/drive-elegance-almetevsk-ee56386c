@@ -52,7 +52,14 @@ function setupFonts(doc: jsPDF) {
   doc.setFont("Roboto", "normal");
 }
 
-export function generateContract(data: ContractData) {
+export interface GeneratedContract {
+  blobUrl: string;
+  blob: Blob;
+  fileName: string;
+  download: () => void;
+}
+
+export function generateContract(data: ContractData, options: { autoDownload?: boolean } = { autoDownload: true }): GeneratedContract {
   const doc = new jsPDF({ unit: "mm", format: "a4" });
   setupFonts(doc);
 
@@ -336,5 +343,17 @@ export function generateContract(data: ContractData) {
   y += 6;
   doc.text(`Дата: ${todayStr}`, marginL, y);
 
-  doc.save(`Договор_аренды_${contractNo}.pdf`);
+  const fileName = `Договор_аренды_${contractNo}.pdf`;
+  const blob = doc.output("blob");
+  const blobUrl = URL.createObjectURL(blob);
+  const download = () => {
+    const a = document.createElement("a");
+    a.href = blobUrl;
+    a.download = fileName;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  };
+  if (options.autoDownload) doc.save(fileName);
+  return { blobUrl, blob, fileName, download };
 }
