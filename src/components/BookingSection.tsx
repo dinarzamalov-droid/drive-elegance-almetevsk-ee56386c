@@ -4,6 +4,8 @@ import { ru } from "date-fns/locale";
 import { CalendarIcon, Car, Shield, Gauge, UserCheck, Check, User, Clock, FileText, Gift, Heart, Tag, Percent, MessageCircle, Send, Phone, PiggyBank } from "lucide-react";
 import { generateContract } from "@/lib/generateContract";
 import { openMessenger } from "@/lib/messengerUtils";
+import { formatPhone } from "@/lib/formatUtils";
+import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
@@ -698,9 +700,10 @@ const BookingSection = () => {
                 <input
                   type="tel"
                   required
+                  inputMode="tel"
                   placeholder="+7 (___) ___-__-__"
-                  value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
+                  value={formatPhone(phone)}
+                  onChange={(e) => setPhone(e.target.value.replace(/\D/g, "").slice(0, 11))}
                   className={inputClass}
                 />
               </div>
@@ -760,24 +763,33 @@ const BookingSection = () => {
                 type="button"
                 disabled={!car || !dateFrom || !dateTo || !lastName.trim() || !firstName.trim() || !middleName.trim() || !phone.trim()}
                 onClick={() => {
-                  if (!selectedCar || !dateFrom || !dateTo) return;
-                  generateContract({
-                    name: `${lastName.trim()} ${firstName.trim()} ${middleName.trim()}`,
-                    phone,
-                    carLabel: selectedCar.label,
-                    dateFrom: format(dateFrom, "dd.MM.yyyy"),
-                    dateTo: format(dateTo, "dd.MM.yyyy"),
-                    days,
-                    dailyRate: adjustedRate,
-                    extrasList: selectedExtras.map((id) => extrasConfig.find((e) => e.id === id)?.label ?? id),
-                    extrasCost,
-                    totalCost,
-                    prepay,
-                    remaining,
-                    deposit,
-                    ageLabel: ageOptions.find((a) => a.value === age)?.label ?? age,
-                    experienceLabel: experienceOptions.find((e) => e.value === experience)?.label ?? experience,
-                  });
+                  if (!selectedCar || !dateFrom || !dateTo) {
+                    toast.error("Заполните автомобиль и даты аренды");
+                    return;
+                  }
+                  try {
+                    generateContract({
+                      name: `${lastName.trim()} ${firstName.trim()} ${middleName.trim()}`,
+                      phone: formatPhone(phone),
+                      carLabel: selectedCar.label,
+                      dateFrom: format(dateFrom, "dd.MM.yyyy"),
+                      dateTo: format(dateTo, "dd.MM.yyyy"),
+                      days,
+                      dailyRate: adjustedRate,
+                      extrasList: selectedExtras.map((id) => extrasConfig.find((e) => e.id === id)?.label ?? id),
+                      extrasCost,
+                      totalCost,
+                      prepay,
+                      remaining,
+                      deposit,
+                      ageLabel: ageOptions.find((a) => a.value === age)?.label ?? age,
+                      experienceLabel: experienceOptions.find((e) => e.value === experience)?.label ?? experience,
+                    });
+                    toast.success("Договор скачан");
+                  } catch (err) {
+                    console.error("Contract generation error:", err);
+                    toast.error("Не удалось сгенерировать PDF. Попробуйте ещё раз.");
+                  }
                 }}
                 className="w-full flex items-center justify-center gap-2 px-6 py-3.5 rounded-lg font-semibold text-sm border border-primary text-primary hover:bg-primary/10 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
               >
