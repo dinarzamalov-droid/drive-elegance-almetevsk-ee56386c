@@ -1,5 +1,5 @@
 import { format } from "date-fns";
-import { cars, ageOptions, experienceOptions } from "@/lib/bookingData";
+import { cars, ageOptions, experienceOptions, savingsConfig } from "@/lib/bookingData";
 import { getBookingCalculations } from "@/lib/bookingCalculations";
 import type { BookingState } from "@/lib/bookingData";
 
@@ -9,6 +9,10 @@ export function buildContractData(state: BookingState) {
   if (!selectedCar || !state.dateFrom || !state.dateTo) return null;
 
   const fullName = `${state.lastName} ${state.firstName} ${state.middleName}`.trim();
+
+  const savingsList = state.selectedSavings.map(
+    (id) => savingsConfig.find((s) => s.id === id)?.label ?? id,
+  );
 
   return {
     name: fullName,
@@ -30,6 +34,7 @@ export function buildContractData(state: BookingState) {
     dailyRate: calc.adjustedRate,
     extrasList: calc.extrasList,
     extrasCost: calc.extrasCost,
+    savingsList,
     totalCost: calc.totalCost,
     prepay: calc.prepay,
     remaining: calc.remaining,
