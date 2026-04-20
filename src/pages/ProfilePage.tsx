@@ -45,6 +45,7 @@ interface Booking {
   created_at: string;
   prepay: number;
   deposit: number;
+  contract_url: string | null;
 }
 
 const statusLabels: Record<string, string> = { new: "Новая", confirmed: "Подтверждена", completed: "Завершена", cancelled: "Отменена" };
@@ -76,7 +77,7 @@ const ProfilePage = () => {
 
       // Fetch bookings by email
       if (profileData?.email) {
-        const { data: bookingsData } = await supabase.from("bookings").select("id, car_label, car_value, date_from, date_to, days, total_cost, status, created_at, prepay, deposit").eq("email", profileData.email).order("created_at", { ascending: false });
+        const { data: bookingsData } = await supabase.from("bookings").select("id, car_label, car_value, date_from, date_to, days, total_cost, status, created_at, prepay, deposit, contract_url").eq("email", profileData.email).order("created_at", { ascending: false });
         if (bookingsData) setBookings(bookingsData);
       }
 
@@ -250,11 +251,22 @@ const ProfilePage = () => {
                           <div className="font-bold">{b.car_label}</div>
                           <div className="text-sm text-muted-foreground">{b.date_from} — {b.date_to} · {b.days} д.</div>
                         </div>
-                        <div className="flex items-center gap-3">
+                        <div className="flex items-center gap-3 flex-wrap">
                           <span className="text-lg font-bold">{b.total_cost.toLocaleString("ru-RU")} ₽</span>
                           <span className={`px-2 py-1 rounded-full text-xs font-medium ${b.status === "new" ? "bg-primary/20 text-primary" : "bg-green-500/20 text-green-400"}`}>
                             {statusLabels[b.status]}
                           </span>
+                          {b.contract_url && (
+                            <a
+                              href={b.contract_url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              title="Открыть PDF договора"
+                              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-primary/10 text-primary hover:bg-primary/20 transition-colors"
+                            >
+                              <FileText className="w-3.5 h-3.5" /> Договор
+                            </a>
+                          )}
                         </div>
                       </div>
                     ))}
@@ -273,13 +285,24 @@ const ProfilePage = () => {
                 ) : (
                   <div className="space-y-2">
                     {completedBookings.map((b) => (
-                      <div key={b.id} className="flex items-center justify-between bg-secondary/50 border border-border rounded-lg p-3">
+                      <div key={b.id} className="flex items-center justify-between bg-secondary/50 border border-border rounded-lg p-3 gap-2 flex-wrap">
                         <div>
                           <span className="font-medium text-sm">{b.car_label}</span>
                           <span className="text-xs text-muted-foreground ml-2">{b.date_from} — {b.date_to}</span>
                         </div>
                         <div className="flex items-center gap-2">
                           <span className="text-sm font-medium">{b.total_cost.toLocaleString("ru-RU")} ₽</span>
+                          {b.contract_url && (
+                            <a
+                              href={b.contract_url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              title="Открыть PDF договора"
+                              className="p-1.5 rounded-lg bg-primary/10 text-primary hover:bg-primary/20"
+                            >
+                              <FileText className="w-3.5 h-3.5" />
+                            </a>
+                          )}
                           <button onClick={() => repeatBooking(b)} className="p-1.5 rounded-lg bg-primary/10 text-primary hover:bg-primary/20" title="Повторить">
                             <RotateCcw className="w-3.5 h-3.5" />
                           </button>
