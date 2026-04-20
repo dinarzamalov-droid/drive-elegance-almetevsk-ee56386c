@@ -1,6 +1,7 @@
 import jsPDF from "jspdf";
 import { ROBOTO_BASE64 } from "./robotoFont";
 import { ROBOTO_BOLD_BASE64 } from "./robotoBoldFont";
+import { CONTRACT_BLOCKS, type ContractBlock } from "./contractTemplate";
 
 interface ContractData {
   name: string;
@@ -59,301 +60,263 @@ export interface GeneratedContract {
   download: () => void;
 }
 
-export function generateContract(data: ContractData, options: { autoDownload?: boolean } = { autoDownload: true }): GeneratedContract {
+const MONTHS = ["января", "февраля", "марта", "апреля", "мая", "июня", "июля", "августа", "сентября", "октября", "ноября", "декабря"];
+
+function fmtNum(n: number) {
+  return n.toLocaleString("ru-RU");
+}
+
+/** Грубое преобразование ФИО в родительный падеж для акта приёма-передачи */
+function toGenitive(fullName: string): string {
+  const parts = fullName.trim().split(/\s+/);
+  return parts
+    .map((w) => {
+      if (/[аеёиоуыэюя]$/i.test(w)) {
+        if (/я$/i.test(w)) return w.slice(0, -1) + "и";
+        if (/а$/i.test(w)) return w.slice(0, -1) + "ы";
+      }
+      if (/[бвгджзйклмнпрстфхцчшщ]$/i.test(w)) return w + "а";
+      if (/й$/i.test(w)) return w.slice(0, -1) + "я";
+      if (/ь$/i.test(w)) return w.slice(0, -1) + "я";
+      return w;
+    })
+    .join(" ");
+}
+
+function buildPlaceholders(data: ContractData): Record<string, string> {
+  const today = new Date();
+  const dateStr = `${String(today.getDate()).padStart(2, "0")}.${String(today.getMonth() + 1).padStart(2, "0")}.${today.getFullYear()}`;
+  const contractNo = String(Math.floor(Math.random() * 900 + 100));
+  const validUntil = `31 декабря ${today.getFullYear()}`;
+  const v = data.vehicle || {
+    year: 0, vin: "—", enginePower: 0, plate: "—", certNumber: "—",
+    body: "—", color: "—", fuel: "—", fuelLevel: 0, fuelType: "—", mileageLimit: 300,
+  };
+  const passportFull = [
+    data.passportSeries && data.passportNumber ? `${data.passportSeries} ${data.passportNumber}` : null,
+    data.passportIssuedBy ? `выдан ${data.passportIssuedBy}` : null,
+    data.passportDate ? `дата выдачи ${data.passportDate}` : null,
+    data.passportCode ? `код подразделения ${data.passportCode}` : null,
+  ].filter(Boolean).join(", ") || "—";
+  const licenseFull = data.licenseNumber || "—";
+
+  return {
+    contractNo,
+    date: dateStr,
+    dateDay: String(today.getDate()).padStart(2, "0"),
+    dateMonthName: MONTHS[today.getMonth()],
+    dateYear: String(today.getFullYear()),
+    city: data.city || "Альметьевск",
+    name: data.name,
+    nameGenitive: toGenitive(data.name),
+    birthDate: data.birthDate || "—",
+    licenseFull,
+    licenseValid: data.licenseDate || "—",
+    passportFull,
+    passportAddress: data.registrationAddress || "—",
+    phone: data.phone,
+    email: data.email || "—",
+    carLabel: data.carLabel,
+    vehicleYear: String(v.year || "—"),
+    vin: v.vin,
+    enginePower: String(v.enginePower || "—"),
+    plate: v.plate,
+    certNumber: v.certNumber,
+    body: v.body,
+    color: v.color,
+    fuel: v.fuel,
+    fuelLevel: String(v.fuelLevel),
+    fuelType: v.fuelType,
+    dateFromFull: `${data.dateFrom} 19:00`,
+    dateToFull: `${data.dateTo} 19:00`,
+    dateFrom: data.dateFrom,
+    dateTo: data.dateTo,
+    mileageLimit: String(v.mileageLimit),
+    totalCost: fmtNum(data.totalCost),
+    prepay: fmtNum(data.prepay),
+    deposit: fmtNum(data.deposit),
+    contractValidUntil: validUntil,
+  };
+}
+
+function applyPlaceholders(text: string, ph: Record<string, string>): string {
+  return text.replace(/\{\{(\w+)\}\}/g, (_, k) => ph[k] ?? `{{${k}}}`);
+}
+
+export function generateContract(
+  data: ContractData,
+  options: { autoDownload?: boolean } = { autoDownload: true },
+): GeneratedContract {
   const doc = new jsPDF({ unit: "mm", format: "a4" });
   setupFonts(doc);
 
   const W = doc.internal.pageSize.getWidth();
+  const H = doc.internal.pageSize.getHeight();
   const marginL = 18;
   const marginR = 18;
+  const marginB = 20;
   const contentW = W - marginL - marginR;
-  let y = 18;
+  let y = 20;
 
-  const fmt = (n: number) => n.toLocaleString("ru-RU");
+  const ph = buildPlaceholders(data);
 
-  const checkPage = (needed: number = 8) => {
-    if (y > 280 - needed) {
+  const ensureSpace = (needed: number) => {
+    if (y + needed > H - marginB) {
       doc.addPage();
-      y = 18;
+      y = 20;
     }
   };
 
-  const addText = (size: number, style: "normal" | "bold", text: string, align: "left" | "center" = "left") => {
+  const drawText = (size: number, style: "normal" | "bold", text: string, align: "left" | "center" = "left", lineGap = 1.5) => {
     doc.setFontSize(size);
     doc.setFont("Roboto", style);
     const lines: string[] = doc.splitTextToSize(text, contentW);
-    const lineH = size * 0.42;
+    const lineH = size * 0.45;
     for (const line of lines) {
-      checkPage(lineH + 2);
-      if (align === "center") {
-        doc.text(line, W / 2, y, { align: "center" });
-      } else {
-        doc.text(line, marginL, y);
-      }
+      ensureSpace(lineH);
+      if (align === "center") doc.text(line, W / 2, y, { align: "center" });
+      else doc.text(line, marginL, y);
       y += lineH;
     }
-    y += 1.5;
+    y += lineGap;
   };
 
-  const gap = (h: number = 3) => { y += h; };
+  const drawTable = (rows: [string, string][]) => {
+    doc.setFontSize(9);
+    doc.setFont("Roboto", "normal");
+    const col1 = contentW * 0.55;
+    const col2 = contentW * 0.45;
+    const padX = 2;
+    const lineH = 4.2;
+    for (const [k, v] of rows) {
+      const kVal = applyPlaceholders(k, ph);
+      const vVal = applyPlaceholders(v, ph);
+      const kLines: string[] = doc.splitTextToSize(kVal, col1 - padX * 2);
+      const vLines: string[] = doc.splitTextToSize(vVal, col2 - padX * 2);
+      const rowH = Math.max(kLines.length, vLines.length) * lineH + 2;
+      ensureSpace(rowH);
+      doc.setDrawColor(180);
+      doc.rect(marginL, y - lineH + 1, col1, rowH);
+      doc.rect(marginL + col1, y - lineH + 1, col2, rowH);
+      let yk = y;
+      for (const l of kLines) { doc.text(l, marginL + padX, yk); yk += lineH; }
+      let yv = y;
+      for (const l of vLines) { doc.text(l, marginL + col1 + padX, yv); yv += lineH; }
+      y += rowH;
+    }
+    y += 2;
+  };
 
-  const today = new Date();
-  const todayStr = `${String(today.getDate()).padStart(2, "0")}.${String(today.getMonth() + 1).padStart(2, "0")}.${today.getFullYear()}`;
-  const contractNo = Math.floor(Math.random() * 900 + 100);
-  const city = data.city || "Альметьевск";
-  const v = data.vehicle || { year: 0, vin: "—", enginePower: 0, plate: "—", certNumber: "—", body: "—", color: "—", fuel: "—", fuelLevel: 0, fuelType: "—", mileageLimit: 300 };
+  const drawSignatures = () => {
+    ensureSpace(70);
+    const colW = contentW / 2 - 4;
+    const xL = marginL;
+    const xR = marginL + colW + 8;
+    const startY = y;
+    doc.setFontSize(9);
+    doc.setFont("Roboto", "bold");
+    doc.text("Арендодатель", xL, y);
+    doc.text("Арендатор", xR, y);
+    y += 5;
+    doc.setFont("Roboto", "normal");
+    const left = [
+      "Наименование: 3D Drive",
+      "Адрес: 423403, Россия, Республика Татарстан,",
+      "г. Альметьевск, ул. Гафиатуллина 48",
+      "ИНН: 164491440697",
+      "ОГРН: 325169000076451",
+      "р/счет №: 40802810529950002605",
+      "Тел: +7 (986) 826-23-32",
+      "Банк: ФИЛИАЛ «НИЖЕГОРОДСКИЙ» АО «АЛЬФА-БАНК»",
+      "корр. счёт: 30101810200000000824",
+      "",
+      "ИП Замалов Д.Р.",
+      "Подпись ________________ /",
+    ];
+    const right = [
+      `ФИО: ${data.name}`,
+      `Дата рождения: ${data.birthDate || "—"}`,
+      `Паспорт: ${ph.passportFull}`,
+      `Адрес: ${ph.passportAddress}`,
+      `Тел: ${data.phone}`,
+      `Email: ${data.email || "—"}`,
+      `Водительское удостоверение: ${ph.licenseFull}`,
+      `сроком действия до ${ph.licenseValid} г.`,
+      "",
+      "",
+      "",
+      "Подпись ________________ /",
+    ];
+    const lineH = 4.2;
+    let yL = y, yR = y;
+    for (const t of left) {
+      const ls: string[] = doc.splitTextToSize(t, colW);
+      for (const l of ls) { doc.text(l, xL, yL); yL += lineH; }
+    }
+    for (const t of right) {
+      const ls: string[] = doc.splitTextToSize(t, colW);
+      for (const l of ls) { doc.text(l, xR, yR); yR += lineH; }
+    }
+    y = Math.max(yL, yR) + 4;
+    void startY;
+  };
 
-  // === HEADER ===
-  addText(14, "bold", `ДОГОВОР АРЕНДЫ ТС № ${contractNo}`, "center");
-  gap(2);
-  doc.setFontSize(9);
-  doc.setFont("Roboto", "normal");
-  doc.text(`г. ${city}`, marginL, y);
-  doc.text(todayStr, W - marginR, y, { align: "right" });
-  y += 6;
+  const drawActSignatures = () => {
+    ensureSpace(20);
+    doc.setFontSize(9);
+    doc.setFont("Roboto", "normal");
+    doc.text(`Арендодатель: Замалов Динар Рамисович  / ______________________`, marginL, y);
+    y += 6;
+    doc.text(`Арендатор: ${data.name}  / ______________________`, marginL, y);
+    y += 6;
+  };
 
-  addText(9, "normal", `Индивидуальный предприниматель Замалов Динар Рамисович, именуемый в дальнейшем «Арендодатель», с одной стороны и ${data.name}, ${data.birthDate || "—"} г.р., именуемый в дальнейшем «Арендатор», с другой стороны, заключили настоящий договор о следующем.`);
-  gap(4);
+  const renderBlock = (b: ContractBlock) => {
+    switch (b.kind) {
+      case "h1":
+        ensureSpace(10);
+        drawText(13, "bold", applyPlaceholders(b.text, ph), "center", 3);
+        break;
+      case "h2":
+        ensureSpace(8);
+        drawText(11, "bold", applyPlaceholders(b.text, ph), "left", 2);
+        break;
+      case "p":
+        drawText(9, "normal", applyPlaceholders(b.text, ph));
+        break;
+      case "table":
+        drawTable(b.rows);
+        break;
+      case "spacer":
+        y += b.size ?? 3;
+        break;
+      case "pagebreak":
+        doc.addPage();
+        y = 20;
+        break;
+      case "signatures":
+        drawSignatures();
+        break;
+      case "actSignatures":
+        drawActSignatures();
+        break;
+    }
+  };
 
-  // === 1. ПРЕДМЕТ ДОГОВОРА ===
-  addText(11, "bold", "1. ПРЕДМЕТ ДОГОВОРА");
-  gap(1);
-  addText(9, "normal", "1.1. Арендодатель передает, а Арендатор принимает во временное пользование транспортное средство:");
-  gap(1);
+  for (const block of CONTRACT_BLOCKS) renderBlock(block);
 
-  const carInfo = [
-    `Марка: ${data.carLabel}`,
-    `Год выпуска: ${v.year}`,
-    `VIN: ${v.vin}`,
-    `Мощность двигателя: ${v.enginePower} л.с.`,
-    `Государственный регистрационный знак: ${v.plate}`,
-    `Свидетельство о регистрации: ${v.certNumber}`,
-    `Кузов: ${v.body}`,
-    `Цвет: ${v.color}`,
-    `Рекомендуемое топливо: ${v.fuel}`,
-    `Уровень топлива (расход по км): ${v.fuelLevel}`,
-    `Тип топлива: ${v.fuelType}`,
-  ];
-  for (const line of carInfo) {
-    addText(9, "normal", line);
-  }
-  gap(2);
-
-  addText(9, "normal", `1.2. Срок аренды: с ${data.dateFrom} до ${data.dateTo}. Всего: ${data.days} суток.`);
-  addText(9, "normal", `1.3. Место передачи ТС: г. ${city}.`);
-  addText(9, "normal", "1.4. ТС предоставляется в аренду исключительно для личного пользования.");
-  addText(9, "normal", "1.5. ТС может использоваться только в пределах Республики Татарстан. Выезд за пределы — только по письменному согласованию.");
-  gap(4);
-
-  // === 2. ОБЯЗАТЕЛЬСТВА СТОРОН ===
-  addText(11, "bold", "2. ОБЯЗАТЕЛЬСТВА СТОРОН");
-  gap(1);
-  addText(9, "bold", "2.1. Арендатор обязан:");
-  const obligations = [
-    "— Иметь водительские права категории B и стаж вождения не менее 3 лет.",
-    "— Лично управлять ТС, не передавать третьим лицам.",
-    "— Соблюдать ПДД РФ, не превышать скоростной режим (трасса 130 км/ч, город 80 км/ч).",
-    "— Вернуть ТС в чистом виде, с полным баком топлива.",
-    "— Не курить в салоне.",
-    "— Не использовать ТС для такси, буксировки, дрифта, бернаута, гонок, езды по бездорожью.",
-    "— При ДТП немедленно сообщить Арендодателю, вызвать ГИБДД.",
-  ];
-  for (const o of obligations) addText(9, "normal", o);
-  gap(2);
-
-  addText(9, "bold", "2.2. Арендатору ЗАПРЕЩАЕТСЯ:");
-  const prohibitions = [
-    "— Передавать управление третьим лицам.",
-    "— Использовать ТС в коммерческих целях.",
-    "— Превышать скоростной режим.",
-    "— Курить в салоне, распивать алкоголь.",
-    "— Перевозить детей без специальных кресел.",
-    "— Оставлять ТС открытым.",
-    "— Парковаться в неположенном месте.",
-  ];
-  for (const p of prohibitions) addText(9, "normal", p);
-  gap(4);
-
-  // === 3. ФИНАНСОВЫЕ УСЛОВИЯ ===
-  addText(11, "bold", "3. ФИНАНСОВЫЕ УСЛОВИЯ");
-  gap(1);
-  addText(9, "normal", `3.1. Стоимость аренды: ${fmt(data.dailyRate)} ₽/сутки.`);
-  addText(9, "normal", `3.2. Общая сумма аренды: ${fmt(data.totalCost)} ₽.`);
-  if (data.extrasList.length > 0) {
-    addText(9, "normal", `3.3. Дополнительные опции: ${data.extrasList.join(", ")} (${fmt(data.extrasCost)} ₽).`);
-  }
-  addText(9, "normal", `3.4. Предоплата (20%): ${fmt(data.prepay)} ₽.`);
-  addText(9, "normal", `3.5. Остаток при получении: ${fmt(data.remaining)} ₽.`);
-  addText(9, "normal", `3.6. Залог (возвратный): ${fmt(data.deposit)} ₽ (возвращается после аренды при отсутствии нарушений).`);
-  addText(9, "normal", `3.7. Лимит пробега: ${v.mileageLimit} км/сутки. Перепробег — 25 ₽/км.`);
-  gap(1);
-  addText(9, "normal", "3.8. При задержке возврата ТС:");
-  addText(9, "normal", "    — от 1 до 4 часов — доплата 30% стоимости аренды");
-  addText(9, "normal", "    — от 4 до 12 часов — доплата 50%");
-  addText(9, "normal", "    — от 12 до 24 часов — доплата 100%");
-  gap(4);
-
-  // === 4. ОТВЕТСТВЕННОСТЬ ===
-  addText(11, "bold", "4. ОТВЕТСТВЕННОСТЬ");
-  gap(1);
-  const penalties = [
-    "4.1. За повреждения ТС в результате ДТП по вине Арендатора — полная стоимость восстановительного ремонта.",
-    "4.2. За утерю ключей — штраф 100 000 руб. + стоимость изготовления нового комплекта.",
-    "4.3. За оставление ТС в открытом виде — штраф 20 000 руб.",
-    "4.4. За эвакуацию ТС на штрафстоянку по вине Арендатора — возмещение расходов + штраф 50 000 руб.",
-    "4.5. За управление в состоянии алкогольного/наркотического опьянения — штраф 50 000 руб. + полный ущерб.",
-    "4.6. За передачу управления третьим лицам — штраф 100 000 руб.",
-    "4.7. За превышение скоростного режима — штраф 10 000 руб.",
-    "4.8. За курение (включая вэйп, кальян, электронные сигареты) в салоне — штраф 10 000 руб.",
-    "4.9. За утрату свидетельства о регистрации ТС (СТС) — штраф 10 000 руб.",
-    "4.10. За умышленное повреждение ТС — штраф 30 000 руб. + стоимость ущерба.",
-    "4.11. За заправку нерекомендованным топливом — штраф 50 000 руб. + стоимость ущерба.",
-    "4.12. За буксировку другого ТС или использование прицепа — штраф 10 000 руб.",
-    "4.13. За нарушение скоростного режима (отдельно по правилам) — штраф 10 000 руб.",
-    "4.14. За передачу ТС в субаренду или третьим лицам — штраф 100 000 руб.",
-    "4.15. За управление ТС без действующего ВУ — штраф 50 000 руб. + полный ущерб.",
-    "4.16. За загрязнение салона, требующее химической чистки — стоимость химчистки 10 000 руб.",
-    "4.17. За мойку кузова при возврате грязного авто — 1 000–1 500 руб.",
-    "4.18. За возврат с уровнем топлива ниже, чем при выдаче — 100 руб./литр.",
-  ];
-  for (const p of penalties) addText(9, "normal", p);
-  gap(4);
-
-  // === 5. ДАННЫЕ АРЕНДАТОРА ===
-  addText(11, "bold", "5. ДАННЫЕ АРЕНДАТОРА");
-  gap(1);
-  addText(9, "normal", `ФИО: ${data.name}`);
-  addText(9, "normal", `Дата рождения: ${data.birthDate || "—"}`);
-  addText(9, "normal", `Паспорт: ${data.passportSeries || ""} ${data.passportNumber || "—"} выдан ${data.passportDate || "—"}, код ${data.passportCode || "—"}`);
-  addText(9, "normal", `Кем выдан: ${data.passportIssuedBy || "—"}`);
-  addText(9, "normal", `Адрес регистрации: ${data.registrationAddress || "—"}`);
-  addText(9, "normal", `Телефон: ${data.phone}`);
-  addText(9, "normal", `Email: ${data.email || "—"}`);
-  addText(9, "normal", `Водительское удостоверение: ${data.licenseNumber || "—"} выдан ${data.licenseDate || "—"}`);
-  gap(4);
-
-  // === 6. ПОМОЩЬ НА ДОРОГЕ ===
-  addText(11, "bold", "6. ПОМОЩЬ НА ДОРОГЕ (за дополнительную плату)");
-  gap(1);
-  const roadHelp = [
-    "— Экстренная техническая помощь при ДТП/неисправности",
-    "— Эвакуация автомобиля (в радиусе 50 км)",
-    "— Выезд аварийного комиссара",
-    "— Содействие в сборе документов для страховой",
-    "— Подвоз топлива",
-    "— Забор авто со штрафстоянки",
-  ];
-  for (const r of roadHelp) addText(9, "normal", r);
-  gap(4);
-
-  // === 7. СОГЛАСИЕ НА ОБРАБОТКУ ===
-  addText(11, "bold", "7. СОГЛАСИЕ НА ОБРАБОТКУ ПЕРСОНАЛЬНЫХ ДАННЫХ");
-  gap(1);
-  addText(9, "normal", "Арендатор дает согласие на обработку своих персональных данных (ФИО, паспорт, ВУ, телефон, адрес) для целей заключения и исполнения договора. Согласие действует бессрочно, может быть отозвано письменным уведомлением за 30 дней.");
-  gap(4);
-
-  // === 8. ПРИЛОЖЕНИЯ ===
-  addText(11, "bold", "8. ПРИЛОЖЕНИЯ");
-  gap(1);
-  addText(9, "normal", "Приложение №1 — Акт приёма-передачи ТС");
-  addText(9, "normal", "Приложение №2 — Правила пользования автомобилем");
-  addText(9, "normal", "Приложение №3 — Критерии определения нормального износа автомобиля");
-  gap(6);
-
-  // === ПРИЛОЖЕНИЕ №1 ===
-  checkPage(40);
-  addText(11, "bold", "АКТ ПРИЁМА-ПЕРЕДАЧИ ТРАНСПОРТНОГО СРЕДСТВА (Приложение №1)", "center");
-  gap(2);
-  doc.setFontSize(9);
-  doc.setFont("Roboto", "normal");
-  doc.text(`г. ${city}`, marginL, y);
-  doc.text(todayStr, W - marginR, y, { align: "right" });
-  y += 5;
-  addText(9, "normal", `Арендодатель передал, а Арендатор принял автомобиль ${data.carLabel}, госномер ${v.plate}, в технически исправном состоянии, чистым, с полным баком топлива.`);
-  gap(1);
-  addText(9, "normal", "Пробег на момент передачи: ___________ км.");
-  addText(9, "normal", "Уровень топлива: полный бак.");
-  addText(9, "normal", "Претензий к внешнему виду и техническому состоянию нет.");
-  gap(4);
-  addText(9, "normal", "Арендодатель: ИП Замалов Д.Р.  /_______________/");
-  addText(9, "normal", `Арендатор: ${data.name}  /_______________/`);
-  gap(6);
-
-  // === ПРИЛОЖЕНИЕ №2 ===
-  checkPage(40);
-  addText(11, "bold", "ПРАВИЛА ПОЛЬЗОВАНИЯ АВТОМОБИЛЕМ (Приложение №2)", "center");
-  gap(2);
-  const rules = [
-    `1. Суточный пробег ${v.mileageLimit} км. Перепробег — 25 руб./км.`,
-    "2. География использования: Республика Татарстан.",
-    "3. При ДТП по вине Арендатора — полное возмещение ущерба.",
-    "4. Топливо: возврат с полным баком, иначе 100 руб./литр.",
-    "5. Автомобиль возвращается чистым. Мойка кузова — 1 000–1 500 руб., химчистка салона — 10 000 руб.",
-    "6. Утрата СТС — штраф 10 000 руб.",
-    "7. Утрата ключей — штраф 100 000 руб. + стоимость изготовления.",
-    "8. Выезд представителя Арендодателя — 2 500 руб.",
-    "9. Курение запрещено (штраф 10 000 руб.).",
-    "10. Буксировка запрещена (штраф 10 000 руб.).",
-    "11. Ограничение скорости: трасса — 130 км/ч, город — 80 км/ч (штраф 10 000 руб.).",
-    "12. Запрещены: дрифт, бернаут, гонки, езда по бездорожью.",
-  ];
-  for (const r of rules) addText(9, "normal", r);
-  gap(6);
-
-  // === ПРИЛОЖЕНИЕ №3 ===
-  checkPage(40);
-  addText(11, "bold", "КРИТЕРИИ ОПРЕДЕЛЕНИЯ НОРМАЛЬНОГО ИЗНОСА АВТОМОБИЛЯ (Приложение №3)", "center");
-  gap(2);
-  addText(9, "bold", "Приемлемо:");
-  const acceptable = [
-    "— Сколы и царапины до 5 см, удаляемые полировкой",
-    "— Вмятины до 1 см (не более двух на деталь)",
-    "— Сколы от камней до 1% поверхности, без коррозии",
-  ];
-  for (const a of acceptable) addText(9, "normal", a);
-  gap(2);
-  addText(9, "bold", "Неприемлемо:");
-  const unacceptable = [
-    "— Сколы и царапины более 5 см",
-    "— Вмятины более 1 см",
-    "— Коррозия, сколы до металла",
-    "— Повреждения дисков (царапины более 2 см, деформация)",
-    "— Трещины на стекле в зоне А (более 0,2 см)",
-    "— Загрязнения салона, требующие химчистки",
-    "— Порезы, разрывы обивки",
-    "— Неприятные запахи",
-  ];
-  for (const u of unacceptable) addText(9, "normal", u);
-  gap(8);
-
-  // === 9. ПОДПИСИ СТОРОН ===
-  checkPage(30);
-  addText(11, "bold", "9. ПОДПИСИ СТОРОН");
-  gap(4);
-  doc.setFontSize(9);
-  doc.setFont("Roboto", "normal");
-  doc.text("Арендодатель: ИП Замалов Д.Р.", marginL, y);
-  doc.text("Арендатор:", W / 2 + 10, y);
-  y += 8;
-  doc.line(marginL, y, marginL + 60, y);
-  doc.line(W / 2 + 10, y, W / 2 + 70, y);
-  y += 5;
-  doc.text("ИП Замалов Д.Р.", marginL, y);
-  doc.text(data.name, W / 2 + 10, y);
-  y += 6;
-  doc.text(`Дата: ${todayStr}`, marginL, y);
-
-  const fileName = `Договор_аренды_${contractNo}.pdf`;
   const blob = doc.output("blob");
   const blobUrl = URL.createObjectURL(blob);
+  const fileName = `Договор_аренды_${ph.contractNo}.pdf`;
+
   const download = () => {
     const a = document.createElement("a");
     a.href = blobUrl;
     a.download = fileName;
-    document.body.appendChild(a);
     a.click();
-    document.body.removeChild(a);
   };
-  if (options.autoDownload) doc.save(fileName);
+
+  if (options.autoDownload) download();
+
   return { blobUrl, blob, fileName, download };
 }
