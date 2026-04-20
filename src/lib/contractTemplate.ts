@@ -82,6 +82,24 @@ export const CONTRACT_BLOCKS: ContractBlock[] = [
     ],
   },
   { kind: "p", text: "Место передачи ТС в пользование: г. {{city}}, ул. Шевченко 134А" },
+  { kind: "spacer", size: 2 },
+  { kind: "h2", text: "Условия аренды (зафиксированы при бронировании)" },
+  {
+    kind: "table",
+    rows: [
+      ["Срок аренды", "с {{dateFromFull}} по {{dateToFull}} ({{daysCount}} сут.)"],
+      ["Возрастная категория Арендатора", "{{ageLabel}}"],
+      ["Стаж вождения", "{{experienceLabel}}"],
+      ["Лимит пробега", "{{mileageInfo}}"],
+      ["Доставка автомобиля", "{{deliveryInfo}}"],
+      ["Подача автомобиля", "{{washInfo}}"],
+      ["Возврат с топливом", "{{fuelReturnInfo}}"],
+      ["Дополнительные условия / акции", "{{extrasInfo}}"],
+      ["Стоимость аренды", "{{totalCost}} руб. (предоплата {{prepay}} руб.)"],
+      ["Залог", "{{deposit}} руб."],
+    ],
+  },
+  { kind: "spacer", size: 2 },
   {
     kind: "p",
     text:
