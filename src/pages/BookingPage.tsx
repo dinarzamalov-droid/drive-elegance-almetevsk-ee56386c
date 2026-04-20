@@ -6,6 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { initialBookingState, cars } from "@/lib/bookingData";
 import { getBookingCalculations } from "@/lib/bookingCalculations";
+import { uploadContractForBooking } from "@/lib/uploadContract";
 import type { BookingState } from "@/lib/bookingData";
 import BookingProgress from "@/components/booking/BookingProgress";
 import Step1CarSelect from "@/components/booking/Step1CarSelect";
@@ -164,7 +165,7 @@ const BookingPage = () => {
     if (!calc.selectedCar || !state.dateFrom || !state.dateTo) return;
     setSaving(true);
     try {
-      const { error } = await supabase.from("bookings" as any).insert({
+      const { data: inserted, error } = await supabase.from("bookings" as any).insert({
         car_value: state.car,
         car_label: calc.selectedCar.label,
         date_from: state.dateFrom.toISOString().split("T")[0],
@@ -195,9 +196,25 @@ const BookingPage = () => {
         license_date: state.licenseDate || null,
         payment_method: state.paymentMethod,
         preferred_messenger: state.preferredMessenger,
-      } as any);
+      } as any).select("id").single();
       if (error) throw error;
       toast.success("Бронирование сохранено!");
+
+      // Generate, upload contract PDF and attach link to the booking
+      try {
+        const bookingId = (inserted as any)?.id as string | undefined;
+        if (bookingId) {
+          const contractUrl = await uploadContractForBooking(state, bookingId);
+          if (contractUrl) {
+            await supabase
+              .from("bookings" as any)
+              .update({ contract_url: contractUrl } as any)
+              .eq("id", bookingId);
+          }
+        }
+      } catch (contractErr) {
+        console.error("Contract upload error:", contractErr);
+      }
 
       // Sync profile with latest client data
       try {

@@ -33,6 +33,7 @@ export interface Booking {
   selected_extras: string[] | null;
   promo_code: string | null;
   preferred_messenger: string | null;
+  contract_url?: string | null;
 }
 
 export interface FleetCar {
