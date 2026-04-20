@@ -1,5 +1,5 @@
 import { format } from "date-fns";
-import { X, Search, Download } from "lucide-react";
+import { X, Search, Download, FileText } from "lucide-react";
 import { useState } from "react";
 import type { Booking } from "./types";
 import { statusLabels, methodLabels, paymentLabels } from "./types";
@@ -132,6 +132,19 @@ const AdminBookings = ({ bookings, onUpdateStatus }: Props) => {
                 <Row label="Создано" value={format(new Date(selected.created_at), "dd.MM.yyyy HH:mm")} />
                 <Row label="Статус" value={statusLabels[selected.status] || selected.status} />
               </Section>
+              {selected.contract_url && (
+                <Section title="Договор">
+                  <a
+                    href={selected.contract_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-2 px-3 py-2 rounded-lg bg-primary/10 text-primary hover:bg-primary/20 transition-colors text-sm font-medium"
+                  >
+                    <FileText className="w-4 h-4" />
+                    Открыть PDF договора
+                  </a>
+                </Section>
+              )}
             </div>
           </div>
         </div>
