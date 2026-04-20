@@ -26,9 +26,31 @@ const Row = ({ label, value, bold }: { label: string; value: string; bold?: bool
   </div>
 );
 
-const AdminBookings = ({ bookings, onUpdateStatus }: Props) => {
+const AdminBookings = ({ bookings, onUpdateStatus, onRefresh }: Props) => {
   const [search, setSearch] = useState("");
   const [selected, setSelected] = useState<Booking | null>(null);
+  const [generatingId, setGeneratingId] = useState<string | null>(null);
+
+  const handleRegenerate = async (booking: Booking) => {
+    setGeneratingId(booking.id);
+    try {
+      const url = await regenerateContractFromBooking(booking);
+      if (!url) {
+        toast.error("Не удалось сгенерировать договор");
+        return;
+      }
+      toast.success("Договор сгенерирован и сохранён");
+      if (selected?.id === booking.id) {
+        setSelected({ ...selected, contract_url: url });
+      }
+      await onRefresh?.();
+    } catch (err) {
+      console.error(err);
+      toast.error("Ошибка генерации договора");
+    } finally {
+      setGeneratingId(null);
+    }
+  };
 
   const filtered = bookings.filter((b) => {
     const q = search.toLowerCase();
