@@ -1,16 +1,24 @@
-import { FileText } from "lucide-react";
-import { cars, ageOptions, experienceOptions, PREPAY_PERCENT } from "@/lib/bookingData";
+import { useState } from "react";
+import { Eye, Check } from "lucide-react";
+import { toast } from "sonner";
+import { cars, PREPAY_PERCENT } from "@/lib/bookingData";
 import { getBookingCalculations } from "@/lib/bookingCalculations";
 import { generateContract } from "@/lib/generateContract";
 import { buildContractData } from "@/lib/contractHelper";
 import { format } from "date-fns";
+import { cn } from "@/lib/utils";
+import ContractPreviewDialog from "@/components/ContractPreviewDialog";
 import type { BookingState } from "@/lib/bookingData";
 
 interface Step4Props {
   state: BookingState;
+  agreed: boolean;
+  contractViewed: boolean;
+  onAgreedChange: (value: boolean) => void;
+  onContractViewed: () => void;
 }
 
-const Step4Contract = ({ state }: Step4Props) => {
+const Step4Contract = ({ state, agreed, contractViewed, onAgreedChange, onContractViewed }: Step4Props) => {
   const calc = getBookingCalculations(state);
   const selectedCar = cars.find((c) => c.value === state.car);
   const fullName = `${state.lastName} ${state.firstName} ${state.middleName}`.trim();
@@ -18,17 +26,29 @@ const Step4Contract = ({ state }: Step4Props) => {
   const today = new Date();
   const todayStr = `${String(today.getDate()).padStart(2, "0")}.${String(today.getMonth() + 1).padStart(2, "0")}.${today.getFullYear()}`;
 
-  const handleDownload = () => {
+  const [contractPreview, setContractPreview] = useState<{ blobUrl: string; fileName: string; download: () => void } | null>(null);
+
+  const handleViewContract = () => {
     const contractData = buildContractData(state);
-    if (!contractData) return;
-    generateContract(contractData);
+    if (!contractData) {
+      toast.error("Не удалось сформировать договор. Проверьте данные.");
+      return;
+    }
+    try {
+      const result = generateContract(contractData, { autoDownload: false });
+      setContractPreview({ blobUrl: result.blobUrl, fileName: result.fileName, download: result.download });
+      onContractViewed();
+    } catch (err) {
+      console.error("Contract generation error:", err);
+      toast.error("Не удалось сгенерировать PDF. Попробуйте ещё раз.");
+    }
   };
 
   return (
     <div className="space-y-6">
       <div className="text-center">
         <h2 className="text-2xl font-bold mb-2">Проект договора</h2>
-        <p className="text-muted-foreground text-sm">Проверьте данные перед подтверждением</p>
+        <p className="text-muted-foreground text-sm">Просмотрите договор и подтвердите согласие</p>
       </div>
 
       <div className="bg-secondary/50 rounded-xl p-5 space-y-4 text-sm font-mono">
@@ -71,12 +91,46 @@ const Step4Contract = ({ state }: Step4Props) => {
 
       <button
         type="button"
-        onClick={handleDownload}
-        className="w-full flex items-center justify-center gap-2 px-6 py-3 rounded-lg font-semibold text-sm border border-primary text-primary hover:bg-primary/10 transition-colors"
+        onClick={handleViewContract}
+        className="w-full flex items-center justify-center gap-2 px-6 py-3.5 rounded-lg font-semibold text-sm border border-primary text-primary hover:bg-primary/10 transition-colors"
       >
-        <FileText className="w-4 h-4" />
-        Скачать PDF договора
+        <Eye className="w-4 h-4" />
+        {contractViewed ? "Просмотреть договор снова" : "Просмотреть договор (PDF)"}
       </button>
+
+      <button
+        type="button"
+        disabled={!contractViewed}
+        onClick={() => onAgreedChange(!agreed)}
+        className={cn(
+          "flex items-start gap-3 text-left w-full transition-opacity",
+          !contractViewed && "opacity-50 cursor-not-allowed"
+        )}
+      >
+        <div
+          className={cn(
+            "shrink-0 w-5 h-5 rounded border-2 flex items-center justify-center mt-0.5 transition-colors",
+            agreed ? "bg-primary border-primary" : "border-border"
+          )}
+        >
+          {agreed && <Check className="w-3.5 h-3.5 text-primary-foreground" />}
+        </div>
+        <span className="text-xs text-muted-foreground leading-relaxed">
+          {contractViewed
+            ? "Я ознакомился с условиями договора аренды и подтверждаю бронирование."
+            : "Сначала просмотрите договор выше, чтобы поставить отметку о согласии."}
+        </span>
+      </button>
+
+      <ContractPreviewDialog
+        open={!!contractPreview}
+        onClose={() => setContractPreview(null)}
+        blobUrl={contractPreview?.blobUrl ?? null}
+        fileName={contractPreview?.fileName ?? ""}
+        onDownload={() => contractPreview?.download()}
+        onAgree={() => onAgreedChange(true)}
+        showAgreeButton={!agreed}
+      />
     </div>
   );
 };

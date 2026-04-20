@@ -29,6 +29,8 @@ const BookingPage = () => {
   const [saving, setSaving] = useState(false);
   const [step3Attempted, setStep3Attempted] = useState(false);
   const [profileAutoFilled, setProfileAutoFilled] = useState(false);
+  const [agreed, setAgreed] = useState(false);
+  const [contractViewed, setContractViewed] = useState(false);
   const [state, setState] = useState<BookingState>({
     ...initialBookingState,
     car: preselectedCar || initialBookingState.car,
@@ -152,7 +154,7 @@ const BookingPage = () => {
       case 2: return !!state.dateFrom && !!state.dateTo && calc.days > 0;
       case 3:
         return validateStep3(state).length === 0;
-      case 4: return true;
+      case 4: return contractViewed && agreed;
       case 5: return !!state.paymentMethod;
       default: return false;
     }
@@ -318,7 +320,15 @@ const BookingPage = () => {
             )}
             {step === 2 && <Step2Calculator state={state} onChange={update} />}
             {step === 3 && <Step3ClientData state={state} onChange={update} showErrors={step3Attempted} profileAutoFilled={profileAutoFilled} onDismissAutoFill={() => setProfileAutoFilled(false)} />}
-            {step === 4 && <Step4Contract state={state} />}
+            {step === 4 && (
+              <Step4Contract
+                state={state}
+                agreed={agreed}
+                contractViewed={contractViewed}
+                onAgreedChange={setAgreed}
+                onContractViewed={() => setContractViewed(true)}
+              />
+            )}
             {step === 5 && <Step5Payment state={state} onChange={update} />}
             {step === 6 && <Step6Confirmation state={state} />}
 
