@@ -262,7 +262,8 @@ export function generateContract(
   };
 
   const drawActSignatures = () => {
-    ensureSpace(20);
+    // Reserve enough space so signatures stay on the same page as the preceding "ознакомлен" line
+    ensureSpace(18);
     doc.setFontSize(9);
     doc.setFont("Roboto", "normal");
     doc.text(`Арендодатель: Замалов Динар Рамисович  / ______________________`, marginL, y);
