@@ -152,7 +152,7 @@ const AdminPage = () => {
 
           {/* Content */}
           {activeTab === "analytics" && <AdminAnalytics bookings={bookings} fleet={fleet} />}
-          {activeTab === "bookings" && <AdminBookings bookings={bookings} onUpdateStatus={updateBookingStatus} />}
+          {activeTab === "bookings" && <AdminBookings bookings={bookings} onUpdateStatus={updateBookingStatus} onRefresh={refresh} />}
           {activeTab === "clients" && <AdminClients clients={clients} bookings={bookings} onUpdateClient={updateClient} />}
           {activeTab === "fleet" && <AdminFleet fleet={fleet} onUpdateFleet={updateFleet} />}
           {activeTab === "loyalty" && <AdminLoyalty clients={clients} onAddBonus={addBonus} />}

@@ -1,12 +1,15 @@
 import { format } from "date-fns";
-import { X, Search, Download, FileText } from "lucide-react";
+import { X, Search, Download, FileText, Loader2, Sparkles } from "lucide-react";
 import { useState } from "react";
+import { toast } from "sonner";
+import { regenerateContractFromBooking } from "@/lib/uploadContract";
 import type { Booking } from "./types";
 import { statusLabels, methodLabels, paymentLabels } from "./types";
 
 interface Props {
   bookings: Booking[];
   onUpdateStatus: (id: string, status: string) => void;
+  onRefresh?: () => void | Promise<void>;
 }
 
 const Section = ({ title, children }: { title: string; children: React.ReactNode }) => (
@@ -23,9 +26,31 @@ const Row = ({ label, value, bold }: { label: string; value: string; bold?: bool
   </div>
 );
 
-const AdminBookings = ({ bookings, onUpdateStatus }: Props) => {
+const AdminBookings = ({ bookings, onUpdateStatus, onRefresh }: Props) => {
   const [search, setSearch] = useState("");
   const [selected, setSelected] = useState<Booking | null>(null);
+  const [generatingId, setGeneratingId] = useState<string | null>(null);
+
+  const handleRegenerate = async (booking: Booking) => {
+    setGeneratingId(booking.id);
+    try {
+      const url = await regenerateContractFromBooking(booking);
+      if (!url) {
+        toast.error("Не удалось сгенерировать договор");
+        return;
+      }
+      toast.success("Договор сгенерирован и сохранён");
+      if (selected?.id === booking.id) {
+        setSelected({ ...selected, contract_url: url });
+      }
+      await onRefresh?.();
+    } catch (err) {
+      console.error(err);
+      toast.error("Ошибка генерации договора");
+    } finally {
+      setGeneratingId(null);
+    }
+  };
 
   const filtered = bookings.filter((b) => {
     const q = search.toLowerCase();
@@ -102,9 +127,15 @@ const AdminBookings = ({ bookings, onUpdateStatus }: Props) => {
                       <FileText className="w-4 h-4" />
                     </a>
                   ) : (
-                    <span title="Договор отсутствует" className="inline-flex items-center justify-center text-muted-foreground/40">
-                      <FileText className="w-4 h-4" />
-                    </span>
+                    <button
+                      type="button"
+                      disabled={generatingId === b.id}
+                      onClick={() => handleRegenerate(b)}
+                      title="Сгенерировать договор"
+                      className="inline-flex items-center justify-center w-8 h-8 rounded-md bg-secondary text-muted-foreground hover:bg-primary/10 hover:text-primary transition-colors disabled:opacity-50"
+                    >
+                      {generatingId === b.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
+                    </button>
                   )}
                 </td>
                 <td className="px-4 py-3 text-center" onClick={(e) => e.stopPropagation()}>
@@ -150,19 +181,40 @@ const AdminBookings = ({ bookings, onUpdateStatus }: Props) => {
                 <Row label="Создано" value={format(new Date(selected.created_at), "dd.MM.yyyy HH:mm")} />
                 <Row label="Статус" value={statusLabels[selected.status] || selected.status} />
               </Section>
-              {selected.contract_url && (
-                <Section title="Договор">
-                  <a
-                    href={selected.contract_url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center gap-2 px-3 py-2 rounded-lg bg-primary/10 text-primary hover:bg-primary/20 transition-colors text-sm font-medium"
+              <Section title="Договор">
+                {selected.contract_url ? (
+                  <div className="flex flex-col gap-2">
+                    <a
+                      href={selected.contract_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-2 px-3 py-2 rounded-lg bg-primary/10 text-primary hover:bg-primary/20 transition-colors text-sm font-medium"
+                    >
+                      <FileText className="w-4 h-4" />
+                      Открыть PDF договора
+                    </a>
+                    <button
+                      type="button"
+                      disabled={generatingId === selected.id}
+                      onClick={() => handleRegenerate(selected)}
+                      className="flex items-center gap-2 px-3 py-2 rounded-lg bg-secondary text-foreground hover:bg-secondary/80 transition-colors text-sm font-medium disabled:opacity-50"
+                    >
+                      {generatingId === selected.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
+                      Перегенерировать
+                    </button>
+                  </div>
+                ) : (
+                  <button
+                    type="button"
+                    disabled={generatingId === selected.id}
+                    onClick={() => handleRegenerate(selected)}
+                    className="flex items-center gap-2 px-3 py-2 rounded-lg bg-primary/10 text-primary hover:bg-primary/20 transition-colors text-sm font-medium disabled:opacity-50"
                   >
-                    <FileText className="w-4 h-4" />
-                    Открыть PDF договора
-                  </a>
-                </Section>
-              )}
+                    {generatingId === selected.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
+                    Сгенерировать договор
+                  </button>
+                )}
+              </Section>
             </div>
           </div>
         </div>
