@@ -101,6 +101,30 @@ function buildPlaceholders(data: ContractData): Record<string, string> {
   ].filter(Boolean).join(", ") || "—";
   const licenseFull = data.licenseNumber || "—";
 
+  // Условия аренды (фиксируются при бронировании)
+  const savings = data.savingsList || [];
+  const extras = data.extrasList || [];
+  const hasUnlimited = extras.some((e) => /безлимит/i.test(e));
+  const hasDelivery = extras.some((e) => /доставк/i.test(e));
+  const noWash = savings.some((s) => /без мойки|подача без мойки/i.test(s));
+  const emptyTank = savings.some((s) => /пуст.*бак|возврат.*пуст/i.test(s));
+  const economyPack = savings.some((s) => /эконом/i.test(s));
+
+  const mileageInfo = hasUnlimited
+    ? "безлимитный пробег"
+    : `${v.mileageLimit} км/сутки (перепробег 25 руб./км)`;
+  const deliveryInfo = hasDelivery
+    ? "включена (1 час водителя)"
+    : "не заказана / самовывоз";
+  const washInfo = (noWash || economyPack) ? "без мойки" : "с мойкой";
+  const fuelReturnInfo = (emptyTank || economyPack)
+    ? "допускается возврат с пустым баком (стоимость остатка топлива удерживается из залога по рыночной цене)"
+    : "с тем же уровнем топлива, что при выдаче";
+  const extrasInfo = [
+    ...extras,
+    ...savings,
+  ].filter(Boolean).join("; ") || "стандартные условия";
+
   return {
     contractNo,
     date: dateStr,
@@ -133,6 +157,14 @@ function buildPlaceholders(data: ContractData): Record<string, string> {
     dateFrom: data.dateFrom,
     dateTo: data.dateTo,
     mileageLimit: String(v.mileageLimit),
+    daysCount: String(data.days),
+    ageLabel: data.ageLabel || "—",
+    experienceLabel: data.experienceLabel || "—",
+    mileageInfo,
+    deliveryInfo,
+    washInfo,
+    fuelReturnInfo,
+    extrasInfo,
     totalCost: fmtNum(data.totalCost),
     prepay: fmtNum(data.prepay),
     deposit: fmtNum(data.deposit),
