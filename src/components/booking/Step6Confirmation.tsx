@@ -1,4 +1,6 @@
-import { CheckCircle, FileText, MessageCircle, Send, CalendarPlus, Download, Phone } from "lucide-react";
+import { useState } from "react";
+import { CheckCircle, Eye, MessageCircle, Send, CalendarPlus, Download, Phone } from "lucide-react";
+import { toast } from "sonner";
 import { openMessenger } from "@/lib/messengerUtils";
 import { format } from "date-fns";
 import { cars, ageOptions, experienceOptions, extrasConfig, PREPAY_PERCENT } from "@/lib/bookingData";
@@ -6,6 +8,7 @@ import { getBookingCalculations } from "@/lib/bookingCalculations";
 import { generateContract } from "@/lib/generateContract";
 import { buildContractData } from "@/lib/contractHelper";
 import { downloadIcsFile } from "@/lib/generateIcs";
+import ContractPreviewDialog from "@/components/ContractPreviewDialog";
 import type { BookingState } from "@/lib/bookingData";
 
 interface Step6Props {
@@ -16,6 +19,8 @@ const Step6Confirmation = ({ state }: Step6Props) => {
   const calc = getBookingCalculations(state);
   const selectedCar = cars.find((c) => c.value === state.car);
   const fullName = `${state.lastName} ${state.firstName} ${state.middleName}`.trim();
+
+  const [contractPreview, setContractPreview] = useState<{ blobUrl: string; fileName: string; download: () => void } | null>(null);
 
   const buildMessageText = () => {
     const from = state.dateFrom ? format(state.dateFrom, "dd.MM.yyyy") : "";
@@ -34,10 +39,19 @@ const Step6Confirmation = ({ state }: Step6Props) => {
     openMessenger(m, buildMessageText());
   };
 
-  const handleDownload = () => {
+  const handleViewContract = () => {
     const contractData = buildContractData(state);
-    if (!contractData) return;
-    generateContract(contractData);
+    if (!contractData) {
+      toast.error("Не удалось сформировать договор. Проверьте данные.");
+      return;
+    }
+    try {
+      const result = generateContract(contractData, { autoDownload: false });
+      setContractPreview({ blobUrl: result.blobUrl, fileName: result.fileName, download: result.download });
+    } catch (err) {
+      console.error("Contract generation error:", err);
+      toast.error("Не удалось сгенерировать PDF. Попробуйте ещё раз.");
+    }
   };
 
   return (
@@ -71,8 +85,8 @@ const Step6Confirmation = ({ state }: Step6Props) => {
             <MessageCircle className="w-4 h-4" /> МАХ
           </button>
         </div>
-        <button onClick={handleDownload} className="w-full flex items-center justify-center gap-2 px-6 py-3 rounded-lg font-semibold text-sm border border-primary text-primary hover:bg-primary/10 transition-colors">
-          <FileText className="w-4 h-4" /> Скачать договор PDF
+        <button onClick={handleViewContract} className="w-full flex items-center justify-center gap-2 px-6 py-3 rounded-lg font-semibold text-sm border border-primary text-primary hover:bg-primary/10 transition-colors">
+          <Eye className="w-4 h-4" /> Просмотреть договор (PDF)
         </button>
         {state.dateFrom && state.dateTo && (
           <>
@@ -105,6 +119,15 @@ const Step6Confirmation = ({ state }: Step6Props) => {
           </>
         )}
       </div>
+
+      <ContractPreviewDialog
+        open={!!contractPreview}
+        onClose={() => setContractPreview(null)}
+        blobUrl={contractPreview?.blobUrl ?? null}
+        fileName={contractPreview?.fileName ?? ""}
+        onDownload={() => contractPreview?.download()}
+        showAgreeButton={false}
+      />
     </div>
   );
 };
