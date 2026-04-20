@@ -73,12 +73,13 @@ const AdminBookings = ({ bookings, onUpdateStatus }: Props) => {
               <th className="text-left px-4 py-3 font-semibold">Авто</th>
               <th className="text-left px-4 py-3 font-semibold">Период</th>
               <th className="text-right px-4 py-3 font-semibold">Сумма</th>
+              <th className="text-center px-4 py-3 font-semibold">PDF</th>
               <th className="text-center px-4 py-3 font-semibold">Статус</th>
             </tr>
           </thead>
           <tbody>
             {filtered.length === 0 ? (
-              <tr><td colSpan={6} className="text-center py-8 text-muted-foreground">Нет бронирований</td></tr>
+              <tr><td colSpan={7} className="text-center py-8 text-muted-foreground">Нет бронирований</td></tr>
             ) : filtered.map((b) => (
               <tr key={b.id} onClick={() => setSelected(b)} className="border-t border-border hover:bg-secondary/50 transition-colors cursor-pointer">
                 <td className="px-4 py-3 whitespace-nowrap text-muted-foreground">{format(new Date(b.created_at), "dd.MM.yy HH:mm")}</td>
@@ -89,6 +90,23 @@ const AdminBookings = ({ bookings, onUpdateStatus }: Props) => {
                 <td className="px-4 py-3 font-medium">{b.car_label}</td>
                 <td className="px-4 py-3 whitespace-nowrap text-muted-foreground">{b.date_from} — {b.date_to} ({b.days} д.)</td>
                 <td className="px-4 py-3 text-right font-medium">{b.total_cost.toLocaleString("ru-RU")} ₽</td>
+                <td className="px-4 py-3 text-center" onClick={(e) => e.stopPropagation()}>
+                  {b.contract_url ? (
+                    <a
+                      href={b.contract_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      title="Открыть PDF договора"
+                      className="inline-flex items-center justify-center w-8 h-8 rounded-md bg-primary/10 text-primary hover:bg-primary/20 transition-colors"
+                    >
+                      <FileText className="w-4 h-4" />
+                    </a>
+                  ) : (
+                    <span title="Договор отсутствует" className="inline-flex items-center justify-center text-muted-foreground/40">
+                      <FileText className="w-4 h-4" />
+                    </span>
+                  )}
+                </td>
                 <td className="px-4 py-3 text-center" onClick={(e) => e.stopPropagation()}>
                   <select value={b.status} onChange={(e) => onUpdateStatus(b.id, e.target.value)} className={`px-2 py-1 rounded-full text-xs font-medium border-none cursor-pointer focus:outline-none focus:ring-2 focus:ring-primary ${b.status === "new" ? "bg-primary/20 text-primary" : b.status === "confirmed" ? "bg-green-500/20 text-green-400" : b.status === "cancelled" ? "bg-destructive/20 text-destructive" : "bg-blue-500/20 text-blue-400"}`}>
                     <option value="new">Новая</option>
