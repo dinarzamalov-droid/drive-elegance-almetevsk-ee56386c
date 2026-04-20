@@ -262,9 +262,22 @@ export function generateContract(
   };
 
   const drawActSignatures = () => {
-    ensureSpace(20);
+    ensureSpace(16);
     doc.setFontSize(9);
     doc.setFont("Roboto", "normal");
+    doc.text(`Арендодатель: Замалов Динар Рамисович  / ______________________`, marginL, y);
+    y += 6;
+    doc.text(`Арендатор: ${data.name}  / ______________________`, marginL, y);
+    y += 6;
+  };
+
+  const drawWearSignatures = () => {
+    // Keep intro line + both signature lines together
+    ensureSpace(28);
+    doc.setFontSize(9);
+    doc.setFont("Roboto", "normal");
+    doc.text("С Критериями нормального износа Автомобиля ознакомлен и согласен:", marginL, y);
+    y += 8;
     doc.text(`Арендодатель: Замалов Динар Рамисович  / ______________________`, marginL, y);
     y += 6;
     doc.text(`Арендатор: ${data.name}  / ______________________`, marginL, y);
@@ -299,6 +312,9 @@ export function generateContract(
         break;
       case "actSignatures":
         drawActSignatures();
+        break;
+      case "wearSignatures":
+        drawWearSignatures();
         break;
     }
   };
