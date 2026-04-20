@@ -262,10 +262,12 @@ export function generateContract(
   };
 
   const drawActSignatures = () => {
-    // Reserve enough space so signatures stay on the same page as the preceding "ознакомлен" line
-    ensureSpace(18);
+    // Keep the intro line together with both signature lines (≈26mm)
+    ensureSpace(28);
     doc.setFontSize(9);
     doc.setFont("Roboto", "normal");
+    doc.text("С Критериями нормального износа Автомобиля ознакомлен и согласен:", marginL, y);
+    y += 8;
     doc.text(`Арендодатель: Замалов Динар Рамисович  / ______________________`, marginL, y);
     y += 6;
     doc.text(`Арендатор: ${data.name}  / ______________________`, marginL, y);
