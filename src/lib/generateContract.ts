@@ -23,6 +23,7 @@ interface ContractData {
   dailyRate: number;
   extrasList: string[];
   extrasCost: number;
+  savingsList?: string[];
   totalCost: number;
   prepay: number;
   remaining: number;
