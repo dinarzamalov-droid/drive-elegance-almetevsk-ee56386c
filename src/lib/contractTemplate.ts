@@ -42,7 +42,8 @@ export type ContractBlock =
   | { kind: "spacer"; size?: number }
   | { kind: "pagebreak" }
   | { kind: "signatures" }
-  | { kind: "actSignatures" };
+  | { kind: "actSignatures" }
+  | { kind: "wearSignatures" };
 
 export const CONTRACT_BLOCKS: ContractBlock[] = [
   // === HEADER ===
@@ -369,5 +370,5 @@ export const CONTRACT_BLOCKS: ContractBlock[] = [
       "Неприемлемо: порезы, разрывы, прожоги обивки сидений, потолка, дверных карт, обшивки багажника; пятна, требующие химической чистки; следы животных (шерсть, экскременты, запах); неприятные запахи (табак, парфюм, продукты); поврежденные или отсутствующие элементы салона (накладки, заглушки, подлокотники).",
   },
   { kind: "spacer", size: 4 },
-  { kind: "actSignatures" },
+  { kind: "wearSignatures" },
 ];
