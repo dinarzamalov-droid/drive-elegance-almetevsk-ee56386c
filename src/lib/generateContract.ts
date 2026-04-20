@@ -262,7 +262,17 @@ export function generateContract(
   };
 
   const drawActSignatures = () => {
-    // Keep the intro line together with both signature lines (≈26mm)
+    ensureSpace(16);
+    doc.setFontSize(9);
+    doc.setFont("Roboto", "normal");
+    doc.text(`Арендодатель: Замалов Динар Рамисович  / ______________________`, marginL, y);
+    y += 6;
+    doc.text(`Арендатор: ${data.name}  / ______________________`, marginL, y);
+    y += 6;
+  };
+
+  const drawWearSignatures = () => {
+    // Keep intro line + both signature lines together
     ensureSpace(28);
     doc.setFontSize(9);
     doc.setFont("Roboto", "normal");
@@ -302,6 +312,9 @@ export function generateContract(
         break;
       case "actSignatures":
         drawActSignatures();
+        break;
+      case "wearSignatures":
+        drawWearSignatures();
         break;
     }
   };
