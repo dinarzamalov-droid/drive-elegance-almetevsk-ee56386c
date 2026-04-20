@@ -9,7 +9,9 @@ const BUCKET = "contracts";
 const SIGNED_URL_TTL = 60 * 60 * 24 * 365 * 10; // ~10 years
 
 async function uploadAndSign(generated: GeneratedContract, bookingId: string): Promise<string | null> {
-  const path = `${bookingId}/${generated.fileName}`;
+  // Supabase Storage rejects non-ASCII chars in object keys — use a safe ASCII filename
+  const safeName = `contract_${bookingId.slice(0, 8)}_${Date.now()}.pdf`;
+  const path = `${bookingId}/${safeName}`;
   const { error: uploadError } = await supabase.storage
     .from(BUCKET)
     .upload(path, generated.blob, { contentType: "application/pdf", upsert: true });

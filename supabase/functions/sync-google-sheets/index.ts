@@ -45,18 +45,34 @@ async function getAccessToken(): Promise<string> {
   const unsignedToken = `${enc(header)}.${enc(payload)}`;
 
   // Import the private key — handle escaped newlines and various formats
-  let cleanedPem = privateKeyPem;
+  let cleanedPem = privateKeyPem.trim();
+  // Strip surrounding quotes if present (sometimes secrets get pasted with quotes)
+  if ((cleanedPem.startsWith('"') && cleanedPem.endsWith('"')) ||
+      (cleanedPem.startsWith("'") && cleanedPem.endsWith("'"))) {
+    cleanedPem = cleanedPem.slice(1, -1);
+  }
   // Handle JSON-escaped newlines
   if (cleanedPem.includes("\\n")) {
     cleanedPem = cleanedPem.replace(/\\n/g, "\n");
   }
+
+  // Validate that this is actually a PEM private key
+  if (!cleanedPem.includes("BEGIN PRIVATE KEY")) {
+    throw new Error(
+      "GOOGLE_PRIVATE_KEY secret is invalid: expected a PEM block starting with '-----BEGIN PRIVATE KEY-----'. " +
+      "Please paste the full `private_key` value from your Google service account JSON file."
+    );
+  }
+
   // Remove PEM headers/footers and whitespace
   const keyData = cleanedPem
     .replace(/-----BEGIN PRIVATE KEY-----/g, "")
     .replace(/-----END PRIVATE KEY-----/g, "")
     .replace(/[\s\r\n]/g, "");
 
-  console.log("Key data length:", keyData.length, "first 20 chars:", keyData.substring(0, 20));
+  if (keyData.length < 500) {
+    throw new Error(`GOOGLE_PRIVATE_KEY appears truncated (only ${keyData.length} chars of base64 data). A real RSA private key has ~1600+ chars.`);
+  }
 
   // Use standard base64 decode
   const raw = atob(keyData);
