@@ -4,7 +4,6 @@ import FloatingActions from "@/components/FloatingActions";
 import AboutSection from "@/components/AboutSection";
 import FleetSection from "@/components/FleetSection";
 import CompareSection from "@/components/CompareSection";
-import BookingSection from "@/components/BookingSection";
 import TermsSection from "@/components/TermsSection";
 import WhyUsSection from "@/components/WhyUsSection";
 import ForWhomSection from "@/components/ForWhomSection";
@@ -29,7 +28,6 @@ const Index = () => {
       <AboutSection />
       <FleetSection />
       <CompareSection />
-      <BookingSection />
       <TermsSection />
       <WhyUsSection />
       <ForWhomSection />
