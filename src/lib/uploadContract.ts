@@ -1,7 +1,7 @@
 import { supabase } from "@/integrations/supabase/client";
-import { generateContract, type GeneratedContract } from "./generateContract";
+import { generateContract, type GeneratedContract, type ContractData } from "./generateContract";
 import { generateContractDocx } from "./generateContractDocx";
-import { buildContractData, type ContractData } from "./contractHelper";
+import { buildContractData } from "./contractHelper";
 import { cars, ageOptions, experienceOptions, extrasConfig } from "./bookingData";
 import type { BookingState } from "./bookingData";
 import type { Booking } from "@/components/admin/types";
