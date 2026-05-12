@@ -6,7 +6,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { initialBookingState, cars } from "@/lib/bookingData";
 import { getBookingCalculations } from "@/lib/bookingCalculations";
-import { uploadContractForBooking } from "@/lib/uploadContract";
+import { uploadBothContractsForBooking } from "@/lib/uploadBothContracts";
+import { format } from "date-fns";
 import type { BookingState } from "@/lib/bookingData";
 import BookingProgress from "@/components/booking/BookingProgress";
 import Step1CarSelect from "@/components/booking/Step1CarSelect";
@@ -200,17 +201,44 @@ const BookingPage = () => {
       if (error) throw error;
       toast.success("Бронирование сохранено!");
 
-      // Generate, upload contract PDF and attach link to the booking
+      // Generate, upload PDF + DOCX and email administrator
       try {
         const bookingId = (inserted as any)?.id as string | undefined;
         if (bookingId) {
-          const contractUrl = await uploadContractForBooking(state, bookingId);
-          if (contractUrl) {
+          const { pdfUrl, docxUrl } = await uploadBothContractsForBooking(state, bookingId);
+          if (pdfUrl) {
             await supabase
               .from("bookings" as any)
-              .update({ contract_url: contractUrl } as any)
+              .update({ contract_url: pdfUrl } as any)
               .eq("id", bookingId);
           }
+
+          // Notify administrator (3d.drive@mail.ru) — fire-and-forget
+          const paymentLabel =
+            state.paymentMethod === "cash" ? "Наличные" :
+            state.paymentMethod === "transfer" ? "Перевод" : "Онлайн";
+          supabase.functions.invoke("send-transactional-email", {
+            body: {
+              templateName: "admin-booking-notification",
+              idempotencyKey: `admin-booking-${bookingId}`,
+              templateData: {
+                fullName: `${state.lastName} ${state.firstName} ${state.middleName}`.trim(),
+                phone: state.phone,
+                clientEmail: state.email,
+                carLabel: calc.selectedCar.label,
+                dateFrom: state.dateFrom ? format(state.dateFrom, "dd.MM.yyyy") : "",
+                dateTo: state.dateTo ? format(state.dateTo, "dd.MM.yyyy") : "",
+                days: calc.days,
+                city: state.city,
+                totalCost: calc.totalCost.toLocaleString("ru-RU"),
+                prepay: calc.prepay.toLocaleString("ru-RU"),
+                deposit: calc.deposit.toLocaleString("ru-RU"),
+                paymentMethod: paymentLabel,
+                contractPdfUrl: pdfUrl ?? undefined,
+                contractDocxUrl: docxUrl ?? undefined,
+              },
+            },
+          }).catch((err) => console.error("Admin email send failed:", err));
         }
       } catch (contractErr) {
         console.error("Contract upload error:", contractErr);
