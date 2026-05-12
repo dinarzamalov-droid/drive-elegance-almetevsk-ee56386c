@@ -3,7 +3,7 @@ import { ROBOTO_BASE64 } from "./robotoFont";
 import { ROBOTO_BOLD_BASE64 } from "./robotoBoldFont";
 import { CONTRACT_BLOCKS, type ContractBlock } from "./contractTemplate";
 
-interface ContractData {
+export interface ContractData {
   name: string;
   phone: string;
   email?: string;
@@ -84,7 +84,7 @@ function toGenitive(fullName: string): string {
     .join(" ");
 }
 
-function buildPlaceholders(data: ContractData): Record<string, string> {
+export function buildPlaceholders(data: ContractData): Record<string, string> {
   const today = new Date();
   const dateStr = `${String(today.getDate()).padStart(2, "0")}.${String(today.getMonth() + 1).padStart(2, "0")}.${today.getFullYear()}`;
   const contractNo = String(Math.floor(Math.random() * 900 + 100));
@@ -172,7 +172,7 @@ function buildPlaceholders(data: ContractData): Record<string, string> {
   };
 }
 
-function applyPlaceholders(text: string, ph: Record<string, string>): string {
+export function applyPlaceholders(text: string, ph: Record<string, string>): string {
   return text.replace(/\{\{(\w+)\}\}/g, (_, k) => ph[k] ?? `{{${k}}}`);
 }
 
