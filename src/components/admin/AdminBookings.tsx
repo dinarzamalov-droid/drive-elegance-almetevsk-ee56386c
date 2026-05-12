@@ -102,7 +102,7 @@ const AdminBookings = ({ bookings, onUpdateStatus, onRefresh }: Props) => {
               <th className="text-left px-4 py-3 font-semibold">Авто</th>
               <th className="text-left px-4 py-3 font-semibold">Период</th>
               <th className="text-right px-4 py-3 font-semibold">Сумма</th>
-              <th className="text-center px-4 py-3 font-semibold">PDF</th>
+              <th className="text-center px-4 py-3 font-semibold">Договор</th>
               <th className="text-center px-4 py-3 font-semibold">Статус</th>
             </tr>
           </thead>
