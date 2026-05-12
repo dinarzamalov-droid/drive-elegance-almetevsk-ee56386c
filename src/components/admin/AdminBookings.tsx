@@ -34,14 +34,18 @@ const AdminBookings = ({ bookings, onUpdateStatus, onRefresh }: Props) => {
   const handleRegenerate = async (booking: Booking) => {
     setGeneratingId(booking.id);
     try {
-      const url = await regenerateContractFromBooking(booking);
-      if (!url) {
+      const result = await regenerateContractFromBooking(booking);
+      if (!result || (!result.pdfUrl && !result.docxUrl)) {
         toast.error("Не удалось сгенерировать договор");
         return;
       }
       toast.success("Договор сгенерирован и сохранён");
       if (selected?.id === booking.id) {
-        setSelected({ ...selected, contract_url: url });
+        setSelected({
+          ...selected,
+          contract_url: result.pdfUrl ?? selected.contract_url,
+          contract_docx_url: result.docxUrl ?? selected.contract_docx_url,
+        });
       }
       await onRefresh?.();
     } catch (err) {
