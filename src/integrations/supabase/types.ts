@@ -20,6 +20,7 @@ export type Database = {
           car_label: string
           car_value: string
           city: string
+          contract_docx_url: string | null
           contract_url: string | null
           created_at: string
           daily_rate: number
@@ -58,6 +59,7 @@ export type Database = {
           car_label: string
           car_value: string
           city?: string
+          contract_docx_url?: string | null
           contract_url?: string | null
           created_at?: string
           daily_rate: number
@@ -96,6 +98,7 @@ export type Database = {
           car_label?: string
           car_value?: string
           city?: string
+          contract_docx_url?: string | null
           contract_url?: string | null
           created_at?: string
           daily_rate?: number
