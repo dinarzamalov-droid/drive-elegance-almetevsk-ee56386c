@@ -12,6 +12,7 @@ import EditBookingPage from "./pages/EditBookingPage.tsx";
 import AdminPage from "./pages/AdminPage.tsx";
 import AuthPage from "./pages/AuthPage.tsx";
 import ProfilePage from "./pages/ProfilePage.tsx";
+import UnsubscribePage from "./pages/UnsubscribePage.tsx";
 
 const queryClient = new QueryClient();
 
@@ -30,6 +31,7 @@ const App = () => (
           <Route path="/admin" element={<AdminPage />} />
           <Route path="/auth" element={<AuthPage />} />
           <Route path="/profile" element={<ProfilePage />} />
+          <Route path="/unsubscribe" element={<UnsubscribePage />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
