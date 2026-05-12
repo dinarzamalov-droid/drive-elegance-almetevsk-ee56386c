@@ -1,5 +1,5 @@
 import { format } from "date-fns";
-import { X, Search, Download, FileText, Loader2, Sparkles } from "lucide-react";
+import { X, Search, Download, FileText, FileType2, Loader2, Sparkles } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { regenerateContractFromBooking } from "@/lib/uploadContract";
@@ -34,14 +34,18 @@ const AdminBookings = ({ bookings, onUpdateStatus, onRefresh }: Props) => {
   const handleRegenerate = async (booking: Booking) => {
     setGeneratingId(booking.id);
     try {
-      const url = await regenerateContractFromBooking(booking);
-      if (!url) {
+      const result = await regenerateContractFromBooking(booking);
+      if (!result || (!result.pdfUrl && !result.docxUrl)) {
         toast.error("Не удалось сгенерировать договор");
         return;
       }
       toast.success("Договор сгенерирован и сохранён");
       if (selected?.id === booking.id) {
-        setSelected({ ...selected, contract_url: url });
+        setSelected({
+          ...selected,
+          contract_url: result.pdfUrl ?? selected.contract_url,
+          contract_docx_url: result.docxUrl ?? selected.contract_docx_url,
+        });
       }
       await onRefresh?.();
     } catch (err) {
@@ -98,7 +102,7 @@ const AdminBookings = ({ bookings, onUpdateStatus, onRefresh }: Props) => {
               <th className="text-left px-4 py-3 font-semibold">Авто</th>
               <th className="text-left px-4 py-3 font-semibold">Период</th>
               <th className="text-right px-4 py-3 font-semibold">Сумма</th>
-              <th className="text-center px-4 py-3 font-semibold">PDF</th>
+              <th className="text-center px-4 py-3 font-semibold">Договор</th>
               <th className="text-center px-4 py-3 font-semibold">Статус</th>
             </tr>
           </thead>
@@ -116,27 +120,41 @@ const AdminBookings = ({ bookings, onUpdateStatus, onRefresh }: Props) => {
                 <td className="px-4 py-3 whitespace-nowrap text-muted-foreground">{b.date_from} — {b.date_to} ({b.days} д.)</td>
                 <td className="px-4 py-3 text-right font-medium">{b.total_cost.toLocaleString("ru-RU")} ₽</td>
                 <td className="px-4 py-3 text-center" onClick={(e) => e.stopPropagation()}>
-                  {b.contract_url ? (
-                    <a
-                      href={b.contract_url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      title="Открыть PDF договора"
-                      className="inline-flex items-center justify-center w-8 h-8 rounded-md bg-primary/10 text-primary hover:bg-primary/20 transition-colors"
-                    >
-                      <FileText className="w-4 h-4" />
-                    </a>
-                  ) : (
-                    <button
-                      type="button"
-                      disabled={generatingId === b.id}
-                      onClick={() => handleRegenerate(b)}
-                      title="Сгенерировать договор"
-                      className="inline-flex items-center justify-center w-8 h-8 rounded-md bg-secondary text-muted-foreground hover:bg-primary/10 hover:text-primary transition-colors disabled:opacity-50"
-                    >
-                      {generatingId === b.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
-                    </button>
-                  )}
+                  <div className="inline-flex items-center gap-1.5">
+                    {b.contract_url ? (
+                      <a
+                        href={b.contract_url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        title="Скачать PDF договора"
+                        className="inline-flex items-center justify-center w-8 h-8 rounded-md bg-primary/10 text-primary hover:bg-primary/20 transition-colors"
+                      >
+                        <FileText className="w-4 h-4" />
+                      </a>
+                    ) : null}
+                    {b.contract_docx_url ? (
+                      <a
+                        href={b.contract_docx_url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        title="Скачать Word договора"
+                        className="inline-flex items-center justify-center w-8 h-8 rounded-md bg-blue-500/10 text-blue-400 hover:bg-blue-500/20 transition-colors"
+                      >
+                        <FileType2 className="w-4 h-4" />
+                      </a>
+                    ) : null}
+                    {!b.contract_url && !b.contract_docx_url ? (
+                      <button
+                        type="button"
+                        disabled={generatingId === b.id}
+                        onClick={() => handleRegenerate(b)}
+                        title="Сгенерировать договор"
+                        className="inline-flex items-center justify-center w-8 h-8 rounded-md bg-secondary text-muted-foreground hover:bg-primary/10 hover:text-primary transition-colors disabled:opacity-50"
+                      >
+                        {generatingId === b.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
+                      </button>
+                    ) : null}
+                  </div>
                 </td>
                 <td className="px-4 py-3 text-center" onClick={(e) => e.stopPropagation()}>
                   <select value={b.status} onChange={(e) => onUpdateStatus(b.id, e.target.value)} className={`px-2 py-1 rounded-full text-xs font-medium border-none cursor-pointer focus:outline-none focus:ring-2 focus:ring-primary ${b.status === "new" ? "bg-primary/20 text-primary" : b.status === "confirmed" ? "bg-green-500/20 text-green-400" : b.status === "cancelled" ? "bg-destructive/20 text-destructive" : "bg-blue-500/20 text-blue-400"}`}>
@@ -182,8 +200,8 @@ const AdminBookings = ({ bookings, onUpdateStatus, onRefresh }: Props) => {
                 <Row label="Статус" value={statusLabels[selected.status] || selected.status} />
               </Section>
               <Section title="Договор">
-                {selected.contract_url ? (
-                  <div className="flex flex-col gap-2">
+                <div className="flex flex-col gap-2">
+                  {selected.contract_url && (
                     <a
                       href={selected.contract_url}
                       target="_blank"
@@ -191,29 +209,34 @@ const AdminBookings = ({ bookings, onUpdateStatus, onRefresh }: Props) => {
                       className="flex items-center gap-2 px-3 py-2 rounded-lg bg-primary/10 text-primary hover:bg-primary/20 transition-colors text-sm font-medium"
                     >
                       <FileText className="w-4 h-4" />
-                      Открыть PDF договора
+                      Скачать PDF договора
                     </a>
-                    <button
-                      type="button"
-                      disabled={generatingId === selected.id}
-                      onClick={() => handleRegenerate(selected)}
-                      className="flex items-center gap-2 px-3 py-2 rounded-lg bg-secondary text-foreground hover:bg-secondary/80 transition-colors text-sm font-medium disabled:opacity-50"
+                  )}
+                  {selected.contract_docx_url && (
+                    <a
+                      href={selected.contract_docx_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-2 px-3 py-2 rounded-lg bg-blue-500/10 text-blue-400 hover:bg-blue-500/20 transition-colors text-sm font-medium"
                     >
-                      {generatingId === selected.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
-                      Перегенерировать
-                    </button>
-                  </div>
-                ) : (
+                      <FileType2 className="w-4 h-4" />
+                      Скачать Word договора
+                    </a>
+                  )}
                   <button
                     type="button"
                     disabled={generatingId === selected.id}
                     onClick={() => handleRegenerate(selected)}
-                    className="flex items-center gap-2 px-3 py-2 rounded-lg bg-primary/10 text-primary hover:bg-primary/20 transition-colors text-sm font-medium disabled:opacity-50"
+                    className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-colors text-sm font-medium disabled:opacity-50 ${
+                      selected.contract_url || selected.contract_docx_url
+                        ? "bg-secondary text-foreground hover:bg-secondary/80"
+                        : "bg-primary/10 text-primary hover:bg-primary/20"
+                    }`}
                   >
                     {generatingId === selected.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
-                    Сгенерировать договор
+                    {selected.contract_url || selected.contract_docx_url ? "Перегенерировать (PDF + Word)" : "Сгенерировать договор (PDF + Word)"}
                   </button>
-                )}
+                </div>
               </Section>
             </div>
           </div>
