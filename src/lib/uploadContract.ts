@@ -78,10 +78,12 @@ export async function uploadContractForBooking(
 }
 
 /**
- * Re-generate, upload and sign a contract from an existing DB Booking row.
- * Used by the admin panel for old bookings that don't have a contract_url yet.
+ * Re-generate, upload and sign a contract (PDF + DOCX) from an existing DB Booking row.
+ * Used by the admin panel for old bookings that don't have contract URLs yet.
  */
-export async function regenerateContractFromBooking(booking: Booking): Promise<string | null> {
+export async function regenerateContractFromBooking(
+  booking: Booking,
+): Promise<{ pdfUrl: string | null; docxUrl: string | null } | null> {
   try {
     const car = cars.find((c) => c.value === booking.car_value);
     if (!car) return null;
@@ -96,7 +98,7 @@ export async function regenerateContractFromBooking(booking: Booking): Promise<s
       return `${String(d.getDate()).padStart(2, "0")}.${String(d.getMonth() + 1).padStart(2, "0")}.${d.getFullYear()}`;
     };
 
-    const result = generateContract({
+    const data: ContractData = {
       name: fullName,
       phone: booking.phone,
       email: booking.email,
@@ -121,20 +123,23 @@ export async function regenerateContractFromBooking(booking: Booking): Promise<s
       experienceLabel: expLabel,
       city: booking.city,
       vehicle: car.vehicle,
-    }, { autoDownload: false });
+    };
 
-    const url = await uploadAndSign(result, booking.id);
-    if (!url) return null;
+    const { pdfUrl, docxUrl } = await generateAndUploadBoth(data, booking.id);
 
-    const { error } = await supabase
-      .from("bookings" as any)
-      .update({ contract_url: url } as any)
-      .eq("id", booking.id);
-    if (error) {
-      console.error("Failed to save contract_url:", error);
-      return null;
+    const update: Record<string, string> = {};
+    if (pdfUrl) update.contract_url = pdfUrl;
+    if (docxUrl) update.contract_docx_url = docxUrl;
+
+    if (Object.keys(update).length > 0) {
+      const { error } = await supabase
+        .from("bookings" as any)
+        .update(update as any)
+        .eq("id", booking.id);
+      if (error) console.error("Failed to save contract URLs:", error);
     }
-    return url;
+
+    return { pdfUrl, docxUrl };
   } catch (err) {
     console.error("Contract regeneration failed:", err);
     return null;
