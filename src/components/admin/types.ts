@@ -34,6 +34,7 @@ export interface Booking {
   promo_code: string | null;
   preferred_messenger: string | null;
   contract_url?: string | null;
+  contract_docx_url?: string | null;
 }
 
 export interface FleetCar {
