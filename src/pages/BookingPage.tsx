@@ -206,10 +206,13 @@ const BookingPage = () => {
         const bookingId = (inserted as any)?.id as string | undefined;
         if (bookingId) {
           const { pdfUrl, docxUrl } = await uploadBothContractsForBooking(state, bookingId);
-          if (pdfUrl) {
+          if (pdfUrl || docxUrl) {
+            const update: Record<string, string> = {};
+            if (pdfUrl) update.contract_url = pdfUrl;
+            if (docxUrl) update.contract_docx_url = docxUrl;
             await supabase
               .from("bookings" as any)
-              .update({ contract_url: pdfUrl } as any)
+              .update(update as any)
               .eq("id", bookingId);
           }
 
