@@ -22,7 +22,7 @@ export interface GeneratedDocx {
 const border = { style: BorderStyle.SINGLE, size: 4, color: "BBBBBB" };
 const cellBorders = { top: border, bottom: border, left: border, right: border };
 
-function p(text: string, opts: { bold?: boolean; size?: number; align?: AlignmentType; heading?: typeof HeadingLevel[keyof typeof HeadingLevel] } = {}) {
+function p(text: string, opts: { bold?: boolean; size?: number; align?: typeof AlignmentType[keyof typeof AlignmentType]; heading?: typeof HeadingLevel[keyof typeof HeadingLevel] } = {}) {
   return new Paragraph({
     alignment: opts.align,
     heading: opts.heading,
