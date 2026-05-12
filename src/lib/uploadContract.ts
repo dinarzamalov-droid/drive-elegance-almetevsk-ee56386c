@@ -1,6 +1,7 @@
 import { supabase } from "@/integrations/supabase/client";
 import { generateContract, type GeneratedContract } from "./generateContract";
-import { buildContractData } from "./contractHelper";
+import { generateContractDocx } from "./generateContractDocx";
+import { buildContractData, type ContractData } from "./contractHelper";
 import { cars, ageOptions, experienceOptions, extrasConfig } from "./bookingData";
 import type { BookingState } from "./bookingData";
 import type { Booking } from "@/components/admin/types";
@@ -8,26 +9,54 @@ import type { Booking } from "@/components/admin/types";
 const BUCKET = "contracts";
 const SIGNED_URL_TTL = 60 * 60 * 24 * 365 * 10; // ~10 years
 
-async function uploadAndSign(generated: GeneratedContract, bookingId: string): Promise<string | null> {
-  // Supabase Storage rejects non-ASCII chars in object keys — use a safe ASCII filename
-  const safeName = `contract_${bookingId.slice(0, 8)}_${Date.now()}.pdf`;
+async function uploadBlobAndSign(blob: Blob, bookingId: string, suffix: string, contentType: string): Promise<string | null> {
+  const safeName = `contract_${bookingId.slice(0, 8)}_${Date.now()}.${suffix}`;
   const path = `${bookingId}/${safeName}`;
   const { error: uploadError } = await supabase.storage
     .from(BUCKET)
-    .upload(path, generated.blob, { contentType: "application/pdf", upsert: true });
-  URL.revokeObjectURL(generated.blobUrl);
+    .upload(path, blob, { contentType, upsert: true });
   if (uploadError) {
-    console.error("Contract upload error:", uploadError);
+    console.error(`Contract upload error (${suffix}):`, uploadError);
     return null;
   }
   const { data: signed, error: signError } = await supabase.storage
     .from(BUCKET)
     .createSignedUrl(path, SIGNED_URL_TTL);
   if (signError || !signed?.signedUrl) {
-    console.error("Contract signed URL error:", signError);
+    console.error(`Contract signed URL error (${suffix}):`, signError);
     return null;
   }
   return signed.signedUrl;
+}
+
+async function uploadAndSign(generated: GeneratedContract, bookingId: string): Promise<string | null> {
+  const url = await uploadBlobAndSign(generated.blob, bookingId, "pdf", "application/pdf");
+  URL.revokeObjectURL(generated.blobUrl);
+  return url;
+}
+
+async function generateAndUploadBoth(data: ContractData, bookingId: string): Promise<{ pdfUrl: string | null; docxUrl: string | null }> {
+  let pdfUrl: string | null = null;
+  let docxUrl: string | null = null;
+  try {
+    const pdf = generateContract(data, { autoDownload: false });
+    pdfUrl = await uploadBlobAndSign(pdf.blob, bookingId, "pdf", "application/pdf");
+    URL.revokeObjectURL(pdf.blobUrl);
+  } catch (err) {
+    console.error("PDF generation failed:", err);
+  }
+  try {
+    const docx = await generateContractDocx(data);
+    docxUrl = await uploadBlobAndSign(
+      docx.blob,
+      bookingId,
+      "docx",
+      "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    );
+  } catch (err) {
+    console.error("DOCX generation failed:", err);
+  }
+  return { pdfUrl, docxUrl };
 }
 
 /**
