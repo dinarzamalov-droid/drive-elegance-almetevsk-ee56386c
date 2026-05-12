@@ -120,27 +120,41 @@ const AdminBookings = ({ bookings, onUpdateStatus, onRefresh }: Props) => {
                 <td className="px-4 py-3 whitespace-nowrap text-muted-foreground">{b.date_from} — {b.date_to} ({b.days} д.)</td>
                 <td className="px-4 py-3 text-right font-medium">{b.total_cost.toLocaleString("ru-RU")} ₽</td>
                 <td className="px-4 py-3 text-center" onClick={(e) => e.stopPropagation()}>
-                  {b.contract_url ? (
-                    <a
-                      href={b.contract_url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      title="Открыть PDF договора"
-                      className="inline-flex items-center justify-center w-8 h-8 rounded-md bg-primary/10 text-primary hover:bg-primary/20 transition-colors"
-                    >
-                      <FileText className="w-4 h-4" />
-                    </a>
-                  ) : (
-                    <button
-                      type="button"
-                      disabled={generatingId === b.id}
-                      onClick={() => handleRegenerate(b)}
-                      title="Сгенерировать договор"
-                      className="inline-flex items-center justify-center w-8 h-8 rounded-md bg-secondary text-muted-foreground hover:bg-primary/10 hover:text-primary transition-colors disabled:opacity-50"
-                    >
-                      {generatingId === b.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
-                    </button>
-                  )}
+                  <div className="inline-flex items-center gap-1.5">
+                    {b.contract_url ? (
+                      <a
+                        href={b.contract_url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        title="Скачать PDF договора"
+                        className="inline-flex items-center justify-center w-8 h-8 rounded-md bg-primary/10 text-primary hover:bg-primary/20 transition-colors"
+                      >
+                        <FileText className="w-4 h-4" />
+                      </a>
+                    ) : null}
+                    {b.contract_docx_url ? (
+                      <a
+                        href={b.contract_docx_url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        title="Скачать Word договора"
+                        className="inline-flex items-center justify-center w-8 h-8 rounded-md bg-blue-500/10 text-blue-400 hover:bg-blue-500/20 transition-colors"
+                      >
+                        <FileType2 className="w-4 h-4" />
+                      </a>
+                    ) : null}
+                    {!b.contract_url && !b.contract_docx_url ? (
+                      <button
+                        type="button"
+                        disabled={generatingId === b.id}
+                        onClick={() => handleRegenerate(b)}
+                        title="Сгенерировать договор"
+                        className="inline-flex items-center justify-center w-8 h-8 rounded-md bg-secondary text-muted-foreground hover:bg-primary/10 hover:text-primary transition-colors disabled:opacity-50"
+                      >
+                        {generatingId === b.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
+                      </button>
+                    ) : null}
+                  </div>
                 </td>
                 <td className="px-4 py-3 text-center" onClick={(e) => e.stopPropagation()}>
                   <select value={b.status} onChange={(e) => onUpdateStatus(b.id, e.target.value)} className={`px-2 py-1 rounded-full text-xs font-medium border-none cursor-pointer focus:outline-none focus:ring-2 focus:ring-primary ${b.status === "new" ? "bg-primary/20 text-primary" : b.status === "confirmed" ? "bg-green-500/20 text-green-400" : b.status === "cancelled" ? "bg-destructive/20 text-destructive" : "bg-blue-500/20 text-blue-400"}`}>
