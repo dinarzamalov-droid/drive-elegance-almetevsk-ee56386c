@@ -26,15 +26,42 @@ Deno.serve(async (req) => {
     const body = await req.json();
     const { password, action } = body;
 
-    const adminPassword = Deno.env.get("ADMIN_PASSWORD");
-    if (!adminPassword || password !== adminPassword) {
-      return json({ error: "Неверный пароль" }, 401);
+    const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+    const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+    const anonKey = Deno.env.get("SUPABASE_ANON_KEY")!;
+
+    // ── Auth: prefer JWT + admin role; fall back to legacy ADMIN_PASSWORD ──
+    const authHeader = req.headers.get("Authorization") || "";
+    const jwt = authHeader.startsWith("Bearer ") ? authHeader.slice(7) : "";
+    let authorized = false;
+
+    if (jwt) {
+      const userClient = createClient(supabaseUrl, anonKey, {
+        global: { headers: { Authorization: `Bearer ${jwt}` } },
+      });
+      const { data: userData } = await userClient.auth.getUser();
+      if (userData?.user) {
+        const adminClient = createClient(supabaseUrl, serviceKey);
+        const { data: isAdmin } = await adminClient.rpc("has_role", {
+          _user_id: userData.user.id,
+          _role: "admin",
+        });
+        if (isAdmin === true) authorized = true;
+      }
     }
 
-    const supabase = createClient(
-      Deno.env.get("SUPABASE_URL")!,
-      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
-    );
+    if (!authorized) {
+      const adminPassword = Deno.env.get("ADMIN_PASSWORD");
+      if (adminPassword && password && password === adminPassword) {
+        authorized = true;
+      }
+    }
+
+    if (!authorized) {
+      return json({ error: "Доступ запрещён. Войдите как администратор." }, 401);
+    }
+
+    const supabase = createClient(supabaseUrl, serviceKey);
 
     // ── Update booking status ──
     if (action === "update_status") {
