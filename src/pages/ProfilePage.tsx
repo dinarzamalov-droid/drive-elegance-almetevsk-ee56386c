@@ -76,6 +76,9 @@ const ProfilePage = () => {
       const { data: profileData } = await supabase.from("profiles").select("*").eq("user_id", session.user.id).single();
       if (profileData) setProfile(profileData as unknown as Profile);
 
+      const { data: roleData } = await supabase.from("user_roles").select("role").eq("user_id", session.user.id).eq("role", "admin").maybeSingle();
+      setIsAdmin(!!roleData);
+
       // Fetch bookings by email
       if (profileData?.email) {
         const { data: bookingsData } = await supabase.from("bookings").select("id, car_label, car_value, date_from, date_to, days, total_cost, status, created_at, prepay, deposit, contract_url").eq("email", profileData.email).order("created_at", { ascending: false });
