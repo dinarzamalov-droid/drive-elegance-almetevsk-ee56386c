@@ -1,8 +1,9 @@
 import { format } from "date-fns";
-import { X, Search, Download, FileText, FileType2, Loader2, Sparkles } from "lucide-react";
+import { X, Search, Download, FileText, FileType2, Loader2, Sparkles, IdCard, Sheet, FolderDown } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { regenerateContractFromBooking } from "@/lib/uploadContract";
+import { supabase } from "@/integrations/supabase/client";
 import type { Booking } from "./types";
 import { statusLabels, methodLabels, paymentLabels } from "./types";
 
