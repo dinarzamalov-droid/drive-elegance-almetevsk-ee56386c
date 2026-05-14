@@ -160,6 +160,22 @@ const ProfilePage = () => {
             </button>
           </div>
 
+          {isAdmin && (
+            <button
+              onClick={() => navigate("/admin")}
+              className="w-full mb-6 flex items-center justify-between gap-3 p-4 rounded-2xl bg-gradient-gold text-primary-foreground hover:opacity-90 transition-opacity shadow-lg"
+            >
+              <div className="flex items-center gap-3 text-left">
+                <Shield className="w-6 h-6 shrink-0" />
+                <div>
+                  <div className="font-bold text-base">Перейти в админ-панель</div>
+                  <div className="text-xs opacity-80">Бронирования, клиенты, договоры, аналитика</div>
+                </div>
+              </div>
+              <span className="text-xl">→</span>
+            </button>
+          )}
+
           {/* Stats */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
             <div className="bg-card-gradient border border-border rounded-xl p-4 text-center">
