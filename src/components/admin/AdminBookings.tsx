@@ -1,8 +1,9 @@
 import { format } from "date-fns";
-import { X, Search, Download, FileText, FileType2, Loader2, Sparkles } from "lucide-react";
+import { X, Search, Download, FileText, FileType2, Loader2, Sparkles, IdCard, Sheet, FolderDown } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { regenerateContractFromBooking } from "@/lib/uploadContract";
+import { supabase } from "@/integrations/supabase/client";
 import type { Booking } from "./types";
 import { statusLabels, methodLabels, paymentLabels } from "./types";
 
@@ -30,6 +31,8 @@ const AdminBookings = ({ bookings, onUpdateStatus, onRefresh }: Props) => {
   const [search, setSearch] = useState("");
   const [selected, setSelected] = useState<Booking | null>(null);
   const [generatingId, setGeneratingId] = useState<string | null>(null);
+  const [syncing, setSyncing] = useState(false);
+  const [downloadingContracts, setDownloadingContracts] = useState(false);
 
   const handleRegenerate = async (booking: Booking) => {
     setGeneratingId(booking.id);
@@ -81,16 +84,89 @@ const AdminBookings = ({ bookings, onUpdateStatus, onRefresh }: Props) => {
     URL.revokeObjectURL(url);
   };
 
+  const exportPassportsCsv = () => {
+    if (filtered.length === 0) return;
+    const headers = [
+      "Дата создания","Фамилия","Имя","Отчество","Телефон","Email",
+      "Паспорт серия","Паспорт номер","Дата выдачи","Код подразделения",
+      "ВУ номер","ВУ дата","Авто","Период"
+    ];
+    const rows = filtered.map((b) => [
+      b.created_at, b.last_name, b.first_name, b.middle_name || "", b.phone, b.email,
+      b.passport_series || "", b.passport_number || "", b.passport_date || "", b.passport_code || "",
+      b.license_number || "", b.license_date || "",
+      b.car_label, `${b.date_from} — ${b.date_to}`,
+    ]);
+    const csv = "\uFEFF" + [headers, ...rows].map((r) => r.map((v) => `"${String(v).replace(/"/g, '""')}"`).join(";")).join("\n");
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `passports_${format(new Date(), "yyyy-MM-dd")}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+    toast.success(`Выгружено ${filtered.length} записей`);
+  };
+
+  const syncToSheets = async () => {
+    setSyncing(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("sync-google-sheets", {
+        body: { action: "sync_all_bookings" },
+      });
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+      toast.success(`Синхронизировано ${data?.count ?? 0} бронирований с Google Sheets`);
+    } catch (err) {
+      console.error(err);
+      const msg = err instanceof Error ? err.message : "Ошибка синхронизации";
+      toast.error(`Не удалось синхронизировать: ${msg}`);
+    } finally {
+      setSyncing(false);
+    }
+  };
+
+  const downloadAllContracts = async () => {
+    const withContracts = filtered.filter((b) => b.contract_url || b.contract_docx_url);
+    if (withContracts.length === 0) {
+      toast.info("Нет договоров для скачивания");
+      return;
+    }
+    setDownloadingContracts(true);
+    try {
+      for (const b of withContracts) {
+        const url = b.contract_url || b.contract_docx_url;
+        if (!url) continue;
+        window.open(url, "_blank", "noopener,noreferrer");
+        await new Promise((r) => setTimeout(r, 350));
+      }
+      toast.success(`Открыто ${withContracts.length} договоров в новых вкладках`);
+    } finally {
+      setDownloadingContracts(false);
+    }
+  };
+
   return (
     <div className="space-y-4">
-      <div className="flex gap-2">
+      <div className="flex flex-col sm:flex-row gap-2">
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
           <input type="text" placeholder="Поиск по имени, авто, телефону..." value={search} onChange={(e) => setSearch(e.target.value)} className="w-full pl-10 pr-4 py-2.5 rounded-lg bg-secondary border border-border text-foreground focus:outline-none focus:ring-2 focus:ring-primary text-sm" />
         </div>
-        <button onClick={exportCsv} disabled={filtered.length === 0} className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium bg-primary/10 text-primary hover:bg-primary/20 transition-colors disabled:opacity-50">
-          <Download className="w-4 h-4" /> CSV
-        </button>
+        <div className="flex flex-wrap gap-2">
+          <button onClick={exportCsv} disabled={filtered.length === 0} title="Скачать список бронирований CSV" className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium bg-primary/10 text-primary hover:bg-primary/20 transition-colors disabled:opacity-50">
+            <Download className="w-4 h-4" /> CSV
+          </button>
+          <button onClick={exportPassportsCsv} disabled={filtered.length === 0} title="Выгрузить паспортные данные клиентов" className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium bg-primary/10 text-primary hover:bg-primary/20 transition-colors disabled:opacity-50">
+            <IdCard className="w-4 h-4" /> Паспорта
+          </button>
+          <button onClick={downloadAllContracts} disabled={downloadingContracts || filtered.length === 0} title="Открыть все договоры" className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium bg-blue-500/10 text-blue-400 hover:bg-blue-500/20 transition-colors disabled:opacity-50">
+            {downloadingContracts ? <Loader2 className="w-4 h-4 animate-spin" /> : <FolderDown className="w-4 h-4" />} Договоры
+          </button>
+          <button onClick={syncToSheets} disabled={syncing} title="Синхронизировать с Google Sheets" className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium bg-green-500/10 text-green-500 hover:bg-green-500/20 transition-colors disabled:opacity-50">
+            {syncing ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sheet className="w-4 h-4" />} Google Sheets
+          </button>
+        </div>
       </div>
 
       <div className="overflow-x-auto rounded-xl border border-border">
