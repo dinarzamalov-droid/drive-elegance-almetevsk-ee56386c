@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { User, Heart, Crown, CalendarDays, FileText, LogOut, Settings, Star, RotateCcw } from "lucide-react";
+import { User, Heart, Crown, CalendarDays, FileText, LogOut, Settings, Star, RotateCcw, Shield } from "lucide-react";
 import { format } from "date-fns";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
