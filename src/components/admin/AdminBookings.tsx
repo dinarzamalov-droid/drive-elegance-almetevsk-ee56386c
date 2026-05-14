@@ -148,14 +148,25 @@ const AdminBookings = ({ bookings, onUpdateStatus, onRefresh }: Props) => {
 
   return (
     <div className="space-y-4">
-      <div className="flex gap-2">
+      <div className="flex flex-col sm:flex-row gap-2">
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
           <input type="text" placeholder="Поиск по имени, авто, телефону..." value={search} onChange={(e) => setSearch(e.target.value)} className="w-full pl-10 pr-4 py-2.5 rounded-lg bg-secondary border border-border text-foreground focus:outline-none focus:ring-2 focus:ring-primary text-sm" />
         </div>
-        <button onClick={exportCsv} disabled={filtered.length === 0} className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium bg-primary/10 text-primary hover:bg-primary/20 transition-colors disabled:opacity-50">
-          <Download className="w-4 h-4" /> CSV
-        </button>
+        <div className="flex flex-wrap gap-2">
+          <button onClick={exportCsv} disabled={filtered.length === 0} title="Скачать список бронирований CSV" className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium bg-primary/10 text-primary hover:bg-primary/20 transition-colors disabled:opacity-50">
+            <Download className="w-4 h-4" /> CSV
+          </button>
+          <button onClick={exportPassportsCsv} disabled={filtered.length === 0} title="Выгрузить паспортные данные клиентов" className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium bg-primary/10 text-primary hover:bg-primary/20 transition-colors disabled:opacity-50">
+            <IdCard className="w-4 h-4" /> Паспорта
+          </button>
+          <button onClick={downloadAllContracts} disabled={downloadingContracts || filtered.length === 0} title="Открыть все договоры" className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium bg-blue-500/10 text-blue-400 hover:bg-blue-500/20 transition-colors disabled:opacity-50">
+            {downloadingContracts ? <Loader2 className="w-4 h-4 animate-spin" /> : <FolderDown className="w-4 h-4" />} Договоры
+          </button>
+          <button onClick={syncToSheets} disabled={syncing} title="Синхронизировать с Google Sheets" className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium bg-green-500/10 text-green-500 hover:bg-green-500/20 transition-colors disabled:opacity-50">
+            {syncing ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sheet className="w-4 h-4" />} Google Sheets
+          </button>
+        </div>
       </div>
 
       <div className="overflow-x-auto rounded-xl border border-border">
