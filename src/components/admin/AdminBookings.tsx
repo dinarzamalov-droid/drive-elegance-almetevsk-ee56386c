@@ -84,6 +84,68 @@ const AdminBookings = ({ bookings, onUpdateStatus, onRefresh }: Props) => {
     URL.revokeObjectURL(url);
   };
 
+  const exportPassportsCsv = () => {
+    if (filtered.length === 0) return;
+    const headers = [
+      "Дата создания","Фамилия","Имя","Отчество","Телефон","Email",
+      "Паспорт серия","Паспорт номер","Дата выдачи","Код подразделения",
+      "ВУ номер","ВУ дата","Авто","Период"
+    ];
+    const rows = filtered.map((b) => [
+      b.created_at, b.last_name, b.first_name, b.middle_name || "", b.phone, b.email,
+      b.passport_series || "", b.passport_number || "", b.passport_date || "", b.passport_code || "",
+      b.license_number || "", b.license_date || "",
+      b.car_label, `${b.date_from} — ${b.date_to}`,
+    ]);
+    const csv = "\uFEFF" + [headers, ...rows].map((r) => r.map((v) => `"${String(v).replace(/"/g, '""')}"`).join(";")).join("\n");
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `passports_${format(new Date(), "yyyy-MM-dd")}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+    toast.success(`Выгружено ${filtered.length} записей`);
+  };
+
+  const syncToSheets = async () => {
+    setSyncing(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("sync-google-sheets", {
+        body: { action: "sync_all_bookings" },
+      });
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+      toast.success(`Синхронизировано ${data?.count ?? 0} бронирований с Google Sheets`);
+    } catch (err) {
+      console.error(err);
+      const msg = err instanceof Error ? err.message : "Ошибка синхронизации";
+      toast.error(`Не удалось синхронизировать: ${msg}`);
+    } finally {
+      setSyncing(false);
+    }
+  };
+
+  const downloadAllContracts = async () => {
+    const withContracts = filtered.filter((b) => b.contract_url || b.contract_docx_url);
+    if (withContracts.length === 0) {
+      toast.info("Нет договоров для скачивания");
+      return;
+    }
+    setDownloadingContracts(true);
+    try {
+      for (const b of withContracts) {
+        const url = b.contract_url || b.contract_docx_url;
+        if (!url) continue;
+        window.open(url, "_blank", "noopener,noreferrer");
+        await new Promise((r) => setTimeout(r, 350));
+      }
+      toast.success(`Открыто ${withContracts.length} договоров в новых вкладках`);
+    } finally {
+      setDownloadingContracts(false);
+    }
+  };
+
   return (
     <div className="space-y-4">
       <div className="flex gap-2">
