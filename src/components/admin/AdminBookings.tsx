@@ -31,6 +31,8 @@ const AdminBookings = ({ bookings, onUpdateStatus, onRefresh }: Props) => {
   const [search, setSearch] = useState("");
   const [selected, setSelected] = useState<Booking | null>(null);
   const [generatingId, setGeneratingId] = useState<string | null>(null);
+  const [syncing, setSyncing] = useState(false);
+  const [downloadingContracts, setDownloadingContracts] = useState(false);
 
   const handleRegenerate = async (booking: Booking) => {
     setGeneratingId(booking.id);
