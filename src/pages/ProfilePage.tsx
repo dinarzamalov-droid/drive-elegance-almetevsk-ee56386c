@@ -66,6 +66,7 @@ const ProfilePage = () => {
   const [activeTab, setActiveTab] = useState("profile");
   const [editing, setEditing] = useState(false);
   const [editForm, setEditForm] = useState<Partial<Profile>>({});
+  const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {
     const init = async () => {
