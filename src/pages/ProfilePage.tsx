@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { User, Heart, Crown, CalendarDays, FileText, LogOut, Settings, Star, RotateCcw } from "lucide-react";
+import { User, Heart, Crown, CalendarDays, FileText, LogOut, Settings, Star, RotateCcw, Shield } from "lucide-react";
 import { format } from "date-fns";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -66,6 +66,7 @@ const ProfilePage = () => {
   const [activeTab, setActiveTab] = useState("profile");
   const [editing, setEditing] = useState(false);
   const [editForm, setEditForm] = useState<Partial<Profile>>({});
+  const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {
     const init = async () => {
@@ -74,6 +75,9 @@ const ProfilePage = () => {
 
       const { data: profileData } = await supabase.from("profiles").select("*").eq("user_id", session.user.id).single();
       if (profileData) setProfile(profileData as unknown as Profile);
+
+      const { data: roleData } = await supabase.from("user_roles").select("role").eq("user_id", session.user.id).eq("role", "admin").maybeSingle();
+      setIsAdmin(!!roleData);
 
       // Fetch bookings by email
       if (profileData?.email) {
@@ -155,6 +159,22 @@ const ProfilePage = () => {
               <LogOut className="w-4 h-4" /> Выйти
             </button>
           </div>
+
+          {isAdmin && (
+            <button
+              onClick={() => navigate("/admin")}
+              className="w-full mb-6 flex items-center justify-between gap-3 p-4 rounded-2xl bg-gradient-gold text-primary-foreground hover:opacity-90 transition-opacity shadow-lg"
+            >
+              <div className="flex items-center gap-3 text-left">
+                <Shield className="w-6 h-6 shrink-0" />
+                <div>
+                  <div className="font-bold text-base">Перейти в админ-панель</div>
+                  <div className="text-xs opacity-80">Бронирования, клиенты, договоры, аналитика</div>
+                </div>
+              </div>
+              <span className="text-xl">→</span>
+            </button>
+          )}
 
           {/* Stats */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">

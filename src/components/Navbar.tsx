@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { Menu, X, Phone, User } from "lucide-react";
+import { Menu, X, Phone, User, Shield } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import logo from "@/assets/logo.png";
 
@@ -21,12 +21,24 @@ const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => setIsLoggedIn(!!session));
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => setIsLoggedIn(!!session));
+    const checkAdmin = async (userId: string | undefined) => {
+      if (!userId) { setIsAdmin(false); return; }
+      const { data } = await supabase.from("user_roles").select("role").eq("user_id", userId).eq("role", "admin").maybeSingle();
+      setIsAdmin(!!data);
+    };
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setIsLoggedIn(!!session);
+      checkAdmin(session?.user?.id);
+    });
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setIsLoggedIn(!!session);
+      checkAdmin(session?.user?.id);
+    });
     return () => subscription.unsubscribe();
   }, []);
 
@@ -94,6 +106,16 @@ const Navbar = () => {
             <User className="w-4 h-4" />
             {isLoggedIn ? "Кабинет" : "Войти"}
           </a>
+          {isAdmin && (
+            <a
+              href="/admin"
+              onClick={(e) => handleNavClick(e, "/admin")}
+              className="flex items-center gap-2 bg-primary/15 text-primary px-4 py-2.5 rounded-lg text-sm font-semibold hover:bg-primary/25 transition-colors"
+            >
+              <Shield className="w-4 h-4" />
+              Админ
+            </a>
+          )}
           <a
             href="tel:+79868262332"
             className="flex items-center gap-2 bg-gradient-gold text-primary-foreground px-5 py-2.5 rounded-lg text-sm font-semibold hover:opacity-90 transition-opacity"
@@ -132,6 +154,16 @@ const Navbar = () => {
               <User className="w-4 h-4" />
               {isLoggedIn ? "Личный кабинет" : "Войти / Регистрация"}
             </a>
+            {isAdmin && (
+              <a
+                href="/admin"
+                onClick={(e) => handleNavClick(e, "/admin")}
+                className="flex items-center justify-center gap-2 bg-primary/15 text-primary px-5 py-3 rounded-lg text-sm font-semibold"
+              >
+                <Shield className="w-4 h-4" />
+                Админ-панель
+              </a>
+            )}
             <a
               href="tel:+79868262332"
               className="flex items-center justify-center gap-2 bg-gradient-gold text-primary-foreground px-5 py-3 rounded-lg text-sm font-semibold"
