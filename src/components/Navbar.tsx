@@ -154,6 +154,16 @@ const Navbar = () => {
               <User className="w-4 h-4" />
               {isLoggedIn ? "Личный кабинет" : "Войти / Регистрация"}
             </a>
+            {isAdmin && (
+              <a
+                href="/admin"
+                onClick={(e) => handleNavClick(e, "/admin")}
+                className="flex items-center justify-center gap-2 bg-primary/15 text-primary px-5 py-3 rounded-lg text-sm font-semibold"
+              >
+                <Shield className="w-4 h-4" />
+                Админ-панель
+              </a>
+            )}
             <a
               href="tel:+79868262332"
               className="flex items-center justify-center gap-2 bg-gradient-gold text-primary-foreground px-5 py-3 rounded-lg text-sm font-semibold"
