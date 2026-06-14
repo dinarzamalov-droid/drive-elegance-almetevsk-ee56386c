@@ -112,6 +112,11 @@ const AdminPage = () => {
   };
 
   const refresh = () => loadData();
+  const hardReload = () => {
+    const url = new URL(window.location.href);
+    url.searchParams.set("_nocache", Date.now().toString());
+    window.location.href = url.toString();
+  };
 
   const updateBookingStatus = async (id: string, status: string) => {
     try { await invoke({ action: "update_status", bookingId: id, status }); toast.success("Статус обновлён"); } catch (err: any) { toast.error(err.message); }
