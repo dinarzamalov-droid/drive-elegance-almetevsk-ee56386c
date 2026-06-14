@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Lock, LogOut, RefreshCw, BarChart3, CalendarDays, Users, Car, Crown, Bell, Mail } from "lucide-react";
+import { Lock, LogOut, RefreshCw, RotateCcw, BarChart3, CalendarDays, Users, Car, Crown, Bell, Mail } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import AdminAnalytics from "@/components/admin/AdminAnalytics";
