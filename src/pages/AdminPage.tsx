@@ -207,6 +207,9 @@ const AdminPage = () => {
               <button onClick={refresh} className="flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-medium bg-secondary text-foreground hover:bg-secondary/80 transition-colors">
                 <RefreshCw className={`w-3.5 h-3.5 ${loading ? "animate-spin" : ""}`} /> Обновить
               </button>
+              <button onClick={hardReload} className="flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-medium bg-accent text-accent-foreground hover:bg-accent/80 transition-colors">
+                <RotateCcw className="w-3.5 h-3.5" /> Обновить без кэша
+              </button>
               <button onClick={handleLogout} className="flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-medium bg-destructive/10 text-destructive hover:bg-destructive/20 transition-colors">
                 <LogOut className="w-3.5 h-3.5" /> Выйти
               </button>
