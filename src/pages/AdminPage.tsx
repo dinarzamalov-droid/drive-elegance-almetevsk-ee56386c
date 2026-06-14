@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Lock, LogOut, RefreshCw, BarChart3, CalendarDays, Users, Car, Crown, Bell, Mail } from "lucide-react";
+import { Lock, LogOut, RefreshCw, RotateCcw, BarChart3, CalendarDays, Users, Car, Crown, Bell, Mail } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import AdminAnalytics from "@/components/admin/AdminAnalytics";
@@ -112,6 +112,11 @@ const AdminPage = () => {
   };
 
   const refresh = () => loadData();
+  const hardReload = () => {
+    const url = new URL(window.location.href);
+    url.searchParams.set("_nocache", Date.now().toString());
+    window.location.href = url.toString();
+  };
 
   const updateBookingStatus = async (id: string, status: string) => {
     try { await invoke({ action: "update_status", bookingId: id, status }); toast.success("Статус обновлён"); } catch (err: any) { toast.error(err.message); }
@@ -201,6 +206,9 @@ const AdminPage = () => {
               </button>
               <button onClick={refresh} className="flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-medium bg-secondary text-foreground hover:bg-secondary/80 transition-colors">
                 <RefreshCw className={`w-3.5 h-3.5 ${loading ? "animate-spin" : ""}`} /> Обновить
+              </button>
+              <button onClick={hardReload} className="flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-medium bg-accent text-accent-foreground hover:bg-accent/80 transition-colors">
+                <RotateCcw className="w-3.5 h-3.5" /> Обновить без кэша
               </button>
               <button onClick={handleLogout} className="flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-medium bg-destructive/10 text-destructive hover:bg-destructive/20 transition-colors">
                 <LogOut className="w-3.5 h-3.5" /> Выйти
