@@ -173,6 +173,23 @@ const AdminBookings = ({ bookings, onUpdateStatus, onRefresh }: Props) => {
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
           <input type="text" placeholder="Поиск по имени, авто, телефону..." value={search} onChange={(e) => setSearch(e.target.value)} className="w-full pl-10 pr-4 py-2.5 rounded-lg bg-secondary border border-border text-foreground focus:outline-none focus:ring-2 focus:ring-primary text-sm" />
         </div>
+      </div>
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-2">
+        <select value={carFilter} onChange={(e) => setCarFilter(e.target.value)} className="px-3 py-2 rounded-lg bg-secondary border border-border text-sm focus:outline-none focus:ring-2 focus:ring-primary">
+          <option value="">Все авто</option>
+          {uniqueCars.map((c) => (<option key={c} value={c}>{c}</option>))}
+        </select>
+        <input type="tel" placeholder="Телефон" value={phoneFilter} onChange={(e) => setPhoneFilter(e.target.value)} className="px-3 py-2 rounded-lg bg-secondary border border-border text-sm focus:outline-none focus:ring-2 focus:ring-primary" />
+        <input type="date" value={dateFrom} onChange={(e) => setDateFrom(e.target.value)} title="Период с" className="px-3 py-2 rounded-lg bg-secondary border border-border text-sm focus:outline-none focus:ring-2 focus:ring-primary" />
+        <input type="date" value={dateTo} onChange={(e) => setDateTo(e.target.value)} title="Период по" className="px-3 py-2 rounded-lg bg-secondary border border-border text-sm focus:outline-none focus:ring-2 focus:ring-primary" />
+        <button onClick={resetFilters} disabled={!hasFilters} className="flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-sm font-medium bg-secondary text-foreground hover:bg-secondary/80 transition-colors disabled:opacity-40">
+          <X className="w-4 h-4" /> Сбросить фильтры
+        </button>
+      </div>
+
+      <div className="flex flex-col sm:flex-row gap-2 items-start sm:items-center justify-between">
+        <div className="text-xs text-muted-foreground">Найдено: <span className="text-foreground font-semibold">{filtered.length}</span> из {bookings.length}</div>
         <div className="flex flex-wrap gap-2">
           <button onClick={exportCsv} disabled={filtered.length === 0} title="Скачать список бронирований CSV" className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium bg-primary/10 text-primary hover:bg-primary/20 transition-colors disabled:opacity-50">
             <Download className="w-4 h-4" /> CSV
