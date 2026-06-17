@@ -17,3 +17,6 @@ verify_jwt = false
 
 [functions.admin-bookings]
 verify_jwt = false
+
+[functions.customer-booking]
+verify_jwt = false
