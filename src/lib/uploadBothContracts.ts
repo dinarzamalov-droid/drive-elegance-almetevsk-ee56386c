@@ -4,31 +4,44 @@ import { generateContractDocx } from "./generateContractDocx";
 import { buildContractData } from "./contractHelper";
 import type { BookingState } from "./bookingData";
 
-const BUCKET = "contracts";
-const SIGNED_URL_TTL = 60 * 60 * 24 * 365 * 10;
+async function blobToBase64(blob: Blob): Promise<string> {
+  const buf = new Uint8Array(await blob.arrayBuffer());
+  let binary = "";
+  const chunkSize = 0x8000;
+  for (let i = 0; i < buf.length; i += chunkSize) {
+    binary += String.fromCharCode.apply(null, Array.from(buf.subarray(i, i + chunkSize)));
+  }
+  return btoa(binary);
+}
 
-async function uploadAndSign(blob: Blob, bookingId: string, suffix: string, contentType: string): Promise<string | null> {
-  const safeName = `contract_${bookingId.slice(0, 8)}_${Date.now()}.${suffix}`;
-  const path = `${bookingId}/${safeName}`;
-  const { error: uploadError } = await supabase.storage
-    .from(BUCKET)
-    .upload(path, blob, { contentType, upsert: true });
-  if (uploadError) {
-    console.error(`Upload error (${suffix}):`, uploadError);
+async function uploadViaFunction(
+  blob: Blob,
+  bookingId: string,
+  suffix: "pdf" | "docx",
+  contentType: string,
+  phone: string,
+  email: string,
+): Promise<string | null> {
+  try {
+    const fileBase64 = await blobToBase64(blob);
+    const { data, error } = await supabase.functions.invoke("customer-booking", {
+      body: {
+        action: "upload_contract",
+        bookingId, phone, email,
+        fileBase64, suffix, contentType,
+      },
+    });
+    if (error) throw error;
+    if (data?.error) throw new Error(data.error);
+    return data?.url ?? null;
+  } catch (err) {
+    console.error(`Upload error (${suffix}):`, err);
     return null;
   }
-  const { data: signed, error: signError } = await supabase.storage
-    .from(BUCKET)
-    .createSignedUrl(path, SIGNED_URL_TTL);
-  if (signError || !signed?.signedUrl) {
-    console.error(`Signed URL error (${suffix}):`, signError);
-    return null;
-  }
-  return signed.signedUrl;
 }
 
 /**
- * Generate, upload PDF + DOCX and return signed URLs for both.
+ * Generate, upload PDF + DOCX (via edge function with service role) and return signed URLs.
  */
 export async function uploadBothContractsForBooking(
   state: BookingState,
@@ -37,12 +50,15 @@ export async function uploadBothContractsForBooking(
   const data = buildContractData(state);
   if (!data) return { pdfUrl: null, docxUrl: null };
 
+  const phone = state.phone.trim();
+  const email = state.email.trim();
+
   let pdfUrl: string | null = null;
   let docxUrl: string | null = null;
 
   try {
     const pdf = generateContract(data, { autoDownload: false });
-    pdfUrl = await uploadAndSign(pdf.blob, bookingId, "pdf", "application/pdf");
+    pdfUrl = await uploadViaFunction(pdf.blob, bookingId, "pdf", "application/pdf", phone, email);
     URL.revokeObjectURL(pdf.blobUrl);
   } catch (err) {
     console.error("PDF generation failed:", err);
@@ -50,11 +66,10 @@ export async function uploadBothContractsForBooking(
 
   try {
     const docx = await generateContractDocx(data);
-    docxUrl = await uploadAndSign(
-      docx.blob,
-      bookingId,
-      "docx",
+    docxUrl = await uploadViaFunction(
+      docx.blob, bookingId, "docx",
       "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+      phone, email,
     );
   } catch (err) {
     console.error("DOCX generation failed:", err);
