@@ -207,13 +207,18 @@ const BookingPage = () => {
         if (bookingId) {
           const { pdfUrl, docxUrl } = await uploadBothContractsForBooking(state, bookingId);
           if (pdfUrl || docxUrl) {
-            const update: Record<string, string> = {};
-            if (pdfUrl) update.contract_url = pdfUrl;
-            if (docxUrl) update.contract_docx_url = docxUrl;
-            await supabase
-              .from("bookings" as any)
-              .update(update as any)
-              .eq("id", bookingId);
+            const updates: Record<string, string> = {};
+            if (pdfUrl) updates.contract_url = pdfUrl;
+            if (docxUrl) updates.contract_docx_url = docxUrl;
+            await supabase.functions.invoke("customer-booking", {
+              body: {
+                action: "update",
+                bookingId,
+                phone: state.phone.trim(),
+                email: state.email.trim(),
+                updates,
+              },
+            });
           }
 
           // Notify administrator (3d.drive@mail.ru) — fire-and-forget

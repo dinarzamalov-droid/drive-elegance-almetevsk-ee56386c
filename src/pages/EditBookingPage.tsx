@@ -22,17 +22,17 @@ const EditBookingPage = () => {
     }
     setLoading(true);
     try {
-      let query = supabase.from("bookings").select("*").order("created_at", { ascending: false }).limit(1);
-      if (phone.trim()) query = query.eq("phone", phone.trim());
-      if (email.trim()) query = query.eq("email", email.trim());
-      const { data, error } = await query;
+      const { data, error } = await supabase.functions.invoke("customer-booking", {
+        body: { action: "get", phone: phone.trim(), email: email.trim() },
+      });
       if (error) throw error;
-      if (!data || data.length === 0) {
+      if (data?.error) throw new Error(data.error);
+      const b = data?.booking;
+      if (!b) {
         toast.error("Бронирование не найдено");
         setBooking(null);
         return;
       }
-      const b = data[0];
       setBooking(b);
       setForm({ phone: b.phone, email: b.email, delivery_time: b.delivery_time || "", city: b.city });
       setEditing(false);
@@ -47,16 +47,22 @@ const EditBookingPage = () => {
     if (!booking) return;
     setLoading(true);
     try {
-      const { error } = await supabase
-        .from("bookings")
-        .update({
-          phone: form.phone,
-          email: form.email,
-          delivery_time: form.delivery_time,
-          city: form.city,
-        })
-        .eq("id", booking.id);
+      const { data, error } = await supabase.functions.invoke("customer-booking", {
+        body: {
+          action: "update",
+          bookingId: booking.id,
+          phone: booking.phone,
+          email: booking.email,
+          updates: {
+            phone: form.phone,
+            email: form.email,
+            delivery_time: form.delivery_time,
+            city: form.city,
+          },
+        },
+      });
       if (error) throw error;
+      if (data?.error) throw new Error(data.error);
       setBooking({ ...booking, ...form });
       setEditing(false);
       toast.success("Бронирование обновлено!");
