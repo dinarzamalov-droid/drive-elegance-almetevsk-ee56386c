@@ -29,10 +29,20 @@ const Row = ({ label, value, bold }: { label: string; value: string; bold?: bool
 
 const AdminBookings = ({ bookings, onUpdateStatus, onRefresh }: Props) => {
   const [search, setSearch] = useState("");
+  const [carFilter, setCarFilter] = useState("");
+  const [phoneFilter, setPhoneFilter] = useState("");
+  const [dateFrom, setDateFrom] = useState("");
+  const [dateTo, setDateTo] = useState("");
   const [selected, setSelected] = useState<Booking | null>(null);
   const [generatingId, setGeneratingId] = useState<string | null>(null);
   const [syncing, setSyncing] = useState(false);
   const [downloadingContracts, setDownloadingContracts] = useState(false);
+
+  const uniqueCars = Array.from(new Set(bookings.map((b) => b.car_label))).sort();
+  const hasFilters = !!(search || carFilter || phoneFilter || dateFrom || dateTo);
+  const resetFilters = () => {
+    setSearch(""); setCarFilter(""); setPhoneFilter(""); setDateFrom(""); setDateTo("");
+  };
 
   const handleRegenerate = async (booking: Booking) => {
     setGeneratingId(booking.id);
@@ -59,9 +69,19 @@ const AdminBookings = ({ bookings, onUpdateStatus, onRefresh }: Props) => {
     }
   };
 
+  const normalizePhone = (p: string) => p.replace(/\D/g, "");
+
   const filtered = bookings.filter((b) => {
     const q = search.toLowerCase();
-    return !q || b.last_name.toLowerCase().includes(q) || b.first_name.toLowerCase().includes(q) || b.car_label.toLowerCase().includes(q) || b.phone.includes(q) || b.email.toLowerCase().includes(q);
+    if (q && !(b.last_name.toLowerCase().includes(q) || b.first_name.toLowerCase().includes(q) || b.car_label.toLowerCase().includes(q) || b.phone.includes(q) || b.email.toLowerCase().includes(q))) return false;
+    if (carFilter && b.car_label !== carFilter) return false;
+    if (phoneFilter) {
+      const np = normalizePhone(phoneFilter);
+      if (np && !normalizePhone(b.phone).includes(np)) return false;
+    }
+    if (dateFrom && b.date_to < dateFrom) return false;
+    if (dateTo && b.date_from > dateTo) return false;
+    return true;
   });
 
   const exportCsv = () => {
