@@ -5,8 +5,10 @@ import heroBg from "@/assets/hero-bg.jpg";
 import bmwImg from "@/assets/bmw-420i.jpg";
 import porscheImg from "@/assets/porsche-macan.jpg";
 import mercedesImg from "@/assets/mercedes-glb.jpg";
+import rangeroverImg from "@/assets/rangerover-1.jpg";
+import lixiangImg from "@/assets/lixiang-1.jpg";
 
-const slides = [heroBg, bmwImg, porscheImg, mercedesImg];
+const slides = [heroBg, bmwImg, porscheImg, mercedesImg, rangeroverImg, lixiangImg];
 
 const messengerOptions = [
   { key: "whatsapp", label: "WhatsApp", href: "https://wa.me/79868262332", icon: Phone, color: "bg-[#25D366]" },
