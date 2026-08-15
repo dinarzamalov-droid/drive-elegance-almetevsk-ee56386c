@@ -1,4 +1,6 @@
 import { useState, useEffect } from "react";
+import SmartImage from "@/components/SmartImage";
+import { bestSource } from "@/lib/imageSources";
 import { Link } from "react-router-dom";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import bmwImg from "@/assets/bmw-420i.jpg";
