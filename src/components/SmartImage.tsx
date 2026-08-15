@@ -28,8 +28,8 @@ const SmartImage = ({ src, alt, priority = false, ...rest }: Props) => {
 
   return (
     <picture>
-      <source srcSet={modern.avif} type="image/avif" />
-      <source srcSet={modern.webp} type="image/webp" />
+      {modern.avif && <source srcSet={modern.avif} type="image/avif" />}
+      {modern.webp && <source srcSet={modern.webp} type="image/webp" />}
       {img}
     </picture>
   );
