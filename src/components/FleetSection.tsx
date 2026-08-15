@@ -78,6 +78,40 @@ const cars = [
 
 const CarImageCarousel = ({ images, name }: { images: string[]; name: string }) => {
   const [current, setCurrent] = useState(0);
+  // Первый кадр грузим сразу, соседние — заранее, остальные — по мере необходимости
+  const [loaded, setLoaded] = useState<number[]>(() => [0, 1]);
+
+  useEffect(() => {
+    const next = (current + 1) % images.length;
+    const prev = (current - 1 + images.length) % images.length;
+    setLoaded((prevLoaded) => {
+      const merged = new Set(prevLoaded);
+      [current, next, prev].forEach((i) => merged.add(i));
+      return merged.size === prevLoaded.length ? prevLoaded : Array.from(merged);
+    });
+    // тёплый прогрев следующего кадра в кэше браузера
+    const img = new Image();
+    img.src = images[next];
+  }, [current, images]);
+
+  // Догружаем остальные кадры в простое время, чтобы листание было мгновенным
+  useEffect(() => {
+    const idle = (cb: () => void) =>
+      "requestIdleCallback" in window
+        ? (window as any).requestIdleCallback(cb, { timeout: 3000 })
+        : window.setTimeout(cb, 1500);
+    const id = idle(() => {
+      images.forEach((src) => {
+        const img = new Image();
+        img.src = src;
+      });
+      setLoaded(images.map((_, i) => i));
+    });
+    return () => {
+      if ("cancelIdleCallback" in window) (window as any).cancelIdleCallback(id);
+      else clearTimeout(id);
+    };
+  }, [images]);
 
   if (images.length === 1) {
     return (
@@ -86,27 +120,29 @@ const CarImageCarousel = ({ images, name }: { images: string[]; name: string }) 
         alt={name}
         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
         loading="lazy"
-        width={1920}
-        height={1080}
+        decoding="async"
       />
     );
   }
 
   return (
     <div className="relative w-full h-full">
-      {images.map((src, i) => (
-        <img
-          key={i}
-          src={src}
-          alt={`${name} ${i + 1}`}
-          className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-500 ${
-            current === i ? "opacity-100" : "opacity-0"
-          }`}
-          loading="lazy"
-          width={1920}
-          height={1080}
-        />
-      ))}
+      {images.map((src, i) =>
+        loaded.includes(i) ? (
+          <img
+            key={i}
+            src={src}
+            alt={`${name} ${i + 1}`}
+            className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-500 ${
+              current === i ? "opacity-100" : "opacity-0"
+            }`}
+            loading={i === 0 ? "eager" : "lazy"}
+            fetchPriority={i === 0 ? "high" : "low"}
+            decoding="async"
+          />
+        ) : null
+      )}
+
       <button
         onClick={(e) => {
           e.preventDefault();
