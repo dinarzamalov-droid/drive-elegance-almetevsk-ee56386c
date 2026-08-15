@@ -43,9 +43,10 @@ const HeroSection = () => {
   }, []);
 
   useEffect(() => {
-    const timer = setInterval(() => setCurrent((p) => (p + 1) % slides.length), 5000);
+    const timer = setInterval(() => setCurrent((p) => (p + 1) % slides.length), 4000);
     return () => clearInterval(timer);
   }, []);
+
 
   return (
     <section className="relative h-screen overflow-hidden">
