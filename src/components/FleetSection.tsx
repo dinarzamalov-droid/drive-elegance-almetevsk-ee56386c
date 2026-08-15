@@ -25,6 +25,12 @@ import lixiang3 from "@/assets/lixiang-3.jpg";
 import lixiang4 from "@/assets/lixiang-4.jpg";
 import lixiang5 from "@/assets/lixiang-5.jpg";
 import lixiang6 from "@/assets/lixiang-6.jpg";
+import rr1 from "@/assets/rangerover-1.jpg";
+import rr2 from "@/assets/rangerover-2.jpg";
+import rr3 from "@/assets/rangerover-3.jpg";
+import rr4 from "@/assets/rangerover-4.jpg";
+import rr5 from "@/assets/rangerover-5.jpg";
+import rr6 from "@/assets/rangerover-6.jpg";
 import AnimatedSection, { AnimatedItem } from "./AnimatedSection";
 
 const cars = [
@@ -59,6 +65,14 @@ const cars = [
     deposit: "35 000",
     specs: "449 л.с., гибрид, полный привод, премиум-кроссовер",
     description: "Технологичный премиум-кроссовер. Гибрид, мощный, стильный серый цвет",
+  },
+  {
+    name: "Range Rover Sport",
+    images: [rr1, rr2, rr3, rr4, rr5, rr6],
+    price: "20 000",
+    deposit: "40 000",
+    specs: "340 л.с., полный привод, бензин АИ-100, 5 мест",
+    description: "Флагманский британский SUV: красный кожаный салон, панорама, максимум статуса",
   },
 ];
 
@@ -167,7 +181,7 @@ const FleetSection = () => {
                     </div>
                   </div>
                   <Link
-                    to={`/booking?car=${encodeURIComponent(car.name === "BMW 420i" ? "bmw-420i" : car.name === "Porsche Macan" ? "porsche-macan" : car.name === "Mercedes GLB" ? "mercedes-glb" : "lixiang-l6")}`}
+                    to={`/booking?car=${encodeURIComponent(car.name === "BMW 420i" ? "bmw-420i" : car.name === "Porsche Macan" ? "porsche-macan" : car.name === "Mercedes GLB" ? "mercedes-glb" : car.name === "Range Rover Sport" ? "range-rover-sport" : "lixiang-l6")}`}
                     className="block w-full rounded-lg bg-gradient-gold py-3 text-center text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90"
                   >
                     Забронировать

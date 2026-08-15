@@ -53,6 +53,16 @@ const carDetails: Record<string, {
     trunk: "607 л",
     features: ["Гибрид", "Автопилот", "Экран 15\"", "Массаж сидений"],
   },
+  "range-rover-sport": {
+    power: "340 л.с.",
+    acceleration: "6,5 сек",
+    drive: "Полный (AWD)",
+    seats: 5,
+    fuelType: "АИ-100",
+    consumption: "13 л/100 км",
+    trunk: "780 л",
+    features: ["Премиум SUV", "Красный кожаный салон", "Панорамная крыша", "Мониторы для пассажиров"],
+  },
 };
 
 const specs: { key: string; label: string; icon: React.ElementType; getValue: (carValue: string) => string }[] = [
