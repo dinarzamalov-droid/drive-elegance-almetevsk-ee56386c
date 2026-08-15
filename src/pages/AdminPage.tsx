@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Lock, LogOut, RefreshCw, RotateCcw, BarChart3, CalendarDays, Users, Car, Crown, Bell, Mail } from "lucide-react";
+import { Lock, LogOut, RefreshCw, RotateCcw, BarChart3, CalendarDays, Users, Car, Crown, Bell, Mail, Briefcase } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import AdminAnalytics from "@/components/admin/AdminAnalytics";
@@ -10,6 +10,7 @@ import AdminClients from "@/components/admin/AdminClients";
 import AdminFleet from "@/components/admin/AdminFleet";
 import AdminLoyalty from "@/components/admin/AdminLoyalty";
 import AdminFeed from "@/components/admin/AdminFeed";
+import AdminCorporate from "@/components/admin/AdminCorporate";
 import type { Booking, FleetCar, Client } from "@/components/admin/types";
 
 const tabs = [
@@ -17,6 +18,7 @@ const tabs = [
   { id: "bookings", label: "Бронирования", icon: CalendarDays },
   { id: "clients", label: "Клиенты", icon: Users },
   { id: "fleet", label: "Автопарк", icon: Car },
+  { id: "corporate", label: "Корп. заявки", icon: Briefcase },
   { id: "loyalty", label: "Лояльность", icon: Crown },
   { id: "feed", label: "Лента", icon: Bell },
 ];
@@ -233,6 +235,7 @@ const AdminPage = () => {
           {activeTab === "clients" && <AdminClients clients={clients} bookings={bookings} onUpdateClient={updateClient} />}
           {activeTab === "fleet" && <AdminFleet fleet={fleet} onUpdateFleet={updateFleet} />}
           {activeTab === "loyalty" && <AdminLoyalty clients={clients} onAddBonus={addBonus} />}
+          {activeTab === "corporate" && <AdminCorporate />}
           {activeTab === "feed" && <AdminFeed bookings={bookings} />}
         </div>
       </div>
