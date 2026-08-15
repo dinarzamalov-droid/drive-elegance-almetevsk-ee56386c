@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import SmartImage from "@/components/SmartImage";
 import { ChevronLeft, ChevronRight, Phone, Send, MessageCircle, ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 import heroBg from "@/assets/hero-bg.jpg";
@@ -56,15 +57,14 @@ const HeroSection = () => {
           className="absolute inset-0 transition-opacity duration-1000"
           style={{ opacity: current === i ? 1 : 0 }}
         >
-          <img
+          <SmartImage
             src={src}
             alt="Premium car"
             className="w-full h-full object-cover"
             style={{ animation: current === i ? "heroZoom 8s ease-out forwards" : "none" }}
             width={1920}
             height={1080}
-            loading={i === 0 ? "eager" : "lazy"}
-            {...{ fetchpriority: i === 0 ? "high" : "low" }}
+            priority={i === 0}
             decoding={i === 0 ? "sync" : "async"}
           />
         </div>
