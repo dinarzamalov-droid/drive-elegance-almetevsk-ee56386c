@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import bmwImg from "@/assets/bmw-420i.jpg";
@@ -99,7 +99,7 @@ const CarImageCarousel = ({ images, name }: { images: string[]; name: string }) 
     const idle = (cb: () => void) =>
       "requestIdleCallback" in window
         ? (window as any).requestIdleCallback(cb, { timeout: 3000 })
-        : window.setTimeout(cb, 1500);
+        : (setTimeout(cb, 1500) as unknown as number);
     const id = idle(() => {
       images.forEach((src) => {
         const img = new Image();
