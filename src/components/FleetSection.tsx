@@ -89,9 +89,9 @@ const CarImageCarousel = ({ images, name }: { images: string[]; name: string }) 
       [current, next, prev].forEach((i) => merged.add(i));
       return merged.size === prevLoaded.length ? prevLoaded : Array.from(merged);
     });
-    // тёплый прогрев следующего кадра в кэше браузера
+    // тёплый прогрев следующего кадра в кэше браузера (в лучшем формате)
     const img = new Image();
-    img.src = images[next];
+    img.src = bestSource(images[next]);
   }, [current, images]);
 
   // Догружаем остальные кадры в простое время, чтобы листание было мгновенным
@@ -103,7 +103,7 @@ const CarImageCarousel = ({ images, name }: { images: string[]; name: string }) 
     const id = idle(() => {
       images.forEach((src) => {
         const img = new Image();
-        img.src = src;
+        img.src = bestSource(src);
       });
       setLoaded(images.map((_, i) => i));
     });
@@ -115,12 +115,10 @@ const CarImageCarousel = ({ images, name }: { images: string[]; name: string }) 
 
   if (images.length === 1) {
     return (
-      <img
+      <SmartImage
         src={images[0]}
         alt={name}
         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
-        loading="lazy"
-        decoding="async"
       />
     );
   }
@@ -129,19 +127,18 @@ const CarImageCarousel = ({ images, name }: { images: string[]; name: string }) 
     <div className="relative w-full h-full">
       {images.map((src, i) =>
         loaded.includes(i) ? (
-          <img
+          <SmartImage
             key={i}
             src={src}
             alt={`${name} ${i + 1}`}
+            priority={i === 0}
             className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-500 ${
               current === i ? "opacity-100" : "opacity-0"
             }`}
-            loading={i === 0 ? "eager" : "lazy"}
-            {...{ fetchpriority: i === 0 ? "high" : "low" }}
-            decoding="async"
           />
         ) : null
       )}
+
 
       <button
         onClick={(e) => {
