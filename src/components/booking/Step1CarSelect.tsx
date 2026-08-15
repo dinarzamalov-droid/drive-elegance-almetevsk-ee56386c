@@ -4,12 +4,14 @@ import bmwImg from "@/assets/bmw-420i.jpg";
 import porsche1 from "@/assets/porsche-1.jpg";
 import mercedes1 from "@/assets/mercedes-1.jpg";
 import lixiang1 from "@/assets/lixiang-1.jpg";
+import rangerover1 from "@/assets/rangerover-1.jpg";
 
 const carImages: Record<string, string> = {
   "bmw-420i": bmwImg,
   "porsche-macan": porsche1,
   "mercedes-glb": mercedes1,
   "lixiang-l6": lixiang1,
+  "range-rover-sport": rangerover1,
 };
 
 interface Step1Props {
