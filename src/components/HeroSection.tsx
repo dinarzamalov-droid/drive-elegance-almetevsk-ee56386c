@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import SmartImage from "@/components/SmartImage";
 import { ChevronLeft, ChevronRight, Phone, Send, MessageCircle, ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 import heroBg from "@/assets/hero-bg.jpg";
