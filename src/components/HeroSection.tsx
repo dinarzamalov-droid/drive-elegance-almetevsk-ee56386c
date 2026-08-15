@@ -8,7 +8,17 @@ import mercedesImg from "@/assets/mercedes-glb.jpg";
 import rangeroverImg from "@/assets/rangerover-1.jpg";
 import lixiangImg from "@/assets/lixiang-1.jpg";
 
-const slides = [heroBg, bmwImg, porscheImg, mercedesImg, rangeroverImg, lixiangImg];
+const slides = [
+  rangeroverImg,
+  heroBg,
+  lixiangImg,
+  bmwImg,
+  rangeroverImg,
+  porscheImg,
+  lixiangImg,
+  mercedesImg,
+];
+
 
 const messengerOptions = [
   { key: "whatsapp", label: "WhatsApp", href: "https://wa.me/79868262332", icon: Phone, color: "bg-[#25D366]" },
@@ -33,9 +43,10 @@ const HeroSection = () => {
   }, []);
 
   useEffect(() => {
-    const timer = setInterval(() => setCurrent((p) => (p + 1) % slides.length), 5000);
+    const timer = setInterval(() => setCurrent((p) => (p + 1) % slides.length), 4000);
     return () => clearInterval(timer);
   }, []);
+
 
   return (
     <section className="relative h-screen overflow-hidden">
