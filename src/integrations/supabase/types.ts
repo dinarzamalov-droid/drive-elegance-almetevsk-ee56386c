@@ -185,6 +185,51 @@ export type Database = {
         }
         Relationships: []
       }
+      corporate_requests: {
+        Row: {
+          company: string
+          contact_name: string
+          created_at: string
+          deferred_payment: boolean
+          email: string | null
+          id: string
+          inn: string | null
+          message: string | null
+          need_docs: boolean
+          phone: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          company: string
+          contact_name: string
+          created_at?: string
+          deferred_payment?: boolean
+          email?: string | null
+          id?: string
+          inn?: string | null
+          message?: string | null
+          need_docs?: boolean
+          phone: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          company?: string
+          contact_name?: string
+          created_at?: string
+          deferred_payment?: boolean
+          email?: string | null
+          id?: string
+          inn?: string | null
+          message?: string | null
+          need_docs?: boolean
+          phone?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       email_send_log: {
         Row: {
           created_at: string

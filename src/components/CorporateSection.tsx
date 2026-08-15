@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { Building2, FileText, Send } from "lucide-react";
+import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 import MessengerSelect from "./MessengerSelect";
 import { MessengerType, openMessenger } from "@/lib/messengerUtils";
 import AnimatedSection, { AnimatedItem } from "./AnimatedSection";
@@ -17,18 +19,65 @@ const CorporateSection = () => {
   });
   const [messenger, setMessenger] = useState<MessengerType>("whatsapp");
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const [submitting, setSubmitting] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!form.company.trim() || !form.contact.trim() || !form.phone.trim()) return;
+    setSubmitting(true);
 
     const docsLine = form.needDocs ? "Нужны закрывающие документы" : "";
     const deferredLine = form.deferred ? "Нужна отсрочка платежа" : "";
     const extras = [docsLine, deferredLine].filter(Boolean).join(", ");
 
     const text =
-      `Корпоративная заявка с сайта 3D Drive\n\nКомпания: ${form.company}\nИНН: ${form.inn || "не указан"}\nКонтактное лицо: ${form.contact}\nТелефон: ${form.phone}\nEmail: ${form.email || "не указан"}${extras ? `\n\n${extras}` : ""}${form.message ? `\n\nСообщение: ${form.message}` : ""}`
-    ;
-    openMessenger(messenger, text);
+      `Корпоративная заявка с сайта 3D Drive\n\nКомпания: ${form.company}\nИНН: ${form.inn || "не указан"}\nКонтактное лицо: ${form.contact}\nТелефон: ${form.phone}\nEmail: ${form.email || "не указан"}${extras ? `\n\n${extras}` : ""}${form.message ? `\n\nСообщение: ${form.message}` : ""}`;
+
+    try {
+      const { data, error } = await supabase
+        .from("corporate_requests")
+        .insert({
+          company: form.company.trim(),
+          inn: form.inn.trim() || null,
+          contact_name: form.contact.trim(),
+          phone: form.phone.trim(),
+          email: form.email.trim() || null,
+          need_docs: form.needDocs,
+          deferred_payment: form.deferred,
+          message: form.message.trim() || null,
+        })
+        .select("id")
+        .single();
+      if (error) throw error;
+
+      toast.success("Заявка отправлена — мы свяжемся с вами в течение часа");
+
+      supabase.functions
+        .invoke("send-transactional-email", {
+          body: {
+            templateName: "admin-corporate-request",
+            idempotencyKey: `corporate-request-${data?.id ?? Date.now()}`,
+            templateData: {
+              company: form.company.trim(),
+              inn: form.inn.trim(),
+              contactName: form.contact.trim(),
+              phone: form.phone.trim(),
+              clientEmail: form.email.trim(),
+              needDocs: form.needDocs,
+              deferredPayment: form.deferred,
+              message: form.message.trim(),
+              createdAt: new Date().toLocaleString("ru-RU"),
+            },
+          },
+        })
+        .catch((err) => console.error("Corporate email send failed:", err));
+    } catch (err) {
+      console.error("Corporate request save failed:", err);
+      toast.error("Не удалось сохранить заявку — отправьте её через мессенджер");
+    } finally {
+      setSubmitting(false);
+      openMessenger(messenger, text);
+    }
   };
 
   const inputClass =
@@ -181,9 +230,10 @@ const CorporateSection = () => {
 
               <button
                 type="submit"
-                className="w-full bg-gradient-gold text-primary-foreground py-3 rounded-lg font-semibold text-sm hover:opacity-90 transition-opacity"
+                disabled={submitting}
+                className="w-full bg-gradient-gold text-primary-foreground py-3 rounded-lg font-semibold text-sm hover:opacity-90 transition-opacity disabled:opacity-60"
               >
-                Запросить коммерческое предложение
+                {submitting ? "Отправляем…" : "Запросить коммерческое предложение"}
               </button>
             </form>
           </AnimatedItem>
