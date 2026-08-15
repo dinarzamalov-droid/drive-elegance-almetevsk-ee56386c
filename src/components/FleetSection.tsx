@@ -137,7 +137,7 @@ const CarImageCarousel = ({ images, name }: { images: string[]; name: string }) 
               current === i ? "opacity-100" : "opacity-0"
             }`}
             loading={i === 0 ? "eager" : "lazy"}
-            fetchPriority={i === 0 ? "high" : "low"}
+            {...{ fetchpriority: i === 0 ? "high" : "low" }}
             decoding="async"
           />
         ) : null
