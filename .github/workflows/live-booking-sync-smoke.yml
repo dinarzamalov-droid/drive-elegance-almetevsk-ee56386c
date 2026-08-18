@@ -58,15 +58,17 @@ jobs:
           }
           JSON
           for N in 1 2; do
-            curl --fail-with-body -sS \
+            HTTP_CODE=$(curl -sS -o "/tmp/response${N}.json" -w '%{http_code}' \
               -X POST "$SUPABASE_URL/functions/v1/sync-google-sheets" \
               -H "apikey: $SUPABASE_KEY" \
               -H "Authorization: Bearer $SUPABASE_KEY" \
               -H "Content-Type: application/json" \
-              --data-binary @/tmp/payload.json > "/tmp/response${N}.json"
+              --data-binary @/tmp/payload.json)
+            echo "HTTP $N: $HTTP_CODE"
             echo "Response $N:"
             cat "/tmp/response${N}.json"
             echo
+            if [ "$HTTP_CODE" -ge 400 ]; then exit 22; fi
           done
           grep -q '"success":true' /tmp/response1.json
           grep -Eq '"action":"(inserted|updated)"' /tmp/response1.json
